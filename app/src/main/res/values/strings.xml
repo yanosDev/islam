@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Islam</string>
+    <string name="tab_topic">Topics</string>
+    <string name="tab_quiz">Quiz</string>
+</resources>
