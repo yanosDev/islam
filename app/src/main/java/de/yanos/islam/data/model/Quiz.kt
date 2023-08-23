@@ -5,8 +5,8 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class Quiz(
-    @PrimaryKey val id: String,
-    val topicId: String,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val topicId: Int,
     val question: String,
     val answer: String,
     val difficulty: Int

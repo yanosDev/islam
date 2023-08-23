@@ -1,8 +1,15 @@
 package de.yanos.islam.data.database.dao
 
 import androidx.room.Dao
+import androidx.room.Query
 import de.yanos.islam.data.model.Topic
+import kotlinx.coroutines.flow.Flow
 
 @Dao
-abstract class TopicDao : BaseDao<Topic> {
+interface TopicDao : BaseDao<Topic> {
+    @Query("SELECT * FROM Topic WHERE LOWER(title) LIKE LOWER(:title)")
+    suspend fun loadMainTopicByTitle(title: String): Topic?
+
+    @Query("SELECT * FROM Topic WHERE parentTopicId IS NULL")
+    fun loadAllMainTopics(): Flow<List<Topic>>
 }

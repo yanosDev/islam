@@ -4,5 +4,5 @@ import androidx.room.Dao
 import de.yanos.islam.data.model.Quiz
 
 @Dao
-abstract class QuizDao : BaseDao<Quiz> {
+interface QuizDao : BaseDao<Quiz> {
 }

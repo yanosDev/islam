@@ -65,5 +65,8 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     kapt(libs.androidx.room.compiler)
 
+    //Splash
+    implementation(libs.splash)
+
     implementation(libs.lottie)
 }
