@@ -16,6 +16,9 @@ import androidx.compose.material.icons.filled.Inbox
 import androidx.compose.material.icons.filled.Notes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageShader
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.unit.dp
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -28,6 +31,9 @@ import de.yanos.core.ui.theme.AppTheme
 import de.yanos.core.ui.view.DynamicNavigationScreen
 import de.yanos.core.utils.NavigationDestination
 import de.yanos.islam.ui.TopicView
+import de.yanos.islam.util.MustophaTypography
+import de.yanos.islam.util.SabanaTypography
+import de.yanos.islam.util.SirajunTypography
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -37,7 +43,7 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         setContent {
-            AppTheme(activity = this) { modifier, config ->
+            AppTheme(activity = this, typography = SirajunTypography) { modifier, config ->
                 val navController = rememberNavController()
                 DynamicNavigationScreen(
                     modifier = modifier.padding(top = 48.dp), // TODO: Check statusbar problem

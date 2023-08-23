@@ -16,7 +16,7 @@ data class Topic(
 enum class TopicResource(val id: Int, val title: String, val raw: Int? = null, val parent: Int? = null) {
     ITIKAT(id = 0, title = "Itikat/Iman"),
     IBADET(id = 1, title = "Ibadet"),
-    HAYAT(id = 2, title = "Pegamber Efendimizin Hayati (Siyer-i Nebî)", raw = R.raw.hayat),
+    HAYAT(id = 2, title = "Peygamber Efendimizin Hayati (Siyer-i Nebî)", raw = R.raw.hayat),
     AHLAK(id = 3, title = "Ahlak", raw = R.raw.ahlak),
     KULTUR(id = 4, title = "Genel Kültür", raw = R.raw.kultur_genel),
     FARZ(id = 5, title = "32 Farz", raw = R.raw.farz),
