@@ -7,6 +7,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.ImageShader
 import androidx.compose.ui.graphics.Paint
@@ -36,7 +37,7 @@ fun PatternedBackgroung(
     }
 }
 
-
+val goldColor = Color(android.graphics.Color.parseColor("#FFD700"))
 @Composable
 fun BackGroundPattern(modifier: Modifier = Modifier) {
     val pattern = ImageBitmap.imageResource(R.drawable.pattern_2)

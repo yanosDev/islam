@@ -38,6 +38,7 @@ import com.airbnb.lottie.compose.rememberLottieDynamicProperty
 import de.yanos.islam.R
 import de.yanos.islam.data.model.Topic
 import de.yanos.islam.util.PatternedBackgroung
+import de.yanos.islam.util.goldColor
 
 @Preview
 @Composable
@@ -111,7 +112,7 @@ fun TopicList(modifier: Modifier = Modifier, topics: List<Topic>) {
                     .padding(vertical = 4.dp)
                     .fillMaxWidth(),
                 shape = CutCornerShape(8.dp),
-                border = BorderStroke(1.dp, Color(android.graphics.Color.parseColor("#FFD700"))),
+                border = BorderStroke(1.dp, goldColor),
                 onClick = {},
             ) {
                 Text(text = topic.title, style = MaterialTheme.typography.headlineMedium)
