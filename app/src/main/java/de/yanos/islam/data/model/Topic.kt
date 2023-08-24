@@ -9,7 +9,8 @@ data class Topic(
     @PrimaryKey val id: Int,
     val title: String,
     val ordinal: Int,
-    val parentTopicId: Int?
+    val parentTopicId: Int?,
+    val hasSubTopics: Boolean
 )
 
 

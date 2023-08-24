@@ -30,6 +30,9 @@ internal class AppModule {
     fun provideTopicDao(db:IslamDatabase) = db.topicDao()
     @Provides
     @Singleton
+    fun provideQuizDao(db:IslamDatabase) = db.quizDao()
+    @Provides
+    @Singleton
     @IODispatcher
     fun provideIODispatcher() = Dispatchers.IO
     @Provides

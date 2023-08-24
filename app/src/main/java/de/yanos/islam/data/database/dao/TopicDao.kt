@@ -12,4 +12,7 @@ interface TopicDao : BaseDao<Topic> {
 
     @Query("SELECT * FROM Topic WHERE parentTopicId IS NULL")
     fun loadAllMainTopics(): Flow<List<Topic>>
+
+    @Query("SELECT * FROM Topic WHERE parentTopicId LIKE :id")
+    fun loadSubTopics(id: Int): Flow<List<Topic>>
 }

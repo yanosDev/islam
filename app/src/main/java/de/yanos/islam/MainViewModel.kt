@@ -48,12 +48,13 @@ class MainViewModel @Inject constructor(
             topic.raw?.let { raw ->
                 createQuizByTopic(raw, topic.id)
             }
-            db.topicDao().insert(Topic(id = topic.id, title = topic.title, ordinal = topic.ordinal, parentTopicId = topic.parent))
+            db.topicDao().insert(Topic(id = topic.id, title = topic.title, ordinal = topic.ordinal, parentTopicId = topic.parent, hasSubTopics = topic.raw == null))
         }
         appSettings.isDBInitialized = true
     }
 
     private fun createQuizByTopic(@RawRes topicRaw: Int, topicId: Int) {
+        val regex = Regex("""\d+|\D+""")
         val inputStream: InputStream = context.resources.openRawResource(topicRaw)
         val br = BufferedReader(InputStreamReader(inputStream))
         val lines = br.readLines()
@@ -65,7 +66,16 @@ class MainViewModel @Inject constructor(
                     .trim()
                 try {
                     actualLine.split("?").let { (question, answer) ->
-                        db.quizDao().insert(Quiz(question = question, answer = answer, topicId = topicId, difficulty = 0))
+                        val parts = regex.findAll(answer).map { it.groupValues.first() }.toList()
+                        val builder = StringBuilder()
+                        parts.forEach {
+                            val text = it.trim().replace(".", "")
+                            if (text.isNotBlank())
+                                if (it.matches(Regex("""\d+""")))
+                                    builder.append("$text ")
+                                else builder.append("$text\n")
+                        }
+                        db.quizDao().insert(Quiz(question = question, answer = builder.toString(), topicId = topicId, difficulty = 0))
                     }
                 } catch (e: Exception) {
                     Log.e("e", actualLine)
@@ -79,6 +89,6 @@ class MainViewModel @Inject constructor(
         val currentLine = lines[index]
         return if (index == lines.size - 1 || lines[index + 1].trim().startsWith("*")) {
             currentLine
-        } else currentLine + mergeLines(lines, index + 1)
+        } else currentLine.trim() + " " + mergeLines(lines, index + 1).trim()
     }
 }

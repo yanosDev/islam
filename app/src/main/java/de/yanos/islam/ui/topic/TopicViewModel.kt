@@ -1,4 +1,4 @@
-package de.yanos.islam.ui
+package de.yanos.islam.ui.topic
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
@@ -14,14 +14,22 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TopicViewModel @Inject constructor(
-    private val dao: TopicDao,
-    @IODispatcher private val dispatcher: CoroutineDispatcher
+    private val dao: TopicDao
 ) : ViewModel() {
     var state = mutableStateListOf<Topic>()
 
     init {
         viewModelScope.launch {
             dao.loadAllMainTopics().distinctUntilChanged().collect { topics ->
+                state.clear()
+                state.addAll(topics)
+            }
+        }
+    }
+
+    fun loadSubTopic(id: Int) {
+        viewModelScope.launch {
+            dao.loadSubTopics(id).distinctUntilChanged().collect { topics ->
                 state.clear()
                 state.addAll(topics)
             }

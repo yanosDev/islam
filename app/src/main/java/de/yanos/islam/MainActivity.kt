@@ -1,37 +1,33 @@
 package de.yanos.islam
 
-import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.view.View
 import android.view.ViewTreeObserver
-import android.view.animation.AnticipateInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Inbox
 import androidx.compose.material.icons.filled.Notes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageShader
-import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.unit.dp
-import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
 import de.yanos.core.ui.theme.AppTheme
 import de.yanos.core.ui.view.DynamicNavigationScreen
 import de.yanos.core.utils.NavigationDestination
-import de.yanos.islam.ui.TopicView
-import de.yanos.islam.util.MustophaTypography
+import de.yanos.islam.ui.topic.SubTopicView
+import de.yanos.islam.ui.topic.TopicView
+import de.yanos.islam.ui.topic.content.TopicContentView
+import de.yanos.islam.util.KhodjahTypography
 import de.yanos.islam.util.SabanaTypography
 import de.yanos.islam.util.SirajunTypography
 
@@ -43,7 +39,7 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         setContent {
-            AppTheme(activity = this, typography = SirajunTypography) { modifier, config ->
+            AppTheme(activity = this, typography = SabanaTypography) { modifier, config ->
                 val navController = rememberNavController()
                 DynamicNavigationScreen(
                     modifier = modifier.padding(top = 48.dp), // TODO: Check statusbar problem
@@ -89,6 +85,7 @@ private fun IslamNavHost(
     startRoute: String,
     navController: NavHostController,
 ) {
+
     NavHost(
         modifier = modifier,
         navController = navController,
@@ -96,7 +93,29 @@ private fun IslamNavHost(
     ) {
         composable(Routes.TOPICS) {
             TopicView(
-                onTopicSelected = { id: String -> }
+                onOpenQuizByTopic = { topic ->
+                    if (topic.hasSubTopics)
+                        navController.navigate(Routes.SUBTOPICS.replace("{id}", topic.id.toString()))
+                    else
+                        navController.navigate(Routes.TOPIC_CONTENT.replace("{id}", topic.id.toString()))
+                }
+            )
+        }
+        composable(
+            Routes.SUBTOPICS,
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { backStackEntry ->
+            SubTopicView(
+                onTopicClick = { topic -> navController.navigate(Routes.TOPIC_CONTENT.replace("{id}", topic.id.toString())) },
+                topicId = backStackEntry.arguments?.getInt("id")!!
+            )
+        }
+        composable(
+            Routes.TOPIC_CONTENT,
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { backStackEntry ->
+            TopicContentView(
+                topicId = backStackEntry.arguments?.getInt("id")!!
             )
         }
     }
@@ -104,6 +123,8 @@ private fun IslamNavHost(
 
 object Routes {
     internal const val TOPICS = "Topics"
+    internal const val SUBTOPICS = "SubTopics/{id}"
+    internal const val TOPIC_CONTENT = "TopicContent/{id}"
     internal const val QUIZ = "Quiz"
 }
 
