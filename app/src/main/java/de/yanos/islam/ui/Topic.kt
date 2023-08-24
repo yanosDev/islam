@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,9 +25,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import de.yanos.islam.R
 import de.yanos.islam.util.IslamDivider
 
 @Preview
@@ -41,20 +45,26 @@ fun TopicView(
             .fillMaxSize()
             .padding(8.dp)
     ) {
-        LazyColumn(
-            modifier = Modifier.wrapContentHeight(),
-            contentPadding = WindowInsets.statusBars.add(WindowInsets(top = 48.dp)).asPaddingValues(),
-        ) {
-            items(
-                items = vm.state,
-                key = { it.id }
-            ) { topic ->
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(text = topic.title, style = MaterialTheme.typography.headlineMedium)
-                Spacer(modifier = Modifier.height(4.dp))
-                IslamDivider()
-                Spacer(modifier = Modifier.height(4.dp))
+        Box(modifier = Modifier.fillMaxSize()) {
+            LazyColumn(
+                modifier = Modifier
+                    .wrapContentHeight()
+                    .clip(RoundedCornerShape(16.dp)),
+                contentPadding = WindowInsets.statusBars.add(WindowInsets(top = 48.dp)).asPaddingValues(),
+            ) {
+                items(
+                    items = vm.state,
+                    key = { it.id }
+                ) { topic ->
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(text = topic.title, style = MaterialTheme.typography.headlineMedium)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    IslamDivider()
+                    Spacer(modifier = Modifier.height(4.dp))
+                }
             }
+          //  Image(painter = painterResource(id = R.drawable.bg_1), contentDescription = "anything")
+
         }
     }
 }
