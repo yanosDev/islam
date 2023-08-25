@@ -96,13 +96,13 @@ fun TopicList(
             ElevatedButton(
                 modifier = Modifier
                     .animateItemPlacement()
-                    .padding(vertical = 4.dp)
+                    .padding(vertical = 2.dp)
                     .fillMaxWidth(),
                 shape = CutCornerShape(8.dp),
                 border = BorderStroke(1.dp, goldColor),
                 onClick = { onTopicClick(topic) },
             ) {
-                Text(text = topic.title, style = MaterialTheme.typography.headlineMedium)
+                Text(text = topic.title, style = MaterialTheme.typography.labelMedium)
             }
         }
     }

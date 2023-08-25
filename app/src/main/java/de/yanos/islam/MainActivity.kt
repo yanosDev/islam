@@ -27,6 +27,8 @@ import de.yanos.core.utils.NavigationDestination
 import de.yanos.islam.ui.topic.SubTopicView
 import de.yanos.islam.ui.topic.TopicView
 import de.yanos.islam.ui.topic.content.TopicContentView
+import de.yanos.islam.util.AlogicalTypography
+import de.yanos.islam.util.DancingTypography
 import de.yanos.islam.util.KhodjahTypography
 import de.yanos.islam.util.SabanaTypography
 import de.yanos.islam.util.SirajunTypography
@@ -39,7 +41,7 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         setContent {
-            AppTheme(activity = this, typography = SabanaTypography) { modifier, config ->
+            AppTheme(activity = this, typography = AlogicalTypography) { modifier, config ->
                 val navController = rememberNavController()
                 DynamicNavigationScreen(
                     modifier = modifier.padding(top = 48.dp), // TODO: Check statusbar problem

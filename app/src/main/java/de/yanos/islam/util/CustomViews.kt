@@ -78,6 +78,7 @@ fun PatternedBackgroung(
 @Composable
 fun BackGroundPattern(modifier: Modifier = Modifier) {
     val pattern = ImageBitmap.imageResource(R.drawable.pattern_2)
+
     Canvas(
         modifier = modifier.alpha(0.1F)
     ) {

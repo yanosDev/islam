@@ -54,7 +54,7 @@ class MainViewModel @Inject constructor(
     }
 
     private fun createQuizByTopic(@RawRes topicRaw: Int, topicId: Int) {
-        val regex = Regex("""\d+|\D+""")
+        val regex = Regex("""\d+.|\D+""")
         val inputStream: InputStream = context.resources.openRawResource(topicRaw)
         val br = BufferedReader(InputStreamReader(inputStream))
         val lines = br.readLines()
@@ -69,11 +69,12 @@ class MainViewModel @Inject constructor(
                         val parts = regex.findAll(answer).map { it.groupValues.first() }.toList()
                         val builder = StringBuilder()
                         parts.forEach {
-                            val text = it.trim().replace(".", "")
+                            val text = it.trim()
                             if (text.isNotBlank())
-                                if (it.matches(Regex("""\d+""")))
-                                    builder.append("$text ")
-                                else builder.append("$text\n")
+                                when {
+                                    !it.matches(Regex("""\d+.""")) || builder.isEmpty() -> builder.append(" $text")
+                                    else -> builder.append("\n$text ")
+                                }
                         }
                         db.quizDao().insert(Quiz(question = question, answer = builder.toString(), topicId = topicId, difficulty = 0))
                     }

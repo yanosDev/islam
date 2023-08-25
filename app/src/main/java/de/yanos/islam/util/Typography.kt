@@ -24,6 +24,12 @@ val Mustopha = FontFamily(
 val Khodijah = FontFamily(
     Font(R.font.khodijah, FontWeight.Medium)
 )
+val Dancing = FontFamily(
+    Font(R.font.dancing, FontWeight.Normal)
+)
+val Alogical = FontFamily(
+    Font(R.font.dancing, FontWeight.Normal)
+)
 
 val SabanaTypography = Typography(
     displayLarge = TextStyle(
@@ -130,6 +136,231 @@ val SabanaTypography = Typography(
     ),
     labelSmall = TextStyle(
         fontFamily = Sabana,
+        fontWeight = FontWeight.Medium,
+        fontSize = 17.sp,
+        lineHeight = 22.0.sp,
+        letterSpacing = 0.05.sp,
+    ),
+)
+
+
+val AlogicalTypography = Typography(
+    displayLarge = TextStyle(
+        fontFamily = Alogical,
+        fontWeight = FontWeight.Normal,
+        fontSize = 60.sp,
+        lineHeight = 68.0.sp,
+        letterSpacing = (-0.025).sp,
+        shadow = Shadow(
+            offset = Offset(5f, 4f),
+            blurRadius = 10f
+        ),
+    ),
+    displayMedium = TextStyle(
+        fontFamily = Alogical,
+        fontWeight = FontWeight.Normal,
+        fontSize = 48.sp,
+        lineHeight = 56.0.sp,
+        letterSpacing = (-0.025).sp,
+    ),
+    displaySmall = TextStyle(
+        fontFamily = Alogical,
+        fontWeight = FontWeight.Normal,
+        fontSize = 40.sp,
+        lineHeight = 48.0.sp,
+        letterSpacing = 0.0.sp,
+    ),
+    headlineLarge = TextStyle(
+        fontFamily = Alogical,
+        fontWeight = FontWeight.Normal,
+        fontSize = 36.sp,
+        lineHeight = 44.0.sp,
+        letterSpacing = 0.0.sp,
+    ),
+    headlineMedium = TextStyle(
+        fontFamily = Alogical,
+        fontWeight = FontWeight.Medium,
+        fontSize = 32.sp,
+        lineHeight = 40.0.sp,
+        letterSpacing = 0.0.sp,
+    ),
+    headlineSmall = TextStyle(
+        fontFamily = Alogical,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 28.sp,
+        lineHeight = 36.0.sp,
+        letterSpacing = 0.0.sp,
+    ),
+    titleLarge = TextStyle(
+        fontFamily = Alogical,
+        fontWeight = FontWeight.Normal,
+        fontSize = 26.sp,
+        lineHeight = 32.0.sp,
+        letterSpacing = 0.0.sp,
+    ),
+    titleMedium = TextStyle(
+        fontFamily = Alogical,
+        fontWeight = FontWeight.Medium,
+        fontSize = 22.sp,
+        lineHeight = 40.0.sp,
+        letterSpacing = 0.015.sp,
+    ),
+    titleSmall = TextStyle(
+        fontFamily = Alogical,
+        fontWeight = FontWeight.Medium,
+        fontSize = 18.0.sp,
+        lineHeight = 24.0.sp,
+        letterSpacing = 0.01.sp,
+    ),
+    bodyLarge = TextStyle(
+        fontFamily = Alogical,
+        fontWeight = FontWeight.Medium,
+        fontSize = 22.sp,
+        lineHeight = 30.0.sp,
+        letterSpacing = 0.05.sp,
+    ),
+    bodyMedium = TextStyle(
+        fontFamily = Alogical,
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp,
+        lineHeight = 26.0.sp,
+        letterSpacing = 0.05.sp,
+    ),
+    bodySmall = TextStyle(
+        fontFamily = Alogical,
+        fontWeight = FontWeight.Medium,
+        fontSize = 18.sp,
+        lineHeight = 22.0.sp,
+        letterSpacing = 0.05.sp,
+    ),
+    labelLarge = TextStyle(
+        fontFamily = Alogical,
+        fontWeight = FontWeight.Medium,
+        fontSize = 20.sp,
+        lineHeight = 26.0.sp,
+        letterSpacing = 0.05.sp,
+    ),
+    labelMedium = TextStyle(
+        fontFamily = Alogical,
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp,
+        lineHeight = 22.0.sp,
+        letterSpacing = 0.05.sp,
+    ),
+    labelSmall = TextStyle(
+        fontFamily = Alogical,
+        fontWeight = FontWeight.Medium,
+        fontSize = 17.sp,
+        lineHeight = 22.0.sp,
+        letterSpacing = 0.05.sp,
+    ),
+)
+
+val DancingTypography = Typography(
+    displayLarge = TextStyle(
+        fontFamily = Dancing,
+        fontWeight = FontWeight.Normal,
+        fontSize = 60.sp,
+        lineHeight = 68.0.sp,
+        letterSpacing = (-0.025).sp,
+        shadow = Shadow(
+            offset = Offset(5f, 4f),
+            blurRadius = 10f
+        ),
+    ),
+    displayMedium = TextStyle(
+        fontFamily = Dancing,
+        fontWeight = FontWeight.Normal,
+        fontSize = 48.sp,
+        lineHeight = 56.0.sp,
+        letterSpacing = (-0.025).sp,
+    ),
+    displaySmall = TextStyle(
+        fontFamily = Dancing,
+        fontWeight = FontWeight.Normal,
+        fontSize = 40.sp,
+        lineHeight = 48.0.sp,
+        letterSpacing = 0.0.sp,
+    ),
+    headlineLarge = TextStyle(
+        fontFamily = Dancing,
+        fontWeight = FontWeight.Normal,
+        fontSize = 36.sp,
+        lineHeight = 44.0.sp,
+        letterSpacing = 0.0.sp,
+    ),
+    headlineMedium = TextStyle(
+        fontFamily = Dancing,
+        fontWeight = FontWeight.Medium,
+        fontSize = 32.sp,
+        lineHeight = 40.0.sp,
+        letterSpacing = 0.0.sp,
+    ),
+    headlineSmall = TextStyle(
+        fontFamily = Dancing,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 28.sp,
+        lineHeight = 36.0.sp,
+        letterSpacing = 0.0.sp,
+    ),
+    titleLarge = TextStyle(
+        fontFamily = Dancing,
+        fontWeight = FontWeight.Normal,
+        fontSize = 26.sp,
+        lineHeight = 32.0.sp,
+        letterSpacing = 0.0.sp,
+    ),
+    titleMedium = TextStyle(
+        fontFamily = Dancing,
+        fontWeight = FontWeight.Medium,
+        fontSize = 22.sp,
+        lineHeight = 40.0.sp,
+        letterSpacing = 0.015.sp,
+    ),
+    titleSmall = TextStyle(
+        fontFamily = Dancing,
+        fontWeight = FontWeight.Medium,
+        fontSize = 18.0.sp,
+        lineHeight = 24.0.sp,
+        letterSpacing = 0.01.sp,
+    ),
+    bodyLarge = TextStyle(
+        fontFamily = Dancing,
+        fontWeight = FontWeight.Medium,
+        fontSize = 22.sp,
+        lineHeight = 30.0.sp,
+        letterSpacing = 0.05.sp,
+    ),
+    bodyMedium = TextStyle(
+        fontFamily = Dancing,
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp,
+        lineHeight = 26.0.sp,
+        letterSpacing = 0.05.sp,
+    ),
+    bodySmall = TextStyle(
+        fontFamily = Dancing,
+        fontWeight = FontWeight.Medium,
+        fontSize = 18.sp,
+        lineHeight = 22.0.sp,
+        letterSpacing = 0.05.sp,
+    ),
+    labelLarge = TextStyle(
+        fontFamily = Dancing,
+        fontWeight = FontWeight.Medium,
+        fontSize = 20.sp,
+        lineHeight = 26.0.sp,
+        letterSpacing = 0.05.sp,
+    ),
+    labelMedium = TextStyle(
+        fontFamily = Dancing,
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp,
+        lineHeight = 22.0.sp,
+        letterSpacing = 0.05.sp,
+    ),
+    labelSmall = TextStyle(
+        fontFamily = Dancing,
         fontWeight = FontWeight.Medium,
         fontSize = 17.sp,
         lineHeight = 22.0.sp,
