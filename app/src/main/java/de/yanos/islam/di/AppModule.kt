@@ -27,23 +27,30 @@ internal class AppModule {
 
     @Provides
     @Singleton
-    fun provideTopicDao(db:IslamDatabase) = db.topicDao()
+    fun provideTopicDao(db: IslamDatabase) = db.topicDao()
+
     @Provides
     @Singleton
-    fun provideQuizDao(db:IslamDatabase) = db.quizDao()
+    fun provideQuizDao(db: IslamDatabase) = db.quizDao()
+
+    @Provides
+    @Singleton
+    fun provideQuizFormDao(db: IslamDatabase) = db.quizFormDao()
+
     @Provides
     @Singleton
     @IODispatcher
     fun provideIODispatcher() = Dispatchers.IO
+
     @Provides
     @Singleton
     @MainDispatcher
     fun provideMainDispatcher() = Dispatchers.Main
+
     @Provides
     @Singleton
     @DefaultDispatcher
     fun provideDefaultDispatcher() = Dispatchers.Default
-
 
 
 }

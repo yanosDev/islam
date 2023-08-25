@@ -48,8 +48,8 @@ fun QuizList(modifier: Modifier = Modifier, quizList: List<Quiz>) {
     LazyColumn(
         modifier = modifier
             .wrapContentSize()
-            .widthIn(320.dp, 600.dp)
-            .padding(horizontal = 32.dp)
+            .widthIn(320.dp, 800.dp)
+            .padding(start = 32.dp, end = 32.dp, top = 8.dp)
     ) {
         items(
             items = quizList,

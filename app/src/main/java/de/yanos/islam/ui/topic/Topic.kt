@@ -86,7 +86,6 @@ private fun TopicList(
 ) {
     LazyColumn(
         modifier = modifier
-            .wrapContentSize()
             .widthIn(320.dp, 600.dp)
             .padding(horizontal = 32.dp),
     ) {

@@ -1,13 +1,21 @@
 package de.yanos.islam.util
 
 import androidx.annotation.RawRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
@@ -18,6 +26,8 @@ import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
@@ -29,13 +39,32 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.airbnb.lottie.compose.rememberLottieDynamicProperties
 import com.airbnb.lottie.compose.rememberLottieDynamicProperty
 import de.yanos.islam.R
+import de.yanos.islam.ui.quiz.Difficulty
 
 val goldColor = Color(android.graphics.Color.parseColor("#FFD700"))
 
 @Composable
 @Preview
-fun IslamDivider() {
-    Divider(modifier = Modifier.alpha(0.2f), color = goldColor)
+fun IslamDivider(alpha:Float = 0.35f) {
+    Divider(modifier = Modifier.alpha(alpha), color = goldColor)
+}
+
+@Composable
+fun IslamRadio(
+    modifier: Modifier = Modifier,
+    isSelected: Boolean,
+    @StringRes text: Int,
+    onClick: () -> Unit
+) {
+    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
+        RadioButton(
+            selected = isSelected,
+            onClick = onClick
+        )
+        TextButton(onClick = onClick) {
+            Text(modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Start, text = stringResource(id = text), style = MaterialTheme.typography.bodyMedium)
+        }
+    }
 }
 
 @Composable

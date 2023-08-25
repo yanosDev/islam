@@ -2,6 +2,7 @@ package de.yanos.islam.data.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import de.yanos.islam.ui.quiz.Difficulty
 
 @Entity
 data class Quiz(
@@ -10,4 +11,14 @@ data class Quiz(
     val question: String,
     val answer: String,
     val difficulty: Int
+)
+
+@Entity
+data class QuizForm(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val quizIds: List<Int>,
+    val createdAt: Long,
+    val quizCount: Int,
+    val quizDifficulty: Int,
+    val solved: Int
 )

@@ -4,4 +4,12 @@
     <string name="tab_quiz">Sinav</string>
     <string name="tab_results">Sonuç</string>
     <string name="topics_title">Konular</string>
+    <string name="selection_header">Sinav Zorlugunu ve Konularinizi secin</string>
+    <string name="selection_start">Sinava Gir</string>
+    <string name="selection_low">Kolay</string>
+    <string name="selection_middle">Orta</string>
+    <string name="selection_high">Zor</string>
+    <string name="selection_all">Hepsi</string>
+    <string name="selection_count">Sorularin Sayisi: %s</string>
+    <string name="selection_hardness">Sorularin Zorlugu: %s</string>
 </resources>

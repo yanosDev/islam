@@ -8,12 +8,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Inbox
-import androidx.compose.material.icons.filled.Notes
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.List
 import androidx.compose.material.icons.rounded.Quiz
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -28,14 +26,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.yanos.core.ui.theme.AppTheme
 import de.yanos.core.ui.view.DynamicNavigationScreen
 import de.yanos.core.utils.NavigationDestination
+import de.yanos.islam.ui.quiz.Difficulty
+import de.yanos.islam.ui.quiz.QuizSelectionView
 import de.yanos.islam.ui.topic.SubTopicView
 import de.yanos.islam.ui.topic.TopicView
 import de.yanos.islam.ui.topic.content.TopicContentView
 import de.yanos.islam.util.AlogicalTypography
-import de.yanos.islam.util.DancingTypography
-import de.yanos.islam.util.KhodjahTypography
-import de.yanos.islam.util.SabanaTypography
-import de.yanos.islam.util.SirajunTypography
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -124,8 +120,19 @@ private fun IslamNavHost(
                 topicId = backStackEntry.arguments?.getInt("id")!!
             )
         }
-        composable(Routes.QUIZ) {
-
+        composable(Routes.QUIZ_CONFIG) {
+            QuizSelectionView { id: Int ->
+                navController.navigate(Routes.QUIZ_PLAY.replace("{id}", id.toString()))
+            }
+        }
+        composable(
+            Routes.QUIZ_PLAY,
+            arguments = listOf(
+                navArgument("id") { type = NavType.IntType },
+            )
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getString("id")
+            QuizView()
         }
         composable(Routes.RESULT) {
 
@@ -133,11 +140,17 @@ private fun IslamNavHost(
     }
 }
 
+@Composable
+fun QuizView() {
+    Text(text = "Testing")
+}
+
 object Routes {
     internal const val TOPICS = "Topics"
     internal const val SUBTOPICS = "SubTopics/{id}"
     internal const val TOPIC_CONTENT = "TopicContent/{id}"
-    internal const val QUIZ = "Quiz"
+    internal const val QUIZ_CONFIG = "Quiz"
+    internal const val QUIZ_PLAY = "QuizPlay/{id}"
     internal const val RESULT = "Result"
 }
 
@@ -149,7 +162,7 @@ private val ISLAM_DESTINATIONS = listOf(
         iconTextId = R.string.tab_topic
     ),
     NavigationDestination.TopDestination(
-        route = Routes.QUIZ,
+        route = Routes.QUIZ_CONFIG,
         selectedIcon = Icons.Rounded.Quiz,
         unselectedIcon = Icons.Rounded.Quiz,
         iconTextId = R.string.tab_quiz

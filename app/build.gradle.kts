@@ -68,5 +68,7 @@ dependencies {
     //Splash
     implementation(libs.splash)
 
+    implementation(libs.timber)
+
     implementation(libs.lottie)
 }
