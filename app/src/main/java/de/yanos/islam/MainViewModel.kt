@@ -76,7 +76,7 @@ class MainViewModel @Inject constructor(
                                     else -> builder.append("\n$text ")
                                 }
                         }
-                        db.quizDao().insert(Quiz(question = question, answer = builder.toString(), topicId = topicId, difficulty = 0))
+                        db.quizDao().insert(Quiz(question = question, answer = builder.toString().replace("  ", " ").trim(), topicId = topicId, difficulty = 0))
                     }
                 } catch (e: Exception) {
                     Log.e("e", actualLine)

@@ -8,8 +8,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Inbox
 import androidx.compose.material.icons.filled.Notes
+import androidx.compose.material.icons.rounded.History
+import androidx.compose.material.icons.rounded.List
+import androidx.compose.material.icons.rounded.Quiz
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -120,6 +124,12 @@ private fun IslamNavHost(
                 topicId = backStackEntry.arguments?.getInt("id")!!
             )
         }
+        composable(Routes.QUIZ) {
+
+        }
+        composable(Routes.RESULT) {
+
+        }
     }
 }
 
@@ -128,19 +138,26 @@ object Routes {
     internal const val SUBTOPICS = "SubTopics/{id}"
     internal const val TOPIC_CONTENT = "TopicContent/{id}"
     internal const val QUIZ = "Quiz"
+    internal const val RESULT = "Result"
 }
 
 private val ISLAM_DESTINATIONS = listOf(
     NavigationDestination.TopDestination(
         route = Routes.TOPICS,
-        selectedIcon = Icons.Default.Inbox,
-        unselectedIcon = Icons.Default.Inbox,
+        selectedIcon = Icons.Rounded.List,
+        unselectedIcon = Icons.Rounded.List,
         iconTextId = R.string.tab_topic
     ),
     NavigationDestination.TopDestination(
         route = Routes.QUIZ,
-        selectedIcon = Icons.Default.Notes,
-        unselectedIcon = Icons.Default.Notes,
+        selectedIcon = Icons.Rounded.Quiz,
+        unselectedIcon = Icons.Rounded.Quiz,
         iconTextId = R.string.tab_quiz
+    ),
+    NavigationDestination.TopDestination(
+        route = Routes.RESULT,
+        selectedIcon = Icons.Rounded.History,
+        unselectedIcon = Icons.Rounded.History,
+        iconTextId = R.string.tab_results
     ),
 )

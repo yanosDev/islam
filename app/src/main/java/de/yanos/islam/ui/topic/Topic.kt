@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.AbsoluteCutCornerShape
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
@@ -69,7 +70,7 @@ private fun HeaderStars(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun TopicHeader(modifier: Modifier, title: String) {
+private fun TopicHeader(modifier: Modifier, title: String) {
     Text(
         modifier = modifier,
         text = title,
@@ -78,7 +79,7 @@ fun TopicHeader(modifier: Modifier, title: String) {
 }
 
 @Composable
-fun TopicList(
+private fun TopicList(
     modifier: Modifier = Modifier,
     topics: List<Topic>,
     onTopicClick: (Topic) -> Unit
@@ -98,8 +99,8 @@ fun TopicList(
                     .animateItemPlacement()
                     .padding(vertical = 2.dp)
                     .fillMaxWidth(),
-                shape = CutCornerShape(8.dp),
-                border = BorderStroke(1.dp, goldColor),
+                shape = AbsoluteCutCornerShape(8.dp),
+                border = BorderStroke(1.dp, goldColor.copy(alpha = 0.4f)),
                 onClick = { onTopicClick(topic) },
             ) {
                 Text(text = topic.title, style = MaterialTheme.typography.labelMedium)

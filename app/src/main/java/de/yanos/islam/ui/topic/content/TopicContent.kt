@@ -71,3 +71,12 @@ fun QuizList(modifier: Modifier = Modifier, quizList: List<Quiz>) {
         }
     }
 }
+
+@Composable
+private fun ContentHeader(modifier: Modifier, title: String) {
+    Text(
+        modifier = modifier,
+        text = title,
+        style = MaterialTheme.typography.displayLarge
+    )
+}

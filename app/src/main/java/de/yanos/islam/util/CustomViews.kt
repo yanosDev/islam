@@ -35,7 +35,7 @@ val goldColor = Color(android.graphics.Color.parseColor("#FFD700"))
 @Composable
 @Preview
 fun IslamDivider() {
-    Divider(modifier = Modifier.alpha(0.4f), color = goldColor)
+    Divider(modifier = Modifier.alpha(0.2f), color = goldColor)
 }
 
 @Composable
