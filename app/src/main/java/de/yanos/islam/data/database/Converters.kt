@@ -8,6 +8,6 @@ class Converters {
 
     @TypeConverter
     fun toListIntFromString(stringList: String): List<Int> {
-        return stringList.split("::").map { it.toInt() }
+        return stringList.takeIf { it.isNotEmpty() }?.split("::")?.map { it.toInt() } ?: listOf()
     }
 }

@@ -13,8 +13,10 @@ import de.yanos.islam.data.database.dao.QuizFormDao
 import de.yanos.islam.data.model.Quiz
 import de.yanos.islam.data.model.QuizForm
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -31,12 +33,14 @@ class QuizFormViewModel @Inject constructor(
 
     fun populateQuizForm(id: Int) {
         if (quizList.isEmpty())
-            viewModelScope.launch {
+            viewModelScope.launch(ioDispatcher) {
                 quizFormDao.loadForm(id)?.let { quizForm ->
-                    if (quizForm.quizList.isEmpty())
-                        initForm(quizForm)
-                    else retrieveForm(quizForm)
-                    updateForm(quizForm.copy())
+                    withContext(Dispatchers.Main) {
+                        if (quizForm.quizList.isEmpty())
+                            initForm(quizForm)
+                        else retrieveForm(quizForm)
+                        updateForm(quizForm.copy())
+                    }
                 }
             }
     }
@@ -84,11 +88,13 @@ class QuizFormViewModel @Inject constructor(
         })
     }
 
-    private fun updateForm(quizForm: QuizForm) {
+    private suspend fun updateForm(quizForm: QuizForm) {
         form?.let {
             quizFormDao.delete(it)
         }
-        form = quizForm
+        withContext(Dispatchers.Main) {
+            form = quizForm
+        }
         quizFormDao.insert(quizForm)
     }
 
