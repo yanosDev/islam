@@ -14,7 +14,7 @@ interface QuizFormDao : BaseDao<QuizForm> {
     @Query("SELECT * FROM QuizForm WHERE id = :id")
     fun loadForm(id: Int): QuizForm?
 
-    @Query("SELECT * FROM QuizForm WHERE finished = 0 ORDER BY createdAt")
+    @Query("SELECT * FROM QuizForm WHERE finished = 0 ORDER BY createdAt DESC")
     fun loadOpenQuiz(): List<QuizForm>
 
     @Query("DELETE FROM QuizForm WHERE id = :id")

@@ -2,6 +2,12 @@
 
 package de.yanos.islam.ui.quiz.config
 
+import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,7 +34,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -40,6 +48,7 @@ import de.yanos.islam.util.IslamRadio
 import de.yanos.islam.util.PatternedBackgroung
 import de.yanos.islam.util.correctColor
 import de.yanos.islam.util.errorColor
+import de.yanos.islam.util.goldColor
 
 
 @Composable
@@ -50,29 +59,35 @@ fun QuizConfigurationView(
 ) {
     vm.loadData()
     PatternedBackgroung(modifier = modifier) {
-        Column(modifier = modifier.padding(start = 32.dp, end = 32.dp, top = 8.dp)) {
-            if (vm.recentForms.isEmpty()) {
-                ConfigScreen(
-                    selections = vm.state,
-                    difficulty = vm.difficulty,
-                    onStartQuiz = {
-                        vm.generateQuizForm { id ->
-                            onOpenQuiz(id)
-                        }
-                    },
-                    onDifficultyChanged = vm::onDifficultyChange,
-                    onSelectionChanged = vm::updateSelection
-                )
-            } else {
-                RecentFormsScreen(
-                    forms = vm.recentForms,
-                    onOpenQuiz = { id -> onOpenQuiz(id) },
-                    onDeleteQuiz = vm::deleteForm,
-                    onClearFormerForms = { vm.deleteAllForms() },
-                    onCreateNewForm = { vm.recentForms.clear() }
-                )
+        if (vm.recentForms.isNotEmpty() || vm.state.isNotEmpty()) {
+            AnimatedVisibility(visible = vm.recentForms.isEmpty(), enter = fadeIn(), exit = fadeOut()) {
+                Column(modifier = modifier.padding(start = 32.dp, end = 32.dp, top = 8.dp)) {
+                    ConfigScreen(
+                        selections = vm.state,
+                        difficulty = vm.difficulty,
+                        onStartQuiz = {
+                            vm.generateQuizForm { id ->
+                                onOpenQuiz(id)
+                            }
+                        },
+                        onDifficultyChanged = vm::onDifficultyChange,
+                        onSelectionChanged = vm::updateSelection
+                    )
+                }
+            }
+            AnimatedVisibility(visible = vm.recentForms.isNotEmpty(), enter = fadeIn(), exit = fadeOut()) {
+                Column(modifier = modifier.padding(start = 32.dp, end = 32.dp, top = 8.dp)) {
+                    RecentFormsScreen(
+                        forms = vm.recentForms,
+                        onOpenQuiz = { id -> onOpenQuiz(id) },
+                        onDeleteQuiz = vm::deleteForm,
+                        onClearFormerForms = { vm.deleteAllForms() },
+                        onCreateNewForm = { vm.recentForms.clear() }
+                    )
+                }
             }
         }
+
     }
 }
 
@@ -92,7 +107,12 @@ fun RecentFormsScreen(
             style = MaterialTheme.typography.headlineSmall
         )
         RecentFormsData(modifier = Modifier.weight(1f), forms = forms, openQuiz = onOpenQuiz, deleteQuiz = onDeleteQuiz)
-        Row(modifier = Modifier.padding(8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+        Row(
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
             TextButton(onClick = onClearFormerForms) {
                 Row {
                     Icon(imageVector = Icons.Rounded.DeleteForever, contentDescription = "Delete All", tint = errorColor())
@@ -133,31 +153,36 @@ fun RecentFormsData(modifier: Modifier, forms: List<RecentForm>, openQuiz: (Int)
                 .fillMaxWidth()
                 .padding(vertical = 4.dp), onClick = { openQuiz(form.id) }) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Row {
-                        Text(text = form.topics, style = MaterialTheme.typography.labelMedium)
-                        Spacer(modifier = Modifier.width(4.dp))
-                        IconButton(onClick = { deleteQuiz(form.id) }) {
-                            Icon(imageVector = Icons.Rounded.DeleteOutline, contentDescription = "Delete Form")
+                    Text(text = form.topics, style = MaterialTheme.typography.labelMedium)
+                    ScoreItem(color = goldColor(), text = form.count, label = R.string.quiz_config_former_count)
+                    ScoreItem(color = correctColor(), text = form.corrects, label = R.string.quiz_config_former_corrects)
+                    ScoreItem(color = errorColor(), text = form.failures, label = R.string.quiz_config_former_failures)
+                    IslamDivider(alpha = 1f)
+                    TextButton(modifier = Modifier
+                        .align(Alignment.End)
+                        .padding(2.dp), onClick = { deleteQuiz(form.id) }) {
+                        Row {
+                            Icon(imageVector = Icons.Rounded.DeleteOutline, contentDescription = "Delete Form", tint = errorColor())
+                            Text(text = stringResource(id = R.string.quiz_config_former_delete), style = MaterialTheme.typography.bodySmall, color = errorColor())
                         }
-                    }
-                    Row {
-                        Text(text = stringResource(id = R.string.quiz_config_former_count), style = MaterialTheme.typography.bodySmall)
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = form.count, style = MaterialTheme.typography.bodySmall)
-                    }
-                    Row {
-                        Text(text = stringResource(id = R.string.quiz_config_former_corrects), style = MaterialTheme.typography.bodySmall)
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = form.corrects, style = MaterialTheme.typography.bodySmall, color = correctColor())
-                    }
-                    Row {
-                        Text(text = stringResource(id = R.string.quiz_config_former_failures), style = MaterialTheme.typography.bodySmall)
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = form.failures, style = MaterialTheme.typography.bodySmall, color = errorColor())
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun ScoreItem(
+    modifier: Modifier = Modifier,
+    color: Color,
+    text: String,
+    @StringRes label: Int
+) {
+    Row(modifier = modifier.padding(2.dp)) {
+        Text(text = stringResource(id = label), style = MaterialTheme.typography.bodySmall)
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(text = text, style = MaterialTheme.typography.bodySmall, color = color)
     }
 }
 

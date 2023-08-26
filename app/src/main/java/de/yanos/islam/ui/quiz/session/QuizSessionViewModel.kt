@@ -72,7 +72,7 @@ class QuizFormViewModel @Inject constructor(
                     showSolution = false,
                     answerResult = AnswerResult.OPEN
                 )
-            })
+            }.sortedBy { it.id })
             updateForm()
         }
     }
@@ -94,7 +94,7 @@ class QuizFormViewModel @Inject constructor(
             }.let {
                 withContext(Dispatchers.Main) {
                     quizList.clear()
-                    quizList.addAll(it)
+                    quizList.addAll(it.sortedBy { it.id })
                 }
                 updateForm()
             }

@@ -10,6 +10,6 @@ interface QuizDao : BaseDao<Quiz> {
     @Query("SELECT * FROM Quiz WHERE topicId IN (:ids)")
     fun loadAllQuizByTopics(ids: List<Int>): Flow<List<Quiz>>
 
-    @Query("SELECT * FROM Quiz WHERE id IN (:ids)")
+    @Query("SELECT * FROM Quiz WHERE id IN (:ids) ORDER BY id")
     fun loadAllQuizByIds(ids: List<Int>): List<Quiz>
 }
