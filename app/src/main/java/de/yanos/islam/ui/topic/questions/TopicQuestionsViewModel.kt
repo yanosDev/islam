@@ -17,11 +17,12 @@ class TopicQuestionsViewModel @Inject constructor(
     var state = mutableStateListOf<Quiz>()
 
     fun loadTopicContent(id: Int) {
-        viewModelScope.launch {
-            dao.loadAllQuizByTopics(listOf(id)).distinctUntilChanged().collect {
-                state.clear()
-                state.addAll(it)
+        if (state.isEmpty())
+            viewModelScope.launch {
+                dao.loadAllQuizByTopics(listOf(id)).distinctUntilChanged().collect {
+                    state.clear()
+                    state.addAll(it)
+                }
             }
-        }
     }
 }

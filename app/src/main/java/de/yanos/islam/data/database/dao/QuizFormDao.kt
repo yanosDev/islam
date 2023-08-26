@@ -11,5 +11,5 @@ interface QuizFormDao : BaseDao<QuizForm> {
     fun recentFormId(): Int
 
     @Query("SELECT * FROM QuizForm WHERE id = :id")
-    fun loadForm(id: Int): Flow<QuizForm?>
+    fun loadForm(id: Int): QuizForm?
 }

@@ -45,6 +45,8 @@ import com.airbnb.lottie.compose.rememberLottieDynamicProperty
 import de.yanos.islam.R
 
 val goldColor = Color(android.graphics.Color.parseColor("#FFD700"))
+val errorColor = Color(android.graphics.Color.parseColor("#FF0000"))
+val correctColor = Color(android.graphics.Color.parseColor("#00FF00"))
 
 @Composable
 @Preview

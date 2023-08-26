@@ -15,9 +15,12 @@ data class Quiz(
 @Entity
 data class QuizForm(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val quizIds: List<Int>,
-    val createdAt: Long,
+    val topicIds: List<Int>,
+    val createdAt: Long = System.currentTimeMillis(),
+    val finished: Boolean = false,
     val quizCount: Int,
     val quizDifficulty: Int,
-    val solved: Int
+    val quizList: List<Int> = listOf(),
+    val solvedQuizList: List<Int> = listOf(),
+    val failedQuizList: List<Int> = listOf()
 )

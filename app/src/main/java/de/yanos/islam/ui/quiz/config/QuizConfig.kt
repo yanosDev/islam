@@ -10,13 +10,11 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -32,7 +30,7 @@ import de.yanos.islam.util.PatternedBackgroung
 @Composable
 fun QuizSelectionView(
     modifier: Modifier = Modifier,
-    vm: QuizSelectionViewModel = hiltViewModel(),
+    vm: QuizConfigViewModel = hiltViewModel(),
     onQuizConfigured: (quizId: Int) -> Unit
 ) {
     val onSelectionChanged = { id: Int, isSelected: Boolean ->

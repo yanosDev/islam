@@ -15,4 +15,9 @@
     <string name="quiz_session_previous">Önceki Soru</string>
     <string name="quiz_session_next">Sonraki Soru</string>
     <string name="quiz_session_show_answer">Sonucu göster</string>
+    <string name="quiz_session_total">Toplam Sorular:</string>
+    <string name="quiz_session_correct">Bilinen Sorular:</string>
+    <string name="quiz_session_error">Hatali Sorular:</string>
+    <string name="quiz_session_answer_correct">Bildim</string>
+    <string name="quiz_session_answer_failure">Bilemedim</string>
 </resources>

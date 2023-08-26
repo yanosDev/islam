@@ -19,7 +19,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class QuizSelectionViewModel @Inject constructor(
+class QuizConfigViewModel @Inject constructor(
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
   //  @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
     private val topicDao: TopicDao,
@@ -92,7 +92,7 @@ class QuizSelectionViewModel @Inject constructor(
 
     fun onDifficultyChange(difficulty: Difficulty) {
         viewModelScope.launch {
-            this@QuizSelectionViewModel.difficulty = difficulty
+            this@QuizConfigViewModel.difficulty = difficulty
         }
     }
 
@@ -101,11 +101,10 @@ class QuizSelectionViewModel @Inject constructor(
 
             quizFormDao.insert(
                 QuizForm(
-                    quizIds = selections.filter { topic -> topic.isSelected && selections.none { it.parentId == topic.id } }.map { it.id },
+                    topicIds = selections.filter { topic -> topic.isSelected && selections.none { it.parentId == topic.id } }.map { it.id },
                     createdAt = System.currentTimeMillis(),
                     quizCount = difficulty.quizCount,
                     quizDifficulty = difficulty.quizMinDifficulty,
-                    solved = 0
                 )
             )
             val id = quizFormDao.recentFormId()

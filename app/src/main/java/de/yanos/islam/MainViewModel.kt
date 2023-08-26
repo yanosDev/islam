@@ -18,6 +18,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -54,7 +55,7 @@ class MainViewModel @Inject constructor(
     }
 
     private fun createQuizByTopic(@RawRes topicRaw: Int, topicId: Int) {
-        val regex = Regex("""\d+.|\D+""")
+        val regex = Regex("""\d+[.]|\D+""")
         val inputStream: InputStream = context.resources.openRawResource(topicRaw)
         val br = BufferedReader(InputStreamReader(inputStream))
         val lines = br.readLines()
@@ -79,7 +80,7 @@ class MainViewModel @Inject constructor(
                         db.quizDao().insert(Quiz(question = question, answer = builder.toString().replace("  ", " ").trim(), topicId = topicId, difficulty = 0))
                     }
                 } catch (e: Exception) {
-                    Log.e("e", actualLine)
+                    Timber.e(actualLine)
                     e.localizedMessage?.let { Log.e("e", it) }
                 }
             }

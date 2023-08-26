@@ -1,16 +1,23 @@
 package de.yanos.islam.ui.quiz.session
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.ArrowForward
@@ -31,6 +38,9 @@ import de.yanos.islam.R
 import de.yanos.islam.util.IslamCheckBox
 import de.yanos.islam.util.IslamDivider
 import de.yanos.islam.util.PatternedBackgroung
+import de.yanos.islam.util.correctColor
+import de.yanos.islam.util.errorColor
+import de.yanos.islam.util.goldColor
 import kotlinx.coroutines.launch
 
 
@@ -55,15 +65,19 @@ fun QuizFormView(
         if (vm.quizList.size > 0)
             Column {
                 QuizList(modifier = Modifier.weight(1f), state = state, quizList = vm.quizList)
-                AnswerDisplayer(
+                QuizBoard(
                     modifier = Modifier
-                        .align(Alignment.End)
-                        .padding(horizontal = 8.dp)
-                        .wrapContentWidth(),
-                    currentItem = vm.quizList[vm.currentIndex],
-                    onShowAnswerChange = { id, showAnswer -> vm.updateAnswerVisibility(id, showAnswer) }
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp),
+                    currentIndex = vm.currentIndex,
+                    quizList = vm.quizList,
+                    onShowAnswerChange = { id, showAnswer -> vm.updateAnswerVisibility(id, showAnswer) },
+                    onAnswerResult = { id, result -> vm.updateQuizResult(id, result) }
                 )
-                ScrollButtons(
+                QuizNavigation(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp),
                     currentIndex = vm.currentIndex,
                     isNextButtonEnabled = vm.currentIndex < vm.quizList.size - 1,
                     isPreviousButtonEnabled = vm.currentIndex > 0,
@@ -74,10 +88,92 @@ fun QuizFormView(
 }
 
 @Composable
-fun AnswerDisplayer(
-    modifier: Modifier,
+private fun QuizBoard(
+    modifier: Modifier = Modifier,
+    quizList: List<QuizItem>,
+    currentIndex: Int,
+    onShowAnswerChange: (id: Int, showAnswer: Boolean) -> Unit,
+    onAnswerResult: (id: Int, result: AnswerResult) -> Unit
+) {
+    Row(
+        modifier = modifier.fillMaxHeight(0.2f),
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        QuizScore(modifier = Modifier.fillMaxHeight(), results = quizList.map { it.answerResult })
+        QuizResultButtons(
+            modifier = Modifier.fillMaxHeight(),
+            quizList = quizList,
+            currentIndex = currentIndex,
+            onShowAnswerChange = onShowAnswerChange,
+            onAnswerResult = onAnswerResult
+        )
+    }
+}
+
+@Composable
+private fun QuizResultButtons(
+    modifier: Modifier = Modifier,
+    quizList: List<QuizItem>,
+    currentIndex: Int,
+    onShowAnswerChange: (id: Int, showAnswer: Boolean) -> Unit,
+    onAnswerResult: (id: Int, result: AnswerResult) -> Unit
+) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.SpaceEvenly) {
+        AnswerDisplayer(
+            currentItem = quizList[currentIndex],
+            onShowAnswerChange = onShowAnswerChange
+        )
+        TextButton(onClick = { onAnswerResult(quizList[currentIndex].id, AnswerResult.CORRECT) }) {
+            Text(text = stringResource(id = R.string.quiz_session_answer_correct), style = MaterialTheme.typography.labelMedium, color = correctColor)
+        }
+        TextButton(onClick = { onAnswerResult(quizList[currentIndex].id, AnswerResult.FAILURE) }) {
+            Text(text = stringResource(id = R.string.quiz_session_answer_failure), style = MaterialTheme.typography.labelMedium, color = errorColor)
+        }
+    }
+}
+
+@Composable
+private fun QuizScore(modifier: Modifier = Modifier, results: List<AnswerResult>) {
+    Row(modifier = modifier.fillMaxHeight()) {
+        Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.SpaceEvenly) {
+            Text(
+                text = stringResource(id = R.string.quiz_session_total),
+                style = MaterialTheme.typography.labelMedium
+            )
+            Text(
+                text = stringResource(id = R.string.quiz_session_correct),
+                style = MaterialTheme.typography.labelMedium
+            )
+            Text(
+                text = stringResource(id = R.string.quiz_session_error),
+                style = MaterialTheme.typography.labelMedium
+            )
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.SpaceEvenly) {
+            Text(
+                text = results.size.toString(),
+                style = MaterialTheme.typography.labelMedium
+            )
+            Text(
+                text = results.count { it == AnswerResult.CORRECT }.toString(),
+                style = MaterialTheme.typography.labelMedium,
+                color = correctColor
+            )
+            Text(
+                text = results.count { it == AnswerResult.FAILURE }.toString(),
+                style = MaterialTheme.typography.labelMedium,
+                color = errorColor
+            )
+        }
+    }
+}
+
+@Composable
+private fun AnswerDisplayer(
+    modifier: Modifier = Modifier,
     currentItem: QuizItem,
-    onShowAnswerChange: (Int, Boolean) -> Unit
+    onShowAnswerChange: (id: Int, showAnswer: Boolean) -> Unit,
 ) {
     IslamCheckBox(
         modifier = modifier,
@@ -93,7 +189,7 @@ fun AnswerDisplayer(
 }
 
 @Composable
-fun QuizList(
+private fun QuizList(
     modifier: Modifier = Modifier,
     state: LazyListState,
     quizList: List<QuizItem>,
@@ -116,25 +212,32 @@ fun QuizList(
 }
 
 @Composable
-fun Question(
+private fun Question(
     modifier: Modifier = Modifier,
     item: QuizItem
 ) {
     OutlinedCard(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .padding(24.dp)
+            .padding(24.dp),
+        border = BorderStroke(1.dp, goldColor),
     ) {
         Text(modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp), text = "${item.question}?", style = MaterialTheme.typography.headlineSmall)
+        IslamDivider(1f)
         AnimatedVisibility(visible = item.showSolution) {
-            IslamDivider()
-            Text(modifier = Modifier.padding(start = 24.dp, top = 4.dp, bottom = 8.dp, end = 4.dp), text = item.answer, style = MaterialTheme.typography.bodyLarge)
+            Text(
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+                    .padding(start = 24.dp, top = 4.dp, bottom = 8.dp, end = 4.dp),
+                text = item.answer,
+                style = MaterialTheme.typography.bodyLarge
+            )
         }
     }
 }
 
 @Composable
-fun ScrollButtons(
+private fun QuizNavigation(
     modifier: Modifier = Modifier,
     isPreviousButtonEnabled: Boolean,
     isNextButtonEnabled: Boolean,
@@ -142,9 +245,7 @@ fun ScrollButtons(
     onScroll: (Int) -> Unit
 ) {
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 16.dp),
+        modifier = modifier,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         TextButton(
@@ -152,13 +253,13 @@ fun ScrollButtons(
             onClick = { onScroll(currentIndex - 1) }
         ) {
             Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "Former Question")
-            Text(modifier = Modifier.padding(4.dp), text = stringResource(id = R.string.quiz_session_previous), style = MaterialTheme.typography.labelMedium)
+            Text(modifier = Modifier.padding(horizontal = 4.dp), text = stringResource(id = R.string.quiz_session_previous), style = MaterialTheme.typography.labelMedium)
         }
         TextButton(
             enabled = isNextButtonEnabled,
             onClick = { onScroll(currentIndex + 1) }
         ) {
-            Text(modifier = Modifier.padding(4.dp), text = stringResource(id = R.string.quiz_session_next), style = MaterialTheme.typography.labelMedium)
+            Text(modifier = Modifier.padding(horizontal = 4.dp), text = stringResource(id = R.string.quiz_session_next), style = MaterialTheme.typography.labelMedium)
             Icon(imageVector = Icons.Rounded.ArrowForward, contentDescription = "Next Question")
         }
     }
