@@ -55,13 +55,19 @@ class QuizFormViewModel @Inject constructor(
             val selectedQuizList = mutableListOf<Quiz>()
             val prioList = newList.filter { it.difficulty >= quizForm.quizDifficulty }
             val selectedIndex = mutableListOf<Int>()
-            for (i in 0 until quizForm.quizCount) {
-                var index: Int
-                do {
-                    index = Random.nextInt((prioList.size - 1) * 1000) / 1000
-                } while (selectedIndex.contains(index))
-                selectedIndex.add(index)
-                selectedQuizList.add(prioList[index])
+            if (quizForm.quizCount != Int.MAX_VALUE && quizForm.quizCount < newList.size) {
+                for (i in 0 until quizForm.quizCount) {
+                    var index: Int
+                    val useList = if (selectedIndex.size < prioList.size) prioList else newList
+                    do {
+                        index = Random.nextInt((useList.size - 1) * 1000) / 1000
+                    } while (selectedIndex.contains(index) && selectedIndex.size < newList.size)
+                    selectedIndex.add(index)
+                    selectedQuizList.add(useList[index])
+                }
+            } else {
+                selectedIndex.addAll(newList.indices)
+                selectedQuizList.addAll(newList)
             }
             quizList.clear()
             quizList.addAll(selectedQuizList.map {
@@ -102,14 +108,17 @@ class QuizFormViewModel @Inject constructor(
     }
 
     private suspend fun updateForm() {
+        val solved = quizList
+            .filter { it.answerResult == AnswerResult.CORRECT }
+            .map { it.id }
+        val failed = quizList
+            .filter { it.answerResult == AnswerResult.FAILURE }
+            .map { it.id }
         form?.copy(
+            finished = solved.size + failed.size == quizList.size,
             quizList = quizList.map { it.id },
-            solvedQuizList = quizList
-                .filter { it.answerResult == AnswerResult.CORRECT }
-                .map { it.id },
-            failedQuizList = quizList
-                .filter { it.answerResult == AnswerResult.FAILURE }
-                .map { it.id }
+            solvedQuizList = solved,
+            failedQuizList = failed,
         )?.let { newForm ->
             withContext(ioDispatcher) {
                 quizFormDao.update(newForm)

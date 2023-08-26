@@ -157,7 +157,7 @@ fun RecentFormsData(modifier: Modifier, forms: List<RecentForm>, openQuiz: (Int)
                     ScoreItem(color = goldColor(), text = form.count, label = R.string.quiz_config_former_count)
                     ScoreItem(color = correctColor(), text = form.corrects, label = R.string.quiz_config_former_corrects)
                     ScoreItem(color = errorColor(), text = form.failures, label = R.string.quiz_config_former_failures)
-                    IslamDivider(alpha = 1f)
+                    IslamDivider(modifier = Modifier.padding(vertical = 4.dp))
                     TextButton(modifier = Modifier
                         .align(Alignment.End)
                         .padding(2.dp), onClick = { deleteQuiz(form.id) }) {

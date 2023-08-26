@@ -46,7 +46,7 @@ class QuizConfigViewModel @Inject constructor(
                 val topicNames = topics.filter { form.topicIds.contains(it.id) }.map { it.title }
                 RecentForm(
                     id = form.id,
-                    count = form.quizCount.toString(),
+                    count = form.quizList.size.toString(),
                     corrects = form.solvedQuizList.count().toString(),
                     failures = form.failedQuizList.count().toString(),
                     topics = "${(if (topicNames.size < 5) topicNames else topicNames.subList(0, 3)).joinToString(", ")} ..."

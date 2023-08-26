@@ -130,7 +130,9 @@ private fun IslamNavHost(
                 navArgument("id") { type = NavType.IntType },
             )
         ) { backStackEntry ->
-            QuizFormView(id = backStackEntry.arguments?.getInt("id")!!)
+            QuizFormView(id = backStackEntry.arguments?.getInt("id")!!) {
+                navController.popBackStack()
+            }
         }
         composable(Routes.RESULT) {
 

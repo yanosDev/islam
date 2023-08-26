@@ -27,10 +27,12 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import de.yanos.core.ui.view.CustomDialog
 import de.yanos.islam.R
 import de.yanos.islam.util.IslamCheckBox
 import de.yanos.islam.util.IslamDivider
@@ -44,7 +46,8 @@ import kotlinx.coroutines.launch
 fun QuizFormView(
     modifier: Modifier = Modifier,
     vm: QuizFormViewModel = hiltViewModel(),
-    id: Int
+    id: Int,
+    goBack: () -> Unit
 ) {
     val state = rememberLazyListState()
     val scope = rememberCoroutineScope()
@@ -58,6 +61,16 @@ fun QuizFormView(
 
     vm.populateQuizForm(id)
     PatternedBackgroung(modifier = modifier) {
+        vm.form?.let {
+            if (it.finished)
+                CustomDialog(
+                    title = stringResource(id = R.string.quiz_session_finished),
+                    text = stringResource(id = R.string.quiz_session_finished_result, it.quizList.size, it.solvedQuizList.size, it.failedQuizList.size),
+                    onConfirm = goBack,
+                    onDismiss = goBack,
+                    showCancel = false
+                )
+        }
         if (vm.quizList.size > 0)
             Column {
                 QuizList(modifier = Modifier.weight(1f), state = state, quizList = vm.quizList)
@@ -219,7 +232,7 @@ private fun Question(
         border = BorderStroke(1.dp, item.resultColor()),
     ) {
         Text(modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp), text = "${item.question}?", style = MaterialTheme.typography.headlineSmall)
-        IslamDivider(alpha = 1f, color = item.resultColor())
+        IslamDivider(color = item.resultColor())
         AnimatedVisibility(visible = item.showSolution) {
             Text(
                 modifier = Modifier

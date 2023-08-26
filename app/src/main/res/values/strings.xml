@@ -27,4 +27,6 @@
     <string name="quiz_session_error">Hatali Sorular:</string>
     <string name="quiz_session_answer_correct">Bildim</string>
     <string name="quiz_session_answer_failure">Bilemedim</string>
+    <string name="quiz_session_finished">Sinaviniz Bitmistir</string>
+    <string name="quiz_session_finished_result">Toplam %d sorudan tam %d tanesini dogru cevapladiniz ve %d tanesine yanlis cevap verdiniz</string>
 </resources>

@@ -44,8 +44,8 @@ import de.yanos.islam.R
 
 @Composable
 @Preview
-fun IslamDivider(alpha: Float = 0.35f, color: Color = goldColor()) {
-    Divider(modifier = Modifier.alpha(alpha), color = color)
+fun IslamDivider(modifier: Modifier = Modifier, color: Color = goldColor()) {
+    Divider(modifier = modifier, color = color)
 }
 
 @Composable
