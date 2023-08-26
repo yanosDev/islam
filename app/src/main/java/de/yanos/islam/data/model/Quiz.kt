@@ -2,7 +2,6 @@ package de.yanos.islam.data.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import de.yanos.islam.ui.quiz.Difficulty
 
 @Entity
 data class Quiz(

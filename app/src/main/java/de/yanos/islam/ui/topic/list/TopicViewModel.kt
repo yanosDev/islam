@@ -1,4 +1,4 @@
-package de.yanos.islam.ui.topic
+package de.yanos.islam.ui.topic.list
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel

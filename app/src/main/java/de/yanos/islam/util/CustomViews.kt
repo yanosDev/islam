@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
@@ -15,6 +16,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -25,6 +28,7 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -39,14 +43,33 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.airbnb.lottie.compose.rememberLottieDynamicProperties
 import com.airbnb.lottie.compose.rememberLottieDynamicProperty
 import de.yanos.islam.R
-import de.yanos.islam.ui.quiz.Difficulty
 
 val goldColor = Color(android.graphics.Color.parseColor("#FFD700"))
 
 @Composable
 @Preview
-fun IslamDivider(alpha:Float = 0.35f) {
+fun IslamDivider(alpha: Float = 0.35f) {
     Divider(modifier = Modifier.alpha(alpha), color = goldColor)
+}
+
+@Composable
+fun IslamCheckBox(
+    modifier: Modifier = Modifier,
+    isEnabled: Boolean = true,
+    isChecked: Boolean,
+    onCheckChange: (Boolean) -> Unit,
+    content: @Composable () -> Unit,
+) {
+    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
+        Checkbox(
+            enabled = isEnabled,
+            checked = isChecked,
+            onCheckedChange = onCheckChange
+        )
+        TextButton(onClick = { onCheckChange(!isChecked) }, enabled = isEnabled) {
+            content()
+        }
+    }
 }
 
 @Composable

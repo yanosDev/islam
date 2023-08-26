@@ -7,6 +7,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface QuizDao : BaseDao<Quiz> {
-    @Query("SELECT * FROM Quiz WHERE topicId = :id")
-    fun loadAllQuizByTopic(id: Int): Flow<List<Quiz>>
+    @Query("SELECT * FROM Quiz WHERE topicId IN (:id)")
+    fun loadAllQuizByTopics(id: List<Int>): Flow<List<Quiz>>
 }

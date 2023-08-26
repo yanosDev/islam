@@ -1,4 +1,4 @@
-package de.yanos.islam.ui.quiz
+package de.yanos.islam.ui.quiz.config
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -8,11 +8,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.yanos.core.utils.IODispatcher
-import de.yanos.core.utils.MainDispatcher
 import de.yanos.islam.data.database.dao.QuizFormDao
 import de.yanos.islam.data.database.dao.TopicDao
 import de.yanos.islam.data.model.QuizForm
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -20,8 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class QuizSelectionViewModel @Inject constructor(
-    @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
+  //  @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
     private val topicDao: TopicDao,
     private val quizFormDao: QuizFormDao,
 ) : ViewModel() {
@@ -109,7 +109,7 @@ class QuizSelectionViewModel @Inject constructor(
                 )
             )
             val id = quizFormDao.recentFormId()
-            withContext(mainDispatcher){
+            withContext(Dispatchers.Main){
                 callback(id)
             }
         }

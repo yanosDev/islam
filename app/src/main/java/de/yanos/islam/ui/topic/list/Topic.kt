@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalFoundationApi::class)
 
-package de.yanos.islam.ui.topic
+package de.yanos.islam.ui.topic.list
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -9,11 +9,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.AbsoluteCutCornerShape
-import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -66,13 +64,13 @@ fun TopicView(
 
 @Composable
 private fun HeaderStars(modifier: Modifier = Modifier) {
-    PrimaryLottie(modifier = Modifier.height(220.dp), resId = R.raw.stars_moving)
+    PrimaryLottie(modifier = Modifier.height(200.dp), resId = R.raw.stars_moving)
 }
 
 @Composable
 private fun TopicHeader(modifier: Modifier, title: String) {
     Text(
-        modifier = modifier,
+        modifier = modifier.padding(bottom = 32.dp),
         text = title,
         style = MaterialTheme.typography.displayLarge
     )

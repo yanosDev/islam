@@ -11,7 +11,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.List
 import androidx.compose.material.icons.rounded.Quiz
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -26,11 +25,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.yanos.core.ui.theme.AppTheme
 import de.yanos.core.ui.view.DynamicNavigationScreen
 import de.yanos.core.utils.NavigationDestination
-import de.yanos.islam.ui.quiz.Difficulty
-import de.yanos.islam.ui.quiz.QuizSelectionView
-import de.yanos.islam.ui.topic.SubTopicView
-import de.yanos.islam.ui.topic.TopicView
-import de.yanos.islam.ui.topic.content.TopicContentView
+import de.yanos.islam.ui.quiz.config.QuizSelectionView
+import de.yanos.islam.ui.quiz.session.QuizFormView
+import de.yanos.islam.ui.topic.list.SubTopicView
+import de.yanos.islam.ui.topic.list.TopicView
+import de.yanos.islam.ui.topic.questions.TopicContentView
 import de.yanos.islam.util.AlogicalTypography
 
 @AndroidEntryPoint
@@ -131,18 +130,12 @@ private fun IslamNavHost(
                 navArgument("id") { type = NavType.IntType },
             )
         ) { backStackEntry ->
-            val id = backStackEntry.arguments?.getString("id")
-            QuizView()
+            QuizFormView(id = backStackEntry.arguments?.getInt("id")!!)
         }
         composable(Routes.RESULT) {
 
         }
     }
-}
-
-@Composable
-fun QuizView() {
-    Text(text = "Testing")
 }
 
 object Routes {

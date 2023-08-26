@@ -1,4 +1,4 @@
-package de.yanos.islam.ui.quiz
+package de.yanos.islam.ui.quiz.config
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.R
+import de.yanos.islam.util.IslamCheckBox
 import de.yanos.islam.util.IslamDivider
 import de.yanos.islam.util.IslamRadio
 import de.yanos.islam.util.PatternedBackgroung
@@ -39,12 +40,12 @@ fun QuizSelectionView(
     }
     PatternedBackgroung(modifier = modifier) {
         Column(modifier = modifier.padding(start = 32.dp, end = 32.dp, top = 8.dp)) {
-            SelectionHeader {
+            SelectionHeader(modifier.padding(bottom = 8.dp)) {
                 vm.generateQuizForm { id ->
                     onQuizConfigured(id)
                 }
             }
-            DifficultyHeader(difficulty = vm.difficulty, onDifficultyChanged = vm::onDifficultyChange)
+            DifficultyHeader(modifier = Modifier.padding(vertical = 4.dp), difficulty = vm.difficulty, onDifficultyChanged = vm::onDifficultyChange)
             SelectionList(selections = vm.state, onSelectionChanged = onSelectionChanged)
         }
     }
@@ -118,16 +119,16 @@ fun DifficultyHeader(
                     .fillMaxWidth()
                     .padding(4.dp), horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Text(text = stringResource(id = R.string.selection_count, difficulty.count()), style = MaterialTheme.typography.labelMedium)
-                Text(text = stringResource(id = R.string.selection_hardness, difficulty.diff()), style = MaterialTheme.typography.labelMedium)
+                Text(text = stringResource(id = R.string.quiz_config_count, difficulty.count()), style = MaterialTheme.typography.labelMedium)
+                Text(text = stringResource(id = R.string.quiz_config_hardness, difficulty.diff()), style = MaterialTheme.typography.labelMedium)
             }
-            IslamRadio(modifier = modifier, isSelected = difficulty == Difficulty.Low, text = R.string.selection_low, onClick = { onDifficultyChanged(Difficulty.Low) })
+            IslamRadio(modifier = modifier, isSelected = difficulty == Difficulty.Low, text = R.string.quiz_config_low, onClick = { onDifficultyChanged(Difficulty.Low) })
             IslamDivider()
-            IslamRadio(modifier = modifier, isSelected = difficulty == Difficulty.Medium, text = R.string.selection_middle, onClick = { onDifficultyChanged(Difficulty.Medium) })
+            IslamRadio(modifier = modifier, isSelected = difficulty == Difficulty.Medium, text = R.string.quiz_config_middle, onClick = { onDifficultyChanged(Difficulty.Medium) })
             IslamDivider()
-            IslamRadio(modifier = modifier, isSelected = difficulty == Difficulty.High, text = R.string.selection_high, onClick = { onDifficultyChanged(Difficulty.High) })
+            IslamRadio(modifier = modifier, isSelected = difficulty == Difficulty.High, text = R.string.quiz_config_high, onClick = { onDifficultyChanged(Difficulty.High) })
             IslamDivider()
-            IslamRadio(modifier = modifier, isSelected = difficulty == Difficulty.Max, text = R.string.selection_all, onClick = { onDifficultyChanged(Difficulty.Max) })
+            IslamRadio(modifier = modifier, isSelected = difficulty == Difficulty.Max, text = R.string.quiz_config_all, onClick = { onDifficultyChanged(Difficulty.Max) })
         }
     }
 }
@@ -141,13 +142,14 @@ fun SelectionHeader(
         Text(
             modifier = Modifier
                 .padding(horizontal = 4.dp)
-                .fillMaxWidth(0.7f), text = stringResource(id = R.string.selection_header), style = MaterialTheme.typography.headlineSmall
+                .fillMaxWidth(0.7f), text = stringResource(id = R.string.quiz_config_header), style = MaterialTheme.typography.headlineSmall
         )
         TextButton(onClick = onQuizConfigured) {
-            Text(text = stringResource(id = R.string.selection_start), style = MaterialTheme.typography.labelMedium)
+            Text(text = stringResource(id = R.string.quiz_config_start), style = MaterialTheme.typography.labelMedium)
         }
     }
 }
+
 
 @Composable
 private fun TopicCheck(
@@ -156,16 +158,12 @@ private fun TopicCheck(
     topic: TopicSelection,
     onSelectionChanged: (id: Int, isEnabled: Boolean) -> Unit
 ) {
-    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
-        Checkbox(
-            enabled = isParentEnabledOrNeedless,
-            checked = topic.isSelected && isParentEnabledOrNeedless,
-            onCheckedChange = {
-                onSelectionChanged(topic.id, it)
-            }
-        )
-        TextButton(onClick = { onSelectionChanged(topic.id, !topic.isSelected) }, enabled = isParentEnabledOrNeedless) {
-            Text(modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Start, text = topic.title, style = MaterialTheme.typography.bodyMedium)
-        }
+    IslamCheckBox(
+        modifier = modifier,
+        isEnabled = isParentEnabledOrNeedless,
+        isChecked = topic.isSelected && isParentEnabledOrNeedless,
+        onCheckChange = { onSelectionChanged(topic.id, it) }
+    ) {
+        Text(modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Start, text = topic.title, style = MaterialTheme.typography.bodyMedium)
     }
 }
