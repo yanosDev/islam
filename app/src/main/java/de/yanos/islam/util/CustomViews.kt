@@ -16,8 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -28,7 +26,6 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -44,14 +41,11 @@ import com.airbnb.lottie.compose.rememberLottieDynamicProperties
 import com.airbnb.lottie.compose.rememberLottieDynamicProperty
 import de.yanos.islam.R
 
-val goldColor = Color(android.graphics.Color.parseColor("#FFD700"))
-val errorColor = Color(android.graphics.Color.parseColor("#FF0000"))
-val correctColor = Color(android.graphics.Color.parseColor("#00FF00"))
 
 @Composable
 @Preview
-fun IslamDivider(alpha: Float = 0.35f) {
-    Divider(modifier = Modifier.alpha(alpha), color = goldColor)
+fun IslamDivider(alpha: Float = 0.35f, color: Color = goldColor()) {
+    Divider(modifier = Modifier.alpha(alpha), color = color)
 }
 
 @Composable

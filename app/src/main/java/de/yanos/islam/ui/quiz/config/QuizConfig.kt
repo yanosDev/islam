@@ -1,16 +1,29 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package de.yanos.islam.ui.quiz.config
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.DeleteForever
+import androidx.compose.material.icons.rounded.DeleteOutline
+import androidx.compose.material.icons.rounded.NewLabel
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -25,26 +38,125 @@ import de.yanos.islam.util.IslamCheckBox
 import de.yanos.islam.util.IslamDivider
 import de.yanos.islam.util.IslamRadio
 import de.yanos.islam.util.PatternedBackgroung
+import de.yanos.islam.util.correctColor
+import de.yanos.islam.util.errorColor
 
 
 @Composable
-fun QuizSelectionView(
+fun QuizConfigurationView(
     modifier: Modifier = Modifier,
     vm: QuizConfigViewModel = hiltViewModel(),
-    onQuizConfigured: (quizId: Int) -> Unit
+    onOpenQuiz: (quizId: Int) -> Unit
 ) {
-    val onSelectionChanged = { id: Int, isSelected: Boolean ->
-        vm.updateSelection(id, isSelected)
-    }
+    vm.loadData()
     PatternedBackgroung(modifier = modifier) {
         Column(modifier = modifier.padding(start = 32.dp, end = 32.dp, top = 8.dp)) {
-            SelectionHeader(modifier.padding(bottom = 8.dp)) {
-                vm.generateQuizForm { id ->
-                    onQuizConfigured(id)
+            if (vm.recentForms.isEmpty()) {
+                ConfigScreen(
+                    selections = vm.state,
+                    difficulty = vm.difficulty,
+                    onStartQuiz = {
+                        vm.generateQuizForm { id ->
+                            onOpenQuiz(id)
+                        }
+                    },
+                    onDifficultyChanged = vm::onDifficultyChange,
+                    onSelectionChanged = vm::updateSelection
+                )
+            } else {
+                RecentFormsScreen(
+                    forms = vm.recentForms,
+                    onOpenQuiz = { id -> onOpenQuiz(id) },
+                    onDeleteQuiz = vm::deleteForm,
+                    onClearFormerForms = { vm.deleteAllForms() },
+                    onCreateNewForm = { vm.recentForms.clear() }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun RecentFormsScreen(
+    modifier: Modifier = Modifier,
+    forms: List<RecentForm>,
+    onOpenQuiz: (Int) -> Unit,
+    onDeleteQuiz: (Int) -> Unit,
+    onClearFormerForms: () -> Unit,
+    onCreateNewForm: () -> Unit
+) {
+    Column {
+        Text(
+            modifier = modifier.padding(horizontal = 4.dp, vertical = 8.dp),
+            text = stringResource(id = R.string.quiz_config_former_header),
+            style = MaterialTheme.typography.headlineSmall
+        )
+        RecentFormsData(modifier = Modifier.weight(1f), forms = forms, openQuiz = onOpenQuiz, deleteQuiz = onDeleteQuiz)
+        Row(modifier = Modifier.padding(8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+            TextButton(onClick = onClearFormerForms) {
+                Row {
+                    Icon(imageVector = Icons.Rounded.DeleteForever, contentDescription = "Delete All", tint = errorColor())
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(text = stringResource(id = R.string.quiz_config_former_delete_all), style = MaterialTheme.typography.labelMedium, color = errorColor())
                 }
             }
-            DifficultyHeader(modifier = Modifier.padding(vertical = 4.dp), difficulty = vm.difficulty, onDifficultyChanged = vm::onDifficultyChange)
-            SelectionList(selections = vm.state, onSelectionChanged = onSelectionChanged)
+            TextButton(onClick = onCreateNewForm) {
+                Row {
+                    Icon(imageVector = Icons.Rounded.NewLabel, contentDescription = "New Form")
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(text = stringResource(id = R.string.quiz_config_former_new_form), style = MaterialTheme.typography.labelMedium)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ConfigScreen(
+    modifier: Modifier = Modifier,
+    difficulty: Difficulty,
+    selections: MutableList<List<TopicSelection>>,
+    onStartQuiz: () -> Unit,
+    onDifficultyChanged: (Difficulty) -> Unit,
+    onSelectionChanged: (id: Int, isSelected: Boolean) -> Unit,
+) {
+    SelectionHeader(modifier.padding(bottom = 8.dp), text = R.string.quiz_config_header, onQuizConfigured = onStartQuiz)
+    DifficultyHeader(modifier = Modifier.padding(vertical = 4.dp), difficulty = difficulty, onDifficultyChanged = onDifficultyChanged)
+    SelectionList(selections = selections, onSelectionChanged = onSelectionChanged)
+}
+
+@Composable
+fun RecentFormsData(modifier: Modifier, forms: List<RecentForm>, openQuiz: (Int) -> Unit, deleteQuiz: (Int) -> Unit) {
+    LazyColumn(modifier = modifier) {
+        items(items = forms, key = { it.id }) { form ->
+            ElevatedCard(modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp), onClick = { openQuiz(form.id) }) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row {
+                        Text(text = form.topics, style = MaterialTheme.typography.labelMedium)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        IconButton(onClick = { deleteQuiz(form.id) }) {
+                            Icon(imageVector = Icons.Rounded.DeleteOutline, contentDescription = "Delete Form")
+                        }
+                    }
+                    Row {
+                        Text(text = stringResource(id = R.string.quiz_config_former_count), style = MaterialTheme.typography.bodySmall)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(text = form.count, style = MaterialTheme.typography.bodySmall)
+                    }
+                    Row {
+                        Text(text = stringResource(id = R.string.quiz_config_former_corrects), style = MaterialTheme.typography.bodySmall)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(text = form.corrects, style = MaterialTheme.typography.bodySmall, color = correctColor())
+                    }
+                    Row {
+                        Text(text = stringResource(id = R.string.quiz_config_former_failures), style = MaterialTheme.typography.bodySmall)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(text = form.failures, style = MaterialTheme.typography.bodySmall, color = errorColor())
+                    }
+                }
+            }
         }
     }
 }
@@ -134,20 +246,20 @@ fun DifficultyHeader(
 @Composable
 fun SelectionHeader(
     modifier: Modifier = Modifier,
+    text: Int,
     onQuizConfigured: () -> Unit
 ) {
     Row(modifier = modifier) {
         Text(
             modifier = Modifier
                 .padding(horizontal = 4.dp)
-                .fillMaxWidth(0.7f), text = stringResource(id = R.string.quiz_config_header), style = MaterialTheme.typography.headlineSmall
+                .fillMaxWidth(0.7f), text = stringResource(id = text), style = MaterialTheme.typography.headlineSmall
         )
         TextButton(onClick = onQuizConfigured) {
             Text(text = stringResource(id = R.string.quiz_config_start), style = MaterialTheme.typography.labelMedium)
         }
     }
 }
-
 
 @Composable
 private fun TopicCheck(

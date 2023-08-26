@@ -8,10 +8,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -28,7 +26,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -40,7 +37,6 @@ import de.yanos.islam.util.IslamDivider
 import de.yanos.islam.util.PatternedBackgroung
 import de.yanos.islam.util.correctColor
 import de.yanos.islam.util.errorColor
-import de.yanos.islam.util.goldColor
 import kotlinx.coroutines.launch
 
 
@@ -124,10 +120,10 @@ private fun QuizResultButtons(
             onShowAnswerChange = onShowAnswerChange
         )
         TextButton(onClick = { onAnswerResult(quizList[currentIndex].id, AnswerResult.CORRECT) }) {
-            Text(text = stringResource(id = R.string.quiz_session_answer_correct), style = MaterialTheme.typography.labelMedium, color = correctColor)
+            Text(text = stringResource(id = R.string.quiz_session_answer_correct), style = MaterialTheme.typography.labelMedium, color = correctColor())
         }
         TextButton(onClick = { onAnswerResult(quizList[currentIndex].id, AnswerResult.FAILURE) }) {
-            Text(text = stringResource(id = R.string.quiz_session_answer_failure), style = MaterialTheme.typography.labelMedium, color = errorColor)
+            Text(text = stringResource(id = R.string.quiz_session_answer_failure), style = MaterialTheme.typography.labelMedium, color = errorColor())
         }
     }
 }
@@ -158,12 +154,12 @@ private fun QuizScore(modifier: Modifier = Modifier, results: List<AnswerResult>
             Text(
                 text = results.count { it == AnswerResult.CORRECT }.toString(),
                 style = MaterialTheme.typography.labelMedium,
-                color = correctColor
+                color = correctColor()
             )
             Text(
                 text = results.count { it == AnswerResult.FAILURE }.toString(),
                 style = MaterialTheme.typography.labelMedium,
-                color = errorColor
+                color = errorColor()
             )
         }
     }
@@ -220,10 +216,10 @@ private fun Question(
         modifier = modifier
             .fillMaxWidth()
             .padding(24.dp),
-        border = BorderStroke(1.dp, goldColor),
+        border = BorderStroke(1.dp, item.resultColor()),
     ) {
         Text(modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp), text = "${item.question}?", style = MaterialTheme.typography.headlineSmall)
-        IslamDivider(1f)
+        IslamDivider(alpha = 1f, color = item.resultColor())
         AnimatedVisibility(visible = item.showSolution) {
             Text(
                 modifier = Modifier

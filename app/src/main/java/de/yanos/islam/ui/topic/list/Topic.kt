@@ -27,6 +27,7 @@ import de.yanos.islam.data.model.Topic
 import de.yanos.islam.util.PatternedBackgroung
 import de.yanos.islam.util.PrimaryLottie
 import de.yanos.islam.util.goldColor
+import de.yanos.islam.util.goldColorDark
 
 @Preview
 @Composable
@@ -97,7 +98,7 @@ private fun TopicList(
                     .padding(vertical = 2.dp)
                     .fillMaxWidth(),
                 shape = AbsoluteCutCornerShape(8.dp),
-                border = BorderStroke(1.dp, goldColor.copy(alpha = 0.4f)),
+                border = BorderStroke(1.dp, goldColor()),
                 onClick = { onTopicClick(topic) },
             ) {
                 Text(text = topic.title, style = MaterialTheme.typography.labelMedium)

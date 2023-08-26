@@ -17,10 +17,10 @@ data class QuizForm(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val topicIds: List<Int>,
     val createdAt: Long = System.currentTimeMillis(),
-    val finished: Boolean = false,
+    var finished: Boolean = false,
     val quizCount: Int,
     val quizDifficulty: Int,
-    val quizList: List<Int> = listOf(),
-    val solvedQuizList: List<Int> = listOf(),
-    val failedQuizList: List<Int> = listOf()
+    var quizList: List<Int> = listOf(),
+    var solvedQuizList: List<Int> = listOf(),
+    var failedQuizList: List<Int> = listOf()
 )

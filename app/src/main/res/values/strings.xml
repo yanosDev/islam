@@ -12,6 +12,12 @@
     <string name="quiz_config_all">Hepsi</string>
     <string name="quiz_config_count">Sorularin Sayisi: %s</string>
     <string name="quiz_config_hardness">Sorularin Zorlugu: %s</string>
+    <string name="quiz_config_former_header">Henüz Sonuclanmamis Sinavlariniz var. Devam etmek istermisiniz?</string>
+    <string name="quiz_config_former_count">Toplam: </string>
+    <string name="quiz_config_former_corrects">Dogru: </string>
+    <string name="quiz_config_former_failures">Yanlis: </string>
+    <string name="quiz_config_former_delete_all">Hepsini Sil</string>
+    <string name="quiz_config_former_new_form">Yeni Sinav Olustur</string>
     <string name="quiz_session_previous">Önceki Soru</string>
     <string name="quiz_session_next">Sonraki Soru</string>
     <string name="quiz_session_show_answer">Sonucu göster</string>

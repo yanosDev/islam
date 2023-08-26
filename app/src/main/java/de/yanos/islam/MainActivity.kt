@@ -25,7 +25,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.yanos.core.ui.theme.AppTheme
 import de.yanos.core.ui.view.DynamicNavigationScreen
 import de.yanos.core.utils.NavigationDestination
-import de.yanos.islam.ui.quiz.config.QuizSelectionView
+import de.yanos.islam.ui.quiz.config.QuizConfigurationView
 import de.yanos.islam.ui.quiz.session.QuizFormView
 import de.yanos.islam.ui.topic.list.SubTopicView
 import de.yanos.islam.ui.topic.list.TopicView
@@ -120,7 +120,7 @@ private fun IslamNavHost(
             )
         }
         composable(Routes.QUIZ_CONFIG) {
-            QuizSelectionView { id: Int ->
+            QuizConfigurationView { id: Int ->
                 navController.navigate(Routes.QUIZ_PLAY.replace("{id}", id.toString()))
             }
         }

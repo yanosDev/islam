@@ -11,6 +11,7 @@ import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.data.database.dao.QuizFormDao
 import de.yanos.islam.data.database.dao.TopicDao
 import de.yanos.islam.data.model.QuizForm
+import de.yanos.islam.data.model.Topic
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -21,34 +22,59 @@ import javax.inject.Inject
 @HiltViewModel
 class QuizConfigViewModel @Inject constructor(
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
-  //  @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
+    //  @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
     private val topicDao: TopicDao,
     private val quizFormDao: QuizFormDao,
 ) : ViewModel() {
     private var selections = mutableListOf<TopicSelection>()
     var difficulty by mutableStateOf<Difficulty>(Difficulty.Low)
     var state = mutableStateListOf<List<TopicSelection>>()
+    var recentForms = mutableStateListOf<RecentForm>()
 
-    init {
+    fun loadData() {
         viewModelScope.launch {
             topicDao.loadAllTopics().distinctUntilChanged().collect { topics ->
-                selections.clear()
-                selections.addAll(topics.filter { !it.hasSubTopics && it.parentTopicId == null }.map { TopicSelection(id = it.id, title = it.title, isSelected = true, null) })
-                topics.filter { it.hasSubTopics }.forEach { detailedTopic ->
-                    selections.add(
-                        TopicSelection(
-                            id = detailedTopic.id,
-                            title = detailedTopic.title,
-                            isSelected = true,
-                            null
-                        )
-                    )
-                    selections.addAll(topics.filter { it.parentTopicId == detailedTopic.id }
-                        .map { TopicSelection(id = it.id, title = it.title, isSelected = true, it.parentTopicId) })
-                }
-                recreateList()
+                populateRecentQuizList(topics)
+                configSelections(topics)
             }
         }
+    }
+
+    private suspend fun populateRecentQuizList(topics: List<Topic>) {
+        withContext(ioDispatcher) {
+            val forms = quizFormDao.loadOpenQuiz().map { form ->
+                val topicNames = topics.filter { form.topicIds.contains(it.id) }.map { it.title }
+                RecentForm(
+                    id = form.id,
+                    count = form.quizCount.toString(),
+                    corrects = form.solvedQuizList.count().toString(),
+                    failures = form.failedQuizList.count().toString(),
+                    topics = "${(if (topicNames.size < 5) topicNames else topicNames.subList(0, 3)).joinToString(", ")} ..."
+                )
+            }
+            withContext(Dispatchers.Main) {
+                recentForms.clear()
+                recentForms.addAll(forms)
+            }
+        }
+    }
+
+    private fun configSelections(topics: List<Topic>) {
+        selections.clear()
+        selections.addAll(topics.filter { !it.hasSubTopics && it.parentTopicId == null }.map { TopicSelection(id = it.id, title = it.title, isSelected = true, null) })
+        topics.filter { it.hasSubTopics }.forEach { detailedTopic ->
+            selections.add(
+                TopicSelection(
+                    id = detailedTopic.id,
+                    title = detailedTopic.title,
+                    isSelected = true,
+                    null
+                )
+            )
+            selections.addAll(topics.filter { it.parentTopicId == detailedTopic.id }
+                .map { TopicSelection(id = it.id, title = it.title, isSelected = true, it.parentTopicId) })
+        }
+        recreateList()
     }
 
     fun updateSelection(id: Int, selected: Boolean) {
@@ -98,7 +124,6 @@ class QuizConfigViewModel @Inject constructor(
 
     fun generateQuizForm(callback: (Int) -> Unit) {
         viewModelScope.launch(ioDispatcher) {
-
             quizFormDao.insert(
                 QuizForm(
                     topicIds = selections.filter { topic -> topic.isSelected && selections.none { it.parentId == topic.id } }.map { it.id },
@@ -108,9 +133,29 @@ class QuizConfigViewModel @Inject constructor(
                 )
             )
             val id = quizFormDao.recentFormId()
-            withContext(Dispatchers.Main){
+            withContext(Dispatchers.Main) {
                 callback(id)
             }
+        }
+    }
+
+    fun deleteForm(id: Int) {
+        viewModelScope.launch {
+            recentForms.firstOrNull { it.id == id }?.let {
+                recentForms.remove(it)
+                withContext(ioDispatcher) {
+                    quizFormDao.deleteById(it.id)
+                }
+            }
+        }
+    }
+
+    fun deleteAllForms() {
+        viewModelScope.launch {
+            withContext(ioDispatcher) {
+                quizFormDao.deleteAllOpenForms()
+            }
+            recentForms.clear()
         }
     }
 }
@@ -134,4 +179,12 @@ data class TopicSelection(
     val title: String,
     var isSelected: Boolean,
     val parentId: Int?
+)
+
+data class RecentForm(
+    val id: Int,
+    val count: String,
+    val corrects: String,
+    val failures: String,
+    val topics: String
 )
