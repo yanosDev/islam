@@ -62,7 +62,7 @@ class QuizConfigViewModel @Inject constructor(
 
     private fun configSelections(topics: List<Topic>) {
         selections.clear()
-        selections.addAll(topics.filter { !it.hasSubTopics && it.parentTopicId == null }.map { TopicSelection(id = it.id, title = it.title, isSelected = true, parentId = null) })
+        selections.addAll(topics.filter { !it.hasSubTopics && it.parentId == null }.map { TopicSelection(id = it.id, title = it.title, isSelected = true, parentId = null) })
         topics.filter { it.hasSubTopics }.forEach { detailedTopic ->
             selections.add(
                 TopicSelection(
@@ -73,8 +73,8 @@ class QuizConfigViewModel @Inject constructor(
                     hasSubTopics = true,
                 )
             )
-            selections.addAll(topics.filter { it.parentTopicId == detailedTopic.id }
-                .map { TopicSelection(id = it.id, title = it.title, isSelected = true, parentId = it.parentTopicId) })
+            selections.addAll(topics.filter { it.parentId == detailedTopic.id }
+                .map { TopicSelection(id = it.id, title = it.title, isSelected = true, parentId = it.parentId) })
         }
         recreateList()
     }

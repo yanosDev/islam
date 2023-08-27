@@ -9,10 +9,13 @@ data class Topic(
     @PrimaryKey val id: Int,
     val title: String,
     val ordinal: Int,
-    val parentTopicId: Int?,
-    val hasSubTopics: Boolean
+    val parentId: Int?,
+    val type: TopicType
 )
 
+enum class TopicType {
+    MAIN, GROUP, SUB
+}
 
 enum class TopicResource(val id: Int, val title: String, val raw: Int? = null, val parent: Int? = null) {
     ITIKAT(id = 0, title = "Itikat/Iman"),
@@ -21,8 +24,8 @@ enum class TopicResource(val id: Int, val title: String, val raw: Int? = null, v
     AHLAK(id = 3, title = "Ahlak", raw = R.raw.ahlak),
     KULTUR(id = 4, title = "Genel Kültür", raw = R.raw.kultur_genel),
     FARZ(id = 5, title = "32 Farz", raw = R.raw.farz),
-    IBADET_GENEL(id = 101, title = "Genel", raw = R.raw.ibadet_genel, parent = 1),
     IBADET_ABDEST(id = 100, title = "Abdest", raw = R.raw.ibadet_abdest, parent = 1),
+    IBADET_GENEL(id = 101, title = "Genel", raw = R.raw.ibadet_genel, parent = 1),
     IBADET_HAC(id = 102, title = "Hac", raw = R.raw.ibadet_hac, parent = 1),
     IBADET_KURBAN(id = 103, title = "Kurban", raw = R.raw.ibadet_kurban, parent = 1),
     IBADET_NAMAZ(id = 104, title = "Namaz", raw = R.raw.ibadet_namaz, parent = 1),

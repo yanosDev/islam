@@ -15,7 +15,6 @@ import de.yanos.islam.data.model.TopicResource
 import de.yanos.islam.data.model.Topic
 import de.yanos.islam.util.AppSettings
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -49,7 +48,7 @@ class MainViewModel @Inject constructor(
             topic.raw?.let { raw ->
                 createQuizByTopic(raw, topic.id)
             }
-            db.topicDao().insert(Topic(id = topic.id, title = topic.title, ordinal = topic.ordinal, parentTopicId = topic.parent, hasSubTopics = topic.raw == null))
+            db.topicDao().insert(Topic(id = topic.id, title = topic.title, ordinal = topic.ordinal, parentId = topic.parent, hasSubTopics = topic.raw == null))
         }
         appSettings.isDBInitialized = true
     }

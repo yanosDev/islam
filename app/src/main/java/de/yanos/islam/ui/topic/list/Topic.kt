@@ -27,7 +27,6 @@ import de.yanos.islam.data.model.Topic
 import de.yanos.islam.util.PatternedBackgroung
 import de.yanos.islam.util.PrimaryLottie
 import de.yanos.islam.util.goldColor
-import de.yanos.islam.util.goldColorDark
 
 @Preview
 @Composable
@@ -65,7 +64,7 @@ fun TopicView(
 
 @Composable
 private fun HeaderStars(modifier: Modifier = Modifier) {
-    PrimaryLottie(modifier = Modifier.height(200.dp), resId = R.raw.stars_moving)
+    PrimaryLottie(modifier = Modifier.height(200.dp), resId = R.raw.lottie_stars_moving)
 }
 
 @Composable
