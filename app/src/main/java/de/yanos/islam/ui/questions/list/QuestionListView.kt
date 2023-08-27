@@ -22,6 +22,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.data.model.Quiz
 import de.yanos.islam.util.IslamDivider
 import de.yanos.islam.util.NavigationPath
+import de.yanos.islam.util.bodyMedium
 import de.yanos.islam.util.bodySmall
 import de.yanos.islam.util.labelLarge
 import de.yanos.islam.util.titleLarge
@@ -31,8 +32,8 @@ fun QuestionListScreen(
     modifier: Modifier = Modifier,
     vm: QuestionListViewModel = hiltViewModel()
 ) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(modifier = modifier, text = vm.topicName.collectAsState(initial = listOf()).value.firstOrNull() ?: "", style = titleLarge())
+    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(modifier = Modifier.padding(vertical = 32.dp), text = vm.topicName.collectAsState(initial = listOf()).value.firstOrNull() ?: "", style = titleLarge())
         Questions(questions = vm.list.collectAsState(initial = listOf()).value)
     }
 }
@@ -53,14 +54,16 @@ private fun Questions(
             items = questions,
             key = { it.id }) { quiz ->
             ElevatedCard(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp)
             ) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(modifier = Modifier.padding(horizontal = 8.dp), text = "${quiz.question}?", style = labelLarge())
                 Spacer(modifier = Modifier.height(2.dp))
                 IslamDivider()
                 Spacer(modifier = Modifier.height(2.dp))
-                Text(modifier = Modifier.padding(horizontal = 8.dp), text = quiz.answer, style = bodySmall())
+                Text(modifier = Modifier.padding(horizontal = 8.dp), text = quiz.answer, style = bodyMedium())
                 Spacer(modifier = Modifier.height(2.dp))
             }
         }

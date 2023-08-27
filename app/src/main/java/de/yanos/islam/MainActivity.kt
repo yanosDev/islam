@@ -97,7 +97,6 @@ private fun IslamNavHost(
         }
         Unit
     }
-
     PatternedBackgroung(modifier = modifier) {
         NavHost(
             navController = navController,
