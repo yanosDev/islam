@@ -13,6 +13,6 @@ class SubTopicViewModel @Inject constructor(
 ) : ViewModel() {
     private val parentId: Int = savedStateHandle["id"]!!
     val list = dao.loadSubTopics(parentId)
-    val topicName = dao.loadTopicName(parentId)
+    val topicName = dao.loadTopicNames(parentId)
 
 }

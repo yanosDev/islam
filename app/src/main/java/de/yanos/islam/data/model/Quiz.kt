@@ -13,7 +13,7 @@ data class Quiz(
 )
 
 @Entity
-data class QuizForm(
+data class Challenge(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val topicIds: List<Int>,
     val createdAt: Long = System.currentTimeMillis(),

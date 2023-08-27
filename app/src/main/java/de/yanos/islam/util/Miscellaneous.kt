@@ -43,6 +43,14 @@ fun titleMedium() = typo().titleMedium
 
 @Composable
 fun titleLarge() = typo().titleLarge
+@Composable
+fun headlineSmall() = typo().headlineSmall
+
+@Composable
+fun headlineMedium() = typo().headlineMedium
+
+@Composable
+fun headlineLarge() = typo().headlineLarge
 
 @Composable
 fun goldColor(): Color {

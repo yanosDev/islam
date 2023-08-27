@@ -7,10 +7,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.History
-import androidx.compose.material.icons.rounded.List
-import androidx.compose.material.icons.rounded.Quiz
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -25,14 +21,11 @@ import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
 import de.yanos.core.ui.theme.AppTheme
 import de.yanos.core.ui.view.DynamicNavigationScreen
-import de.yanos.core.utils.NavigationDestination
+import de.yanos.islam.ui.challenge.create.ChallengeScreen
+import de.yanos.islam.ui.challenge.open.OpenChallengesScreen
+import de.yanos.islam.ui.questions.list.QuestionListScreen
 import de.yanos.islam.ui.questions.main.MainTopicsScreen
 import de.yanos.islam.ui.questions.sub.SubTopicsScreen
-import de.yanos.islam.ui.quiz.config.QuizConfigurationView
-import de.yanos.islam.ui.quiz.session.QuizFormView
-import de.yanos.islam.ui.topic.list.SubTopicView
-import de.yanos.islam.ui.topic.list.TopicView
-import de.yanos.islam.ui.topic.questions.TopicContentView
 import de.yanos.islam.util.AlogicalTypography
 import de.yanos.islam.util.NAVIGATION_BAR_DESTINATIONS
 import de.yanos.islam.util.NavigationPath
@@ -59,7 +52,7 @@ class MainActivity : ComponentActivity() {
                     //NavHost Here
                     IslamNavHost(
                         modifier = contentModifier,
-                        startRoute = Routes.TOPICS,
+                        startRoute = Routes.MAIN_TOPIC_LIST,
                         navController = navController
                     )
                 }
@@ -116,7 +109,7 @@ private fun IslamNavHost(
                 MainTopicsScreen(onNavigationChange = navigationHandler)
             }
             composable(route = Routes.CHALLENGE) {
-
+                ChallengeScreen(onNavigationChange = navigationHandler)
             }
             composable(route = Routes.TIMES) {
 
@@ -134,36 +127,21 @@ private fun IslamNavHost(
                 SubTopicsScreen(onNavigationChange = navigationHandler)
             }
             composable(
-                Routes.QUESTION_LIST,
+                route = Routes.QUESTION_LIST,
                 arguments = listOf(navArgument("id") { type = NavType.IntType })
-            ) { backStackEntry ->
-                SubTopicView(
-                    onTopicClick = { topic -> navController.navigate(Routes.TOPIC_CONTENT.replace("{id}", topic.id.toString())) },
-                    topicId = backStackEntry.arguments?.getInt("id")!!
-                )
+            ) {
+                QuestionListScreen()
             }
             composable(
-                Routes.TOPIC_CONTENT,
-                arguments = listOf(navArgument("id") { type = NavType.IntType })
-            ) { backStackEntry ->
-                TopicContentView(
-                    topicId = backStackEntry.arguments?.getInt("id")!!
-                )
-            }
-            composable(Routes.QUIZ_CONFIG) {
-                QuizConfigurationView { id: Int ->
-                    navController.navigate(Routes.QUIZ_PLAY.replace("{id}", id.toString()))
-                }
+                route = Routes.CHALLENGE_OPEN,
+            ) {
+                OpenChallengesScreen(onNavigationChange = navigationHandler)
             }
             composable(
-                Routes.QUIZ_PLAY,
-                arguments = listOf(
-                    navArgument("id") { type = NavType.IntType },
-                )
-            ) { backStackEntry ->
-                QuizFormView(id = backStackEntry.arguments?.getInt("id")!!) {
-                    navController.popBackStack()
-                }
+                route = Routes.CHALLENGE_SESSION,
+                arguments = listOf(navArgument("id") { type = NavType.IntType })
+            ) {
+                ChallengeScreen(onNavigationChange = navigationHandler)
             }
         }
     }

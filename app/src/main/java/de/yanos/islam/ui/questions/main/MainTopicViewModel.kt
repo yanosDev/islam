@@ -9,5 +9,5 @@ import javax.inject.Inject
 class MainTopicViewModel @Inject constructor(
     private val dao: TopicDao
 ) : ViewModel() {
-    val list = dao.all()
+    val list = dao.allMain()
 }

@@ -81,13 +81,13 @@ fun IslamRadio(
             onClick = onClick
         )
         TextButton(onClick = onClick) {
-            Text(modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Start, text = stringResource(id = text), style = MaterialTheme.typography.bodyMedium)
+            Text(modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Start, text = stringResource(id = text), style = bodyMedium())
         }
     }
 }
 
 @Composable
-fun PrimaryLottie(modifier: Modifier, @RawRes resId: Int) {
+fun Lottie(modifier: Modifier, @RawRes resId: Int, applyColor: Boolean = true) {
     val dynamicProperties = rememberLottieDynamicProperties(
         rememberLottieDynamicProperty(
             property = LottieProperty.COLOR_FILTER,
@@ -102,12 +102,20 @@ fun PrimaryLottie(modifier: Modifier, @RawRes resId: Int) {
     )
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(resId))
     val progress by animateLottieCompositionAsState(composition)
-    LottieAnimation(
-        modifier = modifier,
-        composition = composition,
-        progress = { progress },
-        dynamicProperties = dynamicProperties
-    )
+    if (applyColor)
+        LottieAnimation(
+            modifier = modifier,
+            composition = composition,
+            progress = { progress },
+            dynamicProperties = dynamicProperties
+        )
+    else
+        LottieAnimation(
+            modifier = modifier,
+            composition = composition,
+            progress = { progress },
+        )
+
 }
 
 @Composable

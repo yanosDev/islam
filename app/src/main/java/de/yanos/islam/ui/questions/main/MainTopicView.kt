@@ -23,8 +23,9 @@ import de.yanos.islam.R
 import de.yanos.islam.data.model.Topic
 import de.yanos.islam.data.model.TopicType
 import de.yanos.islam.util.NavigationPath
-import de.yanos.islam.util.PrimaryLottie
+import de.yanos.islam.util.Lottie
 import de.yanos.islam.util.goldColor
+import de.yanos.islam.util.headlineLarge
 import de.yanos.islam.util.labelMedium
 import de.yanos.islam.util.titleLarge
 
@@ -34,10 +35,9 @@ fun MainTopicsScreen(
     vm: MainTopicViewModel = hiltViewModel(),
     onNavigationChange: (NavigationPath) -> Unit
 ) {
-
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        PrimaryLottie(modifier = modifier.height(180.dp), resId = R.raw.lottie_stars_moving)
-        Text(modifier = modifier, text = stringResource(id = R.string.topics_title), style = titleLarge())
+        Lottie(modifier = modifier.height(220.dp), resId = R.raw.lottie_stars_moving)
+        Text(modifier = Modifier.padding(bottom = 32.dp), text = stringResource(id = R.string.main_topic_title), style = headlineLarge())
         TopicButtons(topics = vm.list.collectAsState(initial = listOf()).value) { topic ->
             onNavigationChange(
                 if (topic.type == TopicType.GROUP)
@@ -58,7 +58,7 @@ fun TopicButtons(
         modifier = modifier
             .widthIn(320.dp, 600.dp)
             .padding(horizontal = 32.dp),
-        contentPadding = PaddingValues(2.dp)
+        contentPadding = PaddingValues(4.dp)
     ) {
         items(
             items = topics,
@@ -79,7 +79,9 @@ private fun TopicButton(
     onTopicClick: (Topic) -> Unit
 ) {
     ElevatedButton(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 2.dp),
         shape = AbsoluteCutCornerShape(8.dp),
         border = BorderStroke(1.dp, goldColor()),
         onClick = { onTopicClick(topic) },

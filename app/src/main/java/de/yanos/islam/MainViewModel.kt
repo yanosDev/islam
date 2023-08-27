@@ -13,6 +13,7 @@ import de.yanos.islam.data.database.IslamDatabase
 import de.yanos.islam.data.model.Quiz
 import de.yanos.islam.data.model.TopicResource
 import de.yanos.islam.data.model.Topic
+import de.yanos.islam.data.model.TopicType
 import de.yanos.islam.util.AppSettings
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
@@ -48,7 +49,15 @@ class MainViewModel @Inject constructor(
             topic.raw?.let { raw ->
                 createQuizByTopic(raw, topic.id)
             }
-            db.topicDao().insert(Topic(id = topic.id, title = topic.title, ordinal = topic.ordinal, parentId = topic.parent, hasSubTopics = topic.raw == null))
+            db.topicDao().insert(
+                Topic(
+                    id = topic.id, title = topic.title, ordinal = topic.ordinal, parentId = topic.parent, type = when {
+                        topic.parent == null && topic.raw != null -> TopicType.MAIN
+                        topic.parent == null -> TopicType.GROUP
+                        else -> TopicType.SUB
+                    }
+                )
+            )
         }
         appSettings.isDBInitialized = true
     }
