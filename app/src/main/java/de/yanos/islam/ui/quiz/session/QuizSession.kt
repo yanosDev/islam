@@ -25,8 +25,10 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -53,10 +55,19 @@ fun QuizFormView(
     val scope = rememberCoroutineScope()
     val scrollExecutor = { index: Int ->
         scope.launch {
-            vm.currentIndex = index
+            vm.updateIndex(index)
             state.animateScrollToItem(index = index)
         }
         Unit
+    }
+
+    if (vm.currentIndex > 0) {
+        DisposableEffect(Unit) {
+            scope.launch {
+                state.animateScrollToItem(index = vm.currentIndex)
+            }
+            onDispose { }
+        }
     }
 
     vm.populateQuizForm(id)
@@ -128,15 +139,24 @@ private fun QuizResultButtons(
     onAnswerResult: (id: Int, result: AnswerResult) -> Unit
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.SpaceEvenly) {
+        val solutionVisible = quizList[currentIndex].showSolution || quizList[currentIndex].answerResult != AnswerResult.OPEN
         AnswerDisplayer(
             currentItem = quizList[currentIndex],
             onShowAnswerChange = onShowAnswerChange
         )
-        TextButton(onClick = { onAnswerResult(quizList[currentIndex].id, AnswerResult.CORRECT) }) {
-            Text(text = stringResource(id = R.string.quiz_session_answer_correct), style = MaterialTheme.typography.labelMedium, color = correctColor())
+        TextButton(onClick = { onAnswerResult(quizList[currentIndex].id, AnswerResult.CORRECT) }, enabled = solutionVisible) {
+            Text(
+                text = stringResource(id = R.string.quiz_session_answer_correct),
+                style = MaterialTheme.typography.labelMedium,
+                color = if (solutionVisible) correctColor() else Color.Unspecified
+            )
         }
-        TextButton(onClick = { onAnswerResult(quizList[currentIndex].id, AnswerResult.FAILURE) }) {
-            Text(text = stringResource(id = R.string.quiz_session_answer_failure), style = MaterialTheme.typography.labelMedium, color = errorColor())
+        TextButton(onClick = { onAnswerResult(quizList[currentIndex].id, AnswerResult.FAILURE) }, enabled = solutionVisible) {
+            Text(
+                text = stringResource(id = R.string.quiz_session_answer_failure),
+                style = MaterialTheme.typography.labelMedium,
+                color = if (solutionVisible) errorColor() else Color.Unspecified
+            )
         }
     }
 }
@@ -186,7 +206,8 @@ private fun AnswerDisplayer(
 ) {
     IslamCheckBox(
         modifier = modifier,
-        isChecked = currentItem.showSolution,
+        isEnabled = currentItem.answerResult == AnswerResult.OPEN,
+        isChecked = currentItem.showSolution || currentItem.answerResult != AnswerResult.OPEN,
         onCheckChange = { onShowAnswerChange(currentItem.id, !currentItem.showSolution) }
     ) {
         Text(
@@ -214,7 +235,7 @@ private fun QuizList(
             Column(
                 modifier = Modifier.fillParentMaxWidth()
             ) {
-                Question(modifier = Modifier.weight(1f), item = item)
+                Question(modifier = Modifier.weight(1f), item = item, index = quizList.indexOf(item) + 1)
             }
         }
     }
@@ -223,7 +244,8 @@ private fun QuizList(
 @Composable
 private fun Question(
     modifier: Modifier = Modifier,
-    item: QuizItem
+    item: QuizItem,
+    index: Int,
 ) {
     OutlinedCard(
         modifier = modifier
@@ -231,9 +253,9 @@ private fun Question(
             .padding(24.dp),
         border = BorderStroke(1.dp, item.resultColor()),
     ) {
-        Text(modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp), text = "${item.question}?", style = MaterialTheme.typography.headlineSmall)
+        Text(modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp), text = "$index. ${item.question}?", style = MaterialTheme.typography.headlineSmall)
         IslamDivider(color = item.resultColor())
-        AnimatedVisibility(visible = item.showSolution) {
+        AnimatedVisibility(visible = item.showSolution || item.answerResult != AnswerResult.OPEN) {
             Text(
                 modifier = Modifier
                     .verticalScroll(rememberScrollState())

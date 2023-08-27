@@ -79,6 +79,7 @@ class QuizFormViewModel @Inject constructor(
                     answerResult = AnswerResult.OPEN
                 )
             }.sortedBy { it.id })
+            currentIndex = quizForm.currentIndex
             updateForm()
         }
     }
@@ -102,6 +103,7 @@ class QuizFormViewModel @Inject constructor(
                     quizList.clear()
                     quizList.addAll(it.sortedBy { it.id })
                 }
+                currentIndex = quizForm.currentIndex
                 updateForm()
             }
         }
@@ -156,6 +158,16 @@ class QuizFormViewModel @Inject constructor(
                 quizList.addAll(newList)
 
                 updateForm()
+            }
+        }
+    }
+
+    fun updateIndex(index: Int) {
+        currentIndex = index
+        viewModelScope.launch(ioDispatcher) {
+            form?.id?.let { id ->
+                form?.currentIndex = index
+                quizFormDao.updateIndex(id, index)
             }
         }
     }

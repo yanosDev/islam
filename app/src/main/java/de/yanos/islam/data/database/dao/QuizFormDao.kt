@@ -22,4 +22,7 @@ interface QuizFormDao : BaseDao<QuizForm> {
 
     @Query("DELETE FROM QuizForm WHERE finished = 0")
     fun deleteAllOpenForms()
+
+    @Query("UPDATE QuizForm SET currentIndex = :index WHERE id = :id")
+    fun updateIndex(id: Int, index: Int)
 }

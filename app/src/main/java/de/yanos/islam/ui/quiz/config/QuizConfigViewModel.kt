@@ -30,6 +30,7 @@ class QuizConfigViewModel @Inject constructor(
     var difficulty by mutableStateOf<Difficulty>(Difficulty.Low)
     var state = mutableStateListOf<List<TopicSelection>>()
     var recentForms = mutableStateListOf<RecentForm>()
+    var creationError by mutableStateOf(false)
 
     fun loadData() {
         viewModelScope.launch {
@@ -61,18 +62,19 @@ class QuizConfigViewModel @Inject constructor(
 
     private fun configSelections(topics: List<Topic>) {
         selections.clear()
-        selections.addAll(topics.filter { !it.hasSubTopics && it.parentTopicId == null }.map { TopicSelection(id = it.id, title = it.title, isSelected = true, null) })
+        selections.addAll(topics.filter { !it.hasSubTopics && it.parentTopicId == null }.map { TopicSelection(id = it.id, title = it.title, isSelected = true, parentId = null) })
         topics.filter { it.hasSubTopics }.forEach { detailedTopic ->
             selections.add(
                 TopicSelection(
                     id = detailedTopic.id,
                     title = detailedTopic.title,
                     isSelected = true,
-                    null
+                    parentId = null,
+                    hasSubTopics = true,
                 )
             )
             selections.addAll(topics.filter { it.parentTopicId == detailedTopic.id }
-                .map { TopicSelection(id = it.id, title = it.title, isSelected = true, it.parentTopicId) })
+                .map { TopicSelection(id = it.id, title = it.title, isSelected = true, parentId = it.parentTopicId) })
         }
         recreateList()
     }
@@ -123,20 +125,27 @@ class QuizConfigViewModel @Inject constructor(
     }
 
     fun generateQuizForm(callback: (Int) -> Unit) {
-        viewModelScope.launch(ioDispatcher) {
-            quizFormDao.insert(
-                QuizForm(
-                    topicIds = selections.filter { topic -> topic.isSelected && selections.none { it.parentId == topic.id } }.map { it.id },
-                    createdAt = System.currentTimeMillis(),
-                    quizCount = difficulty.quizCount,
-                    quizDifficulty = difficulty.quizMinDifficulty,
+        if (selections.any { it.parentId == null && it.isSelected })
+            viewModelScope.launch(ioDispatcher) {
+                quizFormDao.insert(
+                    QuizForm(
+                        topicIds = selections.filter { selection ->
+                            selection.isSelected
+                                    && (selection.parentId == null
+                                    || selections.any { it.id == selection.parentId && it.isSelected }
+                                    )
+                        }.map { it.id },
+                        createdAt = System.currentTimeMillis(),
+                        quizCount = difficulty.quizCount,
+                        quizDifficulty = difficulty.quizMinDifficulty,
+                    )
                 )
-            )
-            val id = quizFormDao.recentFormId()
-            withContext(Dispatchers.Main) {
-                callback(id)
+                val id = quizFormDao.recentFormId()
+                withContext(Dispatchers.Main) {
+                    callback(id)
+                }
             }
-        }
+        else creationError = true
     }
 
     fun deleteForm(id: Int) {
@@ -178,7 +187,8 @@ data class TopicSelection(
     val id: Int,
     val title: String,
     var isSelected: Boolean,
-    val parentId: Int?
+    val hasSubTopics: Boolean = false,
+    val parentId: Int?,
 )
 
 data class RecentForm(

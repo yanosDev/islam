@@ -41,6 +41,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import de.yanos.core.ui.view.CustomDialog
 import de.yanos.islam.R
 import de.yanos.islam.util.IslamCheckBox
 import de.yanos.islam.util.IslamDivider
@@ -59,6 +60,16 @@ fun QuizConfigurationView(
 ) {
     vm.loadData()
     PatternedBackgroung(modifier = modifier) {
+        if (vm.creationError) {
+            val callback = { vm.creationError = false }
+            CustomDialog(
+                title = stringResource(id = R.string.quiz_config_error_topic_title),
+                text = stringResource(id = R.string.quiz_config_error_topic_content),
+                onConfirm = callback,
+                onDismiss = callback,
+                showCancel = false
+            )
+        }
         if (vm.recentForms.isNotEmpty() || vm.state.isNotEmpty()) {
             AnimatedVisibility(visible = vm.recentForms.isEmpty(), enter = fadeIn(), exit = fadeOut()) {
                 Column(modifier = modifier.padding(start = 32.dp, end = 32.dp, top = 8.dp)) {

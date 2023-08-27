@@ -19,6 +19,8 @@
     <string name="quiz_config_former_delete">Sinavi Sil</string>
     <string name="quiz_config_former_delete_all">Hepsini Sil</string>
     <string name="quiz_config_former_new_form">Yeni Sinav Olustur</string>
+    <string name="quiz_config_error_topic_title">Sinav Olusturalamadi</string>
+    <string name="quiz_config_error_topic_content">Herhangi bir Konu secmediniz. Lütfen en azindan bir Konu seciniz</string>
     <string name="quiz_session_previous">Önceki Soru</string>
     <string name="quiz_session_next">Sonraki Soru</string>
     <string name="quiz_session_show_answer">Sonucu göster</string>

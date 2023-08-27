@@ -20,6 +20,7 @@ data class QuizForm(
     var finished: Boolean = false,
     val quizCount: Int,
     val quizDifficulty: Int,
+    var currentIndex: Int = 0,
     var quizList: List<Int> = listOf(),
     var solvedQuizList: List<Int> = listOf(),
     var failedQuizList: List<Int> = listOf()
