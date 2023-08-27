@@ -127,7 +127,7 @@ private fun IslamNavHost(
             }
             composable(
                 route = Routes.QUESTION_LIST,
-                arguments = listOf(navArgument("id") { type = NavType.IntType })
+                arguments = listOf(navArgument("id") { type = NavType.IntType }, navArgument("parentId") { type = NavType.IntType })
             ) {
                 QuestionListScreen()
             }

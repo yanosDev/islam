@@ -17,6 +17,6 @@ interface TopicDao : BaseDao<Topic> {
     @Query("SELECT * FROM Topic WHERE parentId = :id")
     fun loadSubTopics(id: Int): Flow<List<Topic>>
 
-    @Query("SELECT title FROM Topic WHERE id = :id")
+    @Query("SELECT title FROM Topic WHERE id IN (:id)")
     fun loadTopicNames(vararg id: Int): Flow<List<String>>
 }

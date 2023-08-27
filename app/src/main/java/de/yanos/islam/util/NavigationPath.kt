@@ -12,7 +12,9 @@ import de.yanos.islam.R
 sealed class NavigationPath(val route: String) {
     data class NavigateToChallenge(val id: Int) : NavigationPath(Routes.CHALLENGE_SESSION.replace("{id}", id.toString()))
     data class NavigateToSubTopic(val id: Int) : NavigationPath(Routes.SUB_TOPIC_LIST.replace("{id}", id.toString()))
-    data class NavigateToTopicQuestions(val id: Int) : NavigationPath(Routes.QUESTION_LIST.replace("{id}", id.toString()))
+    data class NavigateToTopicQuestions(val id: Int, val parentId: Int?) :
+        NavigationPath(Routes.QUESTION_LIST.replace("{id}", id.toString()).replace("{parentId}", (parentId?.toString() ?: "-1")))
+
     object NavigateBack : NavigationPath("")
 }
 
@@ -25,7 +27,7 @@ object Routes {
     const val SETTINGS = "settings"
 
     const val SUB_TOPIC_LIST = "topic/{id}"
-    const val QUESTION_LIST = "topic/{id}/questions"
+    const val QUESTION_LIST = "topic/{parentId}/questions/{id}"
     const val CHALLENGE_OPEN = "challenge/open/"
     const val CHALLENGE_SESSION = "challenge/{id}"
 }

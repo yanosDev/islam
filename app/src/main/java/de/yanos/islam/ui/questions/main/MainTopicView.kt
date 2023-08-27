@@ -42,7 +42,7 @@ fun MainTopicsScreen(
             onNavigationChange(
                 if (topic.type == TopicType.GROUP)
                     NavigationPath.NavigateToSubTopic(topic.id)
-                else NavigationPath.NavigateToTopicQuestions(topic.id)
+                else NavigationPath.NavigateToTopicQuestions(topic.id, null)
             )
         }
     }

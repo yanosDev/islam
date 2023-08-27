@@ -33,7 +33,7 @@ fun QuestionListScreen(
     vm: QuestionListViewModel = hiltViewModel()
 ) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(modifier = Modifier.padding(vertical = 32.dp), text = vm.topicName.collectAsState(initial = listOf()).value.firstOrNull() ?: "", style = titleLarge())
+        Text(modifier = Modifier.padding(vertical = 32.dp), text = vm.topicName.collectAsState(initial = listOf()).value.joinToString(" - "), style = titleLarge())
         Questions(questions = vm.list.collectAsState(initial = listOf()).value)
     }
 }

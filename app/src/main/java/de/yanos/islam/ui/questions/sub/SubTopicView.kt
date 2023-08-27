@@ -26,6 +26,6 @@ fun SubTopicsScreen(
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Lottie(modifier = Modifier.height(180.dp), resId = R.raw.lottie_girl_thinking, applyColor = false)
         Text(modifier = Modifier.padding(bottom = 32.dp), text = vm.topicName.collectAsState(initial = listOf()).value.firstOrNull() ?: "", style = headlineMedium())
-        TopicButtons(topics = vm.list.collectAsState(initial = listOf()).value) { topic -> onNavigationChange(NavigationPath.NavigateToTopicQuestions(topic.id)) }
+        TopicButtons(topics = vm.list.collectAsState(initial = listOf()).value) { topic -> onNavigationChange(NavigationPath.NavigateToTopicQuestions(topic.id, topic.parentId)) }
     }
 }
