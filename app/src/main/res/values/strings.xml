@@ -36,4 +36,14 @@
     <string name="challenge_session_answer_failure">Bilemedim</string>
     <string name="challenge_session_finished">Sinaviniz Bitmistir</string>
     <string name="challenge_session_finished_result">Toplam %d sorudan tam %d tanesini dogru cevapladiniz ve %d tanesine yanlis cevap verdiniz</string>
+
+    <string name="setting_font_title">Yazi ayarlari</string>
+    <string name="setting_font_size_title">Yazi Boyutu</string>
+    <string name="setting_font_style_title">Yazi türü</string>
+    <string name="setting_apply_now">Simdi Degisiklikleri gerceklestir</string>
+    <string name="font_alogical">Alogical</string>
+    <string name="font_open_sans">Open Sans</string>
+    <string name="font_roboto">Roboto</string>
+    <string name="font_ubuntu">Ubuntu</string>
+    <string name="font_montserrat">Montserrat</string>
 </resources>

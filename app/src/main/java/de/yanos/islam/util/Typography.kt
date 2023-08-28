@@ -13,56 +13,16 @@ import de.yanos.islam.R
 fun typoByConfig(appSettings: AppSettings): Typography {
     return typo(
         sizeFactor = appSettings.fontSizeFactor,
-        family = when (appSettings.fontStyle) {
-            0 -> FontFamily(
-                Font(R.font.sabana, FontWeight.Normal)
-            )
-
-            1 -> FontFamily(
-                Font(R.font.sabana, FontWeight.Normal)
-            )
-
-            2 -> FontFamily(
-                Font(R.font.sirajun, FontWeight.Normal)
-            )
-
-            3 -> FontFamily(
-                Font(R.font.mustopha_regular, FontWeight.Normal)
-            )
-
-            4 -> FontFamily(
-                Font(R.font.khodijah, FontWeight.Normal)
-            )
-
-            5 -> FontFamily(
-                Font(R.font.alogical, FontWeight.Normal)
-            )
-
-            6 -> FontFamily(
-                Font(R.font.open_sans, FontWeight.Normal)
-            )
-
-            7 -> FontFamily(
-                Font(R.font.roboto, FontWeight.Normal)
-            )
-
-            8 -> FontFamily(
-                Font(R.font.ubuntu, FontWeight.Normal)
-            )
-
-            9 -> FontFamily(
-                Font(R.font.mont_sub, FontWeight.Normal)
-            )
-
-            10 -> FontFamily(
-                Font(R.font.mont, FontWeight.Normal)
-            )
-
-            else -> FontFamily(
-                Font(R.font.dancing, FontWeight.Normal)
-            )
-        }
+        family = FontFamily(Font(FontStyle.values()[appSettings.fontStyle].fontId, FontWeight.Normal))
     )
+}
+
+enum class FontStyle(val textId: Int, val fontId: Int) {
+    Alogical(R.string.font_alogical, R.font.alogical),
+    OpenSans(R.string.font_open_sans, R.font.open_sans),
+    Roboto(R.string.font_roboto, R.font.roboto),
+    Ubuntu(R.string.font_ubuntu, R.font.ubuntu),
+    Montserrat(R.string.font_montserrat, R.font.mont)
 }
 
 fun typo(sizeFactor: Int, family: FontFamily): Typography {
