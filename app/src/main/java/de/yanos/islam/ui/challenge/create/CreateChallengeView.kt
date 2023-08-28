@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -16,6 +18,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -28,6 +32,7 @@ import de.yanos.islam.util.IslamCheckBox
 import de.yanos.islam.util.IslamDivider
 import de.yanos.islam.util.IslamRadio
 import de.yanos.islam.util.NavigationPath
+import de.yanos.islam.util.bodyLarge
 import de.yanos.islam.util.bodyMedium
 import de.yanos.islam.util.labelMedium
 import de.yanos.islam.util.titleLarge
@@ -41,17 +46,33 @@ fun ChallengeScreen(
     CreationDialogError(showError = vm.showCreationError) {
         vm.showCreationError = false
     }
-    Column(modifier = modifier) {
-        Text(text = stringResource(id = R.string.challenge_creation_title), style = titleLarge())
-        ChallengeDifficulty(difficulty = vm.difficulty) { difficulty: ChallengeDifficulty -> vm.difficulty = difficulty }
-        ChallengeTopics(topics = vm.topics, onSelectionChanged = vm::updateSelection)
-        TextButton(onClick = {
-            vm.createForm { id ->
-                onNavigationChange(NavigationPath.NavigateToChallenge(id))
-            }
-        }) {
-            Text(text = stringResource(id = R.string.challenge_creation_create))
+    when (vm.hasOpenChallenges) {
+        true -> {
+            onNavigationChange(NavigationPath.NavigateToOpenChallenges)
+            vm.hasOpenChallenges = false
         }
+
+        false -> {
+            Column(modifier = modifier.padding(16.dp)) {
+                Text(text = stringResource(id = R.string.challenge_creation_title), style = titleLarge())
+                Spacer(modifier = Modifier.height(4.dp))
+                ChallengeDifficulty(modifier = Modifier.padding(vertical = 8.dp), difficulty = vm.difficulty) { difficulty: ChallengeDifficulty -> vm.difficulty = difficulty }
+                ChallengeTopics(modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = 8.dp), topics = vm.topics, onSelectionChanged = vm::updateSelection)
+                TextButton(modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(16.dp), onClick = {
+                    vm.createForm { id ->
+                        onNavigationChange(NavigationPath.NavigateToChallenge(id))
+                    }
+                }) {
+                    Text(text = stringResource(id = R.string.challenge_creation_create), style = bodyLarge())
+                }
+            }
+        }
+
+        else -> {}
     }
 }
 
@@ -65,7 +86,7 @@ private fun ChallengeDifficulty(
         IslamRadio(isSelected = contentDifficulty == difficulty, text = stringId, onClick = { onDifficultyChanged(contentDifficulty) })
         IslamDivider()
     }
-    ElevatedCard(modifier = modifier.padding(4.dp)) {
+    ElevatedCard(modifier = modifier) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Row(
                 modifier = Modifier
@@ -109,14 +130,11 @@ private fun ChallengeTopics(
     onSelectionChanged: (id: Int, isSelected: Boolean) -> Unit
 ) {
     ElevatedCard(
-        modifier = modifier
-            .padding(vertical = 8.dp)
-            .fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
     ) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 128.dp),
             modifier = Modifier.widthIn(320.dp, 600.dp),
-            contentPadding = PaddingValues(16.dp)
         ) {
             topics.forEach { subList ->
                 if (subList.any { it.parentId != null }) {

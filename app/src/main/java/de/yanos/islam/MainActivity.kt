@@ -12,6 +12,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -22,7 +23,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.yanos.core.ui.theme.AppTheme
 import de.yanos.core.ui.view.DynamicNavigationScreen
 import de.yanos.islam.ui.challenge.create.ChallengeScreen
+import de.yanos.islam.ui.challenge.create.CreateChallengeViewModel
 import de.yanos.islam.ui.challenge.open.OpenChallengesScreen
+import de.yanos.islam.ui.challenge.session.ChallengeSessionScreen
 import de.yanos.islam.ui.questions.list.QuestionListScreen
 import de.yanos.islam.ui.questions.main.MainTopicsScreen
 import de.yanos.islam.ui.questions.sub.SubTopicsScreen
@@ -140,7 +143,7 @@ private fun IslamNavHost(
                 route = Routes.CHALLENGE_SESSION,
                 arguments = listOf(navArgument("id") { type = NavType.IntType })
             ) {
-                ChallengeScreen(onNavigationChange = navigationHandler)
+                ChallengeSessionScreen(onNavigationChange = navigationHandler)
             }
         }
     }

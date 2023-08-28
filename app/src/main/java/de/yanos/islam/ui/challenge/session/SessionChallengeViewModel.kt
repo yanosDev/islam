@@ -52,7 +52,7 @@ class SessionChallengeViewModel @Inject constructor(
     }
 
     private suspend fun initChallenge(item: Challenge) {
-        quizDao.loadAllByTopic(*item.topicIds.toIntArray()).collect { newList ->
+        quizDao.loadAllByTopic(item.topicIds).collect { newList ->
             val selectedQuizList = mutableListOf<Quiz>()
             val prioList = newList.filter { it.difficulty >= item.quizDifficulty }
             val selectedIndex = mutableListOf<Int>()
@@ -78,7 +78,7 @@ class SessionChallengeViewModel @Inject constructor(
 
     private suspend fun reloadChallenge(item: Challenge) {
         withContext(ioDispatcher) {
-            quizDao.loadAllQuizByIds(*item.quizList.toIntArray()).map {
+            quizDao.loadAllQuizByIds(item.quizList).map {
                 QuizItem(
                     id = it.id,
                     question = it.question,

@@ -8,15 +8,15 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TopicDao : BaseDao<Topic> {
-    @Query("SELECT * FROM Topic WHERE type != 'SUB'")
+    @Query("SELECT * FROM Topic WHERE type != 'SUB' ORDER BY id")
     fun allMain(): Flow<List<Topic>>
 
-    @Query("SELECT id as id, title as title, ordinal as ordinal, parentId as parentId, type as type, 1 as isSelected FROM Topic")
+    @Query("SELECT id as id, title as title, ordinal as ordinal, parentId as parentId, type as type, 1 as isSelected FROM Topic ORDER BY ordinal")
     fun allAsSelection(): Flow<List<TopicSelection>>
 
-    @Query("SELECT * FROM Topic WHERE parentId = :id")
+    @Query("SELECT * FROM Topic WHERE parentId = :id ORDER BY id")
     fun loadSubTopics(id: Int): Flow<List<Topic>>
 
     @Query("SELECT title FROM Topic WHERE id IN (:id)")
-    fun loadTopicNames(vararg id: Int): Flow<List<String>>
+    fun loadTopicNames(id: List<Int>): Flow<List<String>>
 }

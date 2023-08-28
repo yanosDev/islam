@@ -15,6 +15,6 @@ class QuestionListViewModel @Inject constructor(
 ) : ViewModel() {
     private val topicId: Int = savedStateHandle["id"]!!
     private val parentId: Int = savedStateHandle["parentId"]!!
-    val list = quizDao.loadAllByTopic(topicId)
-    val topicName = topicDao.loadTopicNames(topicId, parentId)
+    val list = quizDao.loadAllByTopic(listOf(topicId))
+    val topicName = topicDao.loadTopicNames(listOf(topicId, parentId))
 }
