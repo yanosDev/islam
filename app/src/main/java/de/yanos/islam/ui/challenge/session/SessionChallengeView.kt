@@ -74,27 +74,28 @@ fun ChallengeSessionScreen(
     ChallengeFinished(vm.challenge.collectAsState(initial = null).value) {
         onNavigationChange(NavigationPath.NavigateBack)
     }
-    Column(modifier = modifier) {
-        ChallengeList(modifier = Modifier.weight(1f), state = state, quizList = vm.challengeQuizList)
-        ChallengeBoard(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 4.dp),
-            currentIndex = vm.currentIndex,
-            quizList = vm.challengeQuizList,
-            onShowAnswerChange = { id, showAnswer -> vm.updateAnswerVisibility(id, showAnswer) },
-            onAnswerResult = { id, result -> vm.updateQuizResult(id, result) }
-        )
-        ChallengeNavigation(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 4.dp),
-            isPreviousButtonEnabled = vm.currentIndex > 0,
-            isNextButtonEnabled = vm.currentIndex < vm.challengeQuizList.size - 1,
-            currentIndex = vm.currentIndex,
-            onScroll = scrollExecutor
-        )
-    }
+    if (vm.challengeQuizList.size > 0)
+        Column(modifier = modifier.padding(16.dp)) {
+            ChallengeList(modifier = Modifier.weight(1f), state = state, quizList = vm.challengeQuizList)
+            ChallengeBoard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                currentIndex = vm.currentIndex,
+                quizList = vm.challengeQuizList,
+                onShowAnswerChange = { id, showAnswer -> vm.updateAnswerVisibility(id, showAnswer) },
+                onAnswerResult = { id, result -> vm.updateQuizResult(id, result) }
+            )
+            ChallengeNavigation(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                isPreviousButtonEnabled = vm.currentIndex > 0,
+                isNextButtonEnabled = vm.currentIndex < vm.challengeQuizList.size - 1,
+                currentIndex = vm.currentIndex,
+                onScroll = scrollExecutor
+            )
+        }
 }
 
 @Composable

@@ -32,7 +32,7 @@ class SessionChallengeViewModel @Inject constructor(
     private val quizDao: QuizDao,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    val challengeId: Int = savedStateHandle["id"]!!
+    private val challengeId: Int = savedStateHandle["id"]!!
     val challenge = challengeDao.loadForm(challengeId)
     var currentIndex by mutableStateOf(0)
     var challengeQuizList = mutableStateListOf<QuizItem>()

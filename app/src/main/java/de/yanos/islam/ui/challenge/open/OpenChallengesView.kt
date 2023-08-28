@@ -17,7 +17,6 @@ import androidx.compose.material.icons.rounded.NewLabel
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -25,7 +24,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -38,7 +36,6 @@ import de.yanos.islam.util.errorColor
 import de.yanos.islam.util.goldColor
 import de.yanos.islam.util.labelMedium
 import de.yanos.islam.util.titleLarge
-import de.yanos.islam.util.titleSmall
 
 @Composable
 fun OpenChallengesScreen(
@@ -120,17 +117,18 @@ private fun ChallengeList(
                     .padding(vertical = 4.dp),
                 onClick = { onChallengeClicked(form.id) }) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(text = form.topics, style = labelMedium())
+                    Text(text = form.topics ?: "", style = labelMedium())
                     scoreItem(goldColor(), form.count, R.string.challenge_creation_total_count)
                     scoreItem(correctColor(), form.corrects, R.string.challenge_creation_corrects)
                     scoreItem(errorColor(), form.failures, R.string.challenge_creation_failures)
+                    Spacer(modifier = Modifier.height(4.dp))
                     IslamDivider()
                     TextButton(modifier = Modifier
                         .align(Alignment.End)
                         .padding(2.dp), onClick = { onDeleteChallengeClicked(form.id) }) {
                         Row {
                             Icon(imageVector = Icons.Rounded.DeleteOutline, contentDescription = "Delete Form", tint = errorColor())
-                            Text(text = stringResource(id = R.string.challenge_creation_count), style = bodySmall(), color = errorColor())
+                            Text(text = stringResource(id = R.string.challenge_creation_delete), style = bodySmall(), color = errorColor())
                         }
                     }
                 }

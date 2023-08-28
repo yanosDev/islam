@@ -16,6 +16,7 @@
     <string name="challenge_creation_total_count">Sorularin Sayisi: %s</string>
     <string name="challenge_creation_level">Sorularin Zorlugu: %s</string>
     <string name="challenge_creation_create">Sinava Gir</string>
+    <string name="challenge_creation_to_open">Önceki Sinvalarim</string>
     <string name="challenge_creation_error_title">Sinav Olusturalamadi</string>
     <string name="challenge_creation_error_content">Herhangi bir Konu secmediniz. Lütfen en azindan bir Konu seciniz</string>
     <string name="challenge_creation_header">Henüz Sonuclanmamis Sinavlariniz var. Devam etmek istermisiniz?</string>

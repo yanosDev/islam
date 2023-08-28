@@ -1,5 +1,6 @@
 package de.yanos.islam.ui.challenge.create
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -46,33 +47,38 @@ fun ChallengeScreen(
     CreationDialogError(showError = vm.showCreationError) {
         vm.showCreationError = false
     }
-    when (vm.hasOpenChallenges) {
-        true -> {
-            onNavigationChange(NavigationPath.NavigateToOpenChallenges)
-            vm.hasOpenChallenges = false
-        }
 
-        false -> {
-            Column(modifier = modifier.padding(16.dp)) {
-                Text(text = stringResource(id = R.string.challenge_creation_title), style = titleLarge())
-                Spacer(modifier = Modifier.height(4.dp))
-                ChallengeDifficulty(modifier = Modifier.padding(vertical = 8.dp), difficulty = vm.difficulty) { difficulty: ChallengeDifficulty -> vm.difficulty = difficulty }
-                ChallengeTopics(modifier = Modifier
-                    .weight(1f)
-                    .padding(vertical = 8.dp), topics = vm.topics, onSelectionChanged = vm::updateSelection)
-                TextButton(modifier = Modifier
-                    .align(Alignment.End)
-                    .padding(16.dp), onClick = {
-                    vm.createForm { id ->
-                        onNavigationChange(NavigationPath.NavigateToChallenge(id))
-                    }
+    Column(modifier = modifier.padding(16.dp)) {
+        Text(text = stringResource(id = R.string.challenge_creation_title), style = titleLarge())
+        Spacer(modifier = Modifier.height(4.dp))
+        ChallengeDifficulty(modifier = Modifier.padding(vertical = 8.dp), difficulty = vm.difficulty) { difficulty: ChallengeDifficulty -> vm.difficulty = difficulty }
+        ChallengeTopics(
+            modifier = Modifier
+                .weight(1f)
+                .padding(vertical = 8.dp), topics = vm.topics, onSelectionChanged = vm::updateSelection
+        )
+        Row(
+            modifier = Modifier
+                .align(Alignment.End)
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            AnimatedVisibility(visible = vm.hasOpenChallenges.collectAsState(initial = false).value) {
+                TextButton(onClick = {
+                    onNavigationChange(NavigationPath.NavigateToOpenChallenges)
                 }) {
-                    Text(text = stringResource(id = R.string.challenge_creation_create), style = bodyLarge())
+                    Text(text = stringResource(id = R.string.challenge_creation_to_open), style = bodyLarge())
                 }
             }
+            TextButton(onClick = {
+                vm.createForm { id ->
+                    onNavigationChange(NavigationPath.NavigateToChallenge(id))
+                }
+            }) {
+                Text(text = stringResource(id = R.string.challenge_creation_create), style = bodyLarge())
+            }
         }
-
-        else -> {}
     }
 }
 

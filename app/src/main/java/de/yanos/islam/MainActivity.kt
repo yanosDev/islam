@@ -93,10 +93,11 @@ private fun IslamNavHost(
     val scope = rememberCoroutineScope()
     val navigationHandler = { path: NavigationPath ->
         scope.launch {
-            if (path is NavigationPath.NavigateBack)
-                navController.popBackStack()
-            else
-                navController.navigate(path.route)
+            when (path) {
+                NavigationPath.NavigateBack -> navController.popBackStack()
+                else -> navController.navigate(path.route)
+            }
+
         }
         Unit
     }

@@ -32,8 +32,8 @@ fun QuestionListScreen(
     modifier: Modifier = Modifier,
     vm: QuestionListViewModel = hiltViewModel()
 ) {
-    Column(modifier = modifier.padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(modifier = Modifier.padding(vertical = 32.dp), text = vm.topicName.collectAsState(initial = listOf()).value.joinToString(" - "), style = titleLarge())
+    Column(modifier = modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(text = vm.topicName.collectAsState(initial = listOf()).value.joinToString(" - "), style = titleLarge())
         Questions(questions = vm.list.collectAsState(initial = listOf()).value)
     }
 }
@@ -47,8 +47,7 @@ private fun Questions(
         modifier = modifier
             .wrapContentSize()
             .widthIn(320.dp, 800.dp)
-            .padding(start = 16.dp, end = 16.dp, top = 8.dp),
-        contentPadding = PaddingValues(8.dp)
+            .padding(8.dp),
     ) {
         items(
             items = questions,

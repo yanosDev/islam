@@ -41,5 +41,5 @@ data class OpenChallenge(
     val count: String,
     val corrects: String,
     val failures: String,
-    val topics: String
+    val topics: String? = null
 )

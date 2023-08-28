@@ -25,7 +25,7 @@ class CreateChallengeViewModel @Inject constructor(
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
     private val topicDao: TopicDao,
 ) : ViewModel() {
-    var hasOpenChallenges: Boolean? by mutableStateOf(null)
+    var hasOpenChallenges = challengeDao.hasOpenChallenges()
     var topics = mutableStateListOf<List<TopicSelection>>()
     var showCreationError by mutableStateOf(false)
     var difficulty by mutableStateOf<ChallengeDifficulty>(ChallengeDifficulty.Low)
@@ -33,7 +33,6 @@ class CreateChallengeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            hasOpenChallenges = withContext(ioDispatcher) { challengeDao.hasOpenChallenges() }
             topicDao.allAsSelection().collect { selections ->
                 initialSelections.clear()
                 initialSelections.addAll(selections)

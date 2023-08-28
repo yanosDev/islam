@@ -9,21 +9,23 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ChallengeDao : BaseDao<Challenge> {
 
-    @Query("SELECT" +
-            "    CASE WHEN EXISTS " +
-            "    (" +
-            "        SELECT * FROM CHALLENGE WHERE finished = 0 " +
-            "    )" +
-            "    THEN 1 " +
-            "    ELSE 0 " +
-            "END")
-    fun hasOpenChallenges(): Boolean
+    @Query(
+        "SELECT" +
+                "    CASE WHEN EXISTS " +
+                "    (" +
+                "        SELECT * FROM CHALLENGE WHERE finished = 0 " +
+                "    )" +
+                "    THEN 1 " +
+                "    ELSE 0 " +
+                "END"
+    )
+    fun hasOpenChallenges(): Flow<Boolean>
 
     @Query(
         "SELECT q.id, q.quizCount AS count, COUNT(q.solvedQuizList) AS corrects,  COUNT(q.failedQuizList) AS failures, GROUP_CONCAT(t.title, ', ') AS topics " +
                 "FROM Challenge q " +
                 "LEFT JOIN TOPIC t " +
-                "ON (q.topicids LIKE '%' || t.id ||'%' AND t.type != 'SUB') " +
+                "ON (q.topicIds LIKE '%' || t.id ||'%' AND t.type != 'SUB')  WHERE q.finished = 0 " +
                 "GROUP BY q.id"
     )
     fun openChallenges(): Flow<List<OpenChallenge>>
