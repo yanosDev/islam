@@ -67,7 +67,7 @@ class SessionChallengeViewModel @Inject constructor(
                     selectedQuizList.add(useList[index])
                 }
             } else {
-                selectedQuizList.addAll(newList)
+                selectedQuizList.addAll(newList.shuffled())
             }
 
             challengeDao.updateQuizList(challengeId, quizList = selectedQuizList.map { it.id })

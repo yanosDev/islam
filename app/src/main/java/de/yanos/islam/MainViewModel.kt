@@ -63,7 +63,7 @@ class MainViewModel @Inject constructor(
     }
 
     private fun createQuizByTopic(@RawRes topicRaw: Int, topicId: Int) {
-        val regex = Regex("""\d+[.]|\D+""")
+        val regex = Regex("""\d+|\D+""")
         val inputStream: InputStream = context.resources.openRawResource(topicRaw)
         val br = BufferedReader(InputStreamReader(inputStream))
         val lines = br.readLines()
@@ -81,7 +81,7 @@ class MainViewModel @Inject constructor(
                             val text = it.trim()
                             if (text.isNotBlank())
                                 when {
-                                    !it.matches(Regex("""\d+[.]""")) || builder.isEmpty() -> builder.append(" $text")
+                                    !it.matches(Regex("""\d+""")) || builder.isEmpty() -> builder.append(" $text")
                                     else -> builder.append("\n$text ")
                                 }
                         }
@@ -89,7 +89,7 @@ class MainViewModel @Inject constructor(
                     }
                 } catch (e: Exception) {
                     Timber.e(actualLine)
-                    e.localizedMessage?.let { Log.e("e", it) }
+                    e.localizedMessage?.let { Timber.e("e", it) }
                 }
             }
         }
