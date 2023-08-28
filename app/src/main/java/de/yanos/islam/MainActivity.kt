@@ -12,7 +12,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -23,28 +22,30 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.yanos.core.ui.theme.AppTheme
 import de.yanos.core.ui.view.DynamicNavigationScreen
 import de.yanos.islam.ui.challenge.create.ChallengeScreen
-import de.yanos.islam.ui.challenge.create.CreateChallengeViewModel
 import de.yanos.islam.ui.challenge.open.OpenChallengesScreen
 import de.yanos.islam.ui.challenge.session.ChallengeSessionScreen
 import de.yanos.islam.ui.questions.list.QuestionListScreen
 import de.yanos.islam.ui.questions.main.MainTopicsScreen
 import de.yanos.islam.ui.questions.sub.SubTopicsScreen
-import de.yanos.islam.util.AlogicalTypography
+import de.yanos.islam.ui.settings.SettingsScreen
+import de.yanos.islam.util.AppSettings
 import de.yanos.islam.util.NAVIGATION_BAR_DESTINATIONS
 import de.yanos.islam.util.NavigationPath
 import de.yanos.islam.util.PatternedBackgroung
 import de.yanos.islam.util.Routes
+import de.yanos.islam.util.typoByConfig
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val vm: MainViewModel by viewModels()
-
+    @Inject lateinit var appSettings: AppSettings
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         setContent {
-            AppTheme(activity = this, typography = AlogicalTypography) { modifier, config ->
+            AppTheme(activity = this, typography = typoByConfig(appSettings)) { modifier, config ->
                 val navController = rememberNavController()
                 DynamicNavigationScreen(
                     modifier = modifier.padding(top = 48.dp), // TODO: Check statusbar problem
@@ -121,7 +122,7 @@ private fun IslamNavHost(
 
             }
             composable(route = Routes.SETTINGS) {
-
+                SettingsScreen()
             }
             composable(
                 route = Routes.SUB_TOPIC_LIST,

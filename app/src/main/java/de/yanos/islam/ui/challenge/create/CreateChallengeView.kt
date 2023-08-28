@@ -90,7 +90,7 @@ private fun ChallengeDifficulty(
     onDifficultyChanged: (ChallengeDifficulty) -> Unit
 ) {
     val composeRadio = @Composable { contentDifficulty: ChallengeDifficulty, stringId: Int ->
-        IslamRadio(modifier = Modifier.widthIn(max = 120.dp), isSelected = contentDifficulty == difficulty, text = stringId, onClick = { onDifficultyChanged(contentDifficulty) })
+        IslamRadio(modifier = Modifier.widthIn(max = 200.dp), isSelected = contentDifficulty == difficulty, text = stringId, onClick = { onDifficultyChanged(contentDifficulty) })
     }
     ElevatedCard(modifier = modifier) {
         Column(modifier = Modifier.fillMaxWidth()) {

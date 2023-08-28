@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -76,7 +77,7 @@ fun ChallengeSessionScreen(
         onNavigationChange(NavigationPath.NavigateBack)
     }
     if (vm.challengeQuizList.size > 0)
-        Column(modifier = modifier.padding(16.dp)) {
+        Column(modifier = modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Lottie(modifier = Modifier.height(160.dp), resId = R.raw.lottie_girl_thinking, applyColor = false)
             ChallengeList(modifier = Modifier.weight(1f), state = state, quizList = vm.challengeQuizList)
             ChallengeBoard(
@@ -201,16 +202,10 @@ private fun ChallengeActionButtons(
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.SpaceEvenly) {
         val solutionVisible = quizList[currentIndex].showSolution || quizList[currentIndex].answerResult != AnswerResult.OPEN
-        IslamCheckBox(
-            isEnabled = quizList[currentIndex].answerResult == AnswerResult.OPEN,
-            isChecked = solutionVisible,
-            onCheckChange = { onShowAnswerChange(quizList[currentIndex].id, !quizList[currentIndex].showSolution) }
+        TextButton(enabled = quizList[currentIndex].answerResult == AnswerResult.OPEN,
+            onClick = { onShowAnswerChange(quizList[currentIndex].id, !quizList[currentIndex].showSolution) }
         ) {
-            Text(
-                textAlign = TextAlign.End,
-                text = stringResource(id = R.string.challenge_session_show_answer),
-                style = labelMedium()
-            )
+            Text(text = stringResource(id = R.string.challenge_session_show_answer), style = labelMedium())
         }
         TextButton(onClick = { onAnswerResult(quizList[currentIndex].id, AnswerResult.CORRECT) }, enabled = solutionVisible) {
             Text(text = stringResource(id = R.string.challenge_session_answer_correct), style = labelMedium(), color = if (solutionVisible) correctColor() else Color.Unspecified)

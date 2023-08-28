@@ -81,7 +81,7 @@ class MainViewModel @Inject constructor(
                             val text = it.trim()
                             if (text.isNotBlank())
                                 when {
-                                    !it.matches(Regex("""\d+.""")) || builder.isEmpty() -> builder.append(" $text")
+                                    !it.matches(Regex("""\d+[.]""")) || builder.isEmpty() -> builder.append(" $text")
                                     else -> builder.append("\n$text ")
                                 }
                         }

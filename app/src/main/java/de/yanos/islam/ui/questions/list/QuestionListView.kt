@@ -55,15 +55,15 @@ private fun Questions(
             ElevatedCard(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 4.dp)
+                    .padding(vertical = 4.dp),
             ) {
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(12.dp))
                 Text(modifier = Modifier.padding(horizontal = 8.dp), text = "${quiz.question}?", style = labelLarge())
-                Spacer(modifier = Modifier.height(2.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 IslamDivider()
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(modifier = Modifier.padding(horizontal = 8.dp), text = quiz.answer, style = bodyMedium())
-                Spacer(modifier = Modifier.height(2.dp))
+                Spacer(modifier = Modifier.height(12.dp))
             }
         }
     }
