@@ -1,5 +1,6 @@
 package de.yanos.islam.ui.challenge.open
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -94,7 +95,7 @@ private fun ChallengeActionButtons(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun ChallengeList(
     modifier: Modifier = Modifier,
@@ -114,13 +115,14 @@ private fun ChallengeList(
             ElevatedCard(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .animateItemPlacement()
                     .padding(vertical = 4.dp),
                 onClick = { onChallengeClicked(form.id) }) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(text = form.topics ?: "", style = labelMedium())
-                    scoreItem(goldColor(), form.count, R.string.challenge_creation_total_count)
-                    scoreItem(correctColor(), form.corrects, R.string.challenge_creation_corrects)
-                    scoreItem(errorColor(), form.failures, R.string.challenge_creation_failures)
+                    scoreItem(goldColor(), form.count.takeIf { it.toInt() != Int.MAX_VALUE } ?: stringResource(id = R.string.challenge_creation_difficulty_max), R.string.challenge_creation_count)
+                    scoreItem(correctColor(), form.corrects.size.toString(), R.string.challenge_creation_corrects)
+                    scoreItem(errorColor(), form.failures.size.toString(), R.string.challenge_creation_failures)
                     Spacer(modifier = Modifier.height(4.dp))
                     IslamDivider()
                     TextButton(modifier = Modifier

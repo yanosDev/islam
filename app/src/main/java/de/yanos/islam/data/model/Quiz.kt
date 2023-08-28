@@ -16,7 +16,7 @@ data class Quiz(
 data class Challenge(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val topicIds: List<Int>,
-    val createdAt: Long = System.currentTimeMillis(),
+    val lastAction: Long = System.currentTimeMillis(),
     var finished: Boolean = false,
     val quizCount: Int,
     val quizDifficulty: Int,

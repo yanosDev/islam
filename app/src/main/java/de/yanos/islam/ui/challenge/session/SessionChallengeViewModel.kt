@@ -20,6 +20,10 @@ import de.yanos.islam.util.errorColor
 import de.yanos.islam.util.goldColor
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -38,15 +42,11 @@ class SessionChallengeViewModel @Inject constructor(
     var challengeQuizList = mutableStateListOf<QuizItem>()
 
     init {
-        viewModelScope.launch {
-            challenge.collect {
-                it?.let { c ->
-                    currentIndex = c.currentIndex
-                    if (challengeQuizList.isEmpty())
-                        if (c.quizList.isEmpty()) {
-                            initChallenge(c)
-                        } else reloadChallenge(c)
-                }
+        viewModelScope.launch(ioDispatcher) {
+            challenge.distinctUntilChanged().collectLatest { c ->
+                if (c.quizList.isEmpty()) {
+                    initChallenge(c)
+                } else reloadChallenge(c)
             }
         }
     }
@@ -70,32 +70,32 @@ class SessionChallengeViewModel @Inject constructor(
                 selectedQuizList.addAll(newList)
             }
 
-            withContext(ioDispatcher) {
-                challengeDao.update(item.copy(topicIds = selectedQuizList.map { it.id }))
-            }
+            challengeDao.updateQuizList(challengeId, quizList = selectedQuizList.map { it.id })
+            challengeDao.updateResults(challengeId, listOf(-1), listOf(-1), false) // Above update doesn't trigger the flow for some reason so i added this
+            challengeDao.updateResults(challengeId, listOf(), listOf(), false) // Above update doesn't trigger the flow for some reason so i added this
         }
     }
 
     private suspend fun reloadChallenge(item: Challenge) {
-        withContext(ioDispatcher) {
-            quizDao.loadAllQuizByIds(item.quizList).map {
+        quizDao.loadAllQuizByIds(item.quizList).map {
+            withContext(Dispatchers.Main) {
                 QuizItem(
                     id = it.id,
                     question = it.question,
                     answer = it.answer,
-                    showSolution = false,
+                    showSolution = challengeQuizList.find { c -> c.id == it.id }?.showSolution ?: false,
                     answerResult = when {
                         item.solvedQuizList.contains(it.id) -> AnswerResult.CORRECT
                         item.failedQuizList.contains(it.id) -> AnswerResult.FAILURE
                         else -> AnswerResult.OPEN
                     }
                 )
-            }.let {
-                withContext(Dispatchers.Main) {
-                    challengeQuizList.clear()
-                    challengeQuizList.addAll(it)
-                    currentIndex = item.currentIndex
-                }
+            }
+        }.let {
+            withContext(Dispatchers.Main) {
+                challengeQuizList.clear()
+                challengeQuizList.addAll(it)
+                currentIndex = item.currentIndex
             }
         }
     }
@@ -133,15 +133,12 @@ class SessionChallengeViewModel @Inject constructor(
                     .map { it.id }
                 withContext(ioDispatcher) {
                     challengeDao.updateResults(
+                        challengeId,
                         solved,
                         failed,
-                        solved.size + failed.size == challengeQuizList.size
+                        solved.size + failed.size == newList.size
                     )
                 }
-
-                //Update UI
-                challengeQuizList.clear()
-                challengeQuizList.addAll(newList)
             }
         }
     }

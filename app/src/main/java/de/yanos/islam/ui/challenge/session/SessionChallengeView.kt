@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
@@ -20,7 +21,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.ArrowForward
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -39,6 +39,7 @@ import de.yanos.islam.R
 import de.yanos.islam.data.model.Challenge
 import de.yanos.islam.util.IslamCheckBox
 import de.yanos.islam.util.IslamDivider
+import de.yanos.islam.util.Lottie
 import de.yanos.islam.util.NavigationPath
 import de.yanos.islam.util.bodyLarge
 import de.yanos.islam.util.bodySmall
@@ -76,10 +77,12 @@ fun ChallengeSessionScreen(
     }
     if (vm.challengeQuizList.size > 0)
         Column(modifier = modifier.padding(16.dp)) {
+            Lottie(modifier = Modifier.height(160.dp), resId = R.raw.lottie_girl_thinking, applyColor = false)
             ChallengeList(modifier = Modifier.weight(1f), state = state, quizList = vm.challengeQuizList)
             ChallengeBoard(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .fillMaxHeight(0.35f)
                     .padding(horizontal = 16.dp, vertical = 4.dp),
                 currentIndex = vm.currentIndex,
                 quizList = vm.challengeQuizList,

@@ -3,19 +3,18 @@ package de.yanos.islam.ui.challenge.create
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -32,6 +31,7 @@ import de.yanos.islam.util.ChallengeDifficulty
 import de.yanos.islam.util.IslamCheckBox
 import de.yanos.islam.util.IslamDivider
 import de.yanos.islam.util.IslamRadio
+import de.yanos.islam.util.Lottie
 import de.yanos.islam.util.NavigationPath
 import de.yanos.islam.util.bodyLarge
 import de.yanos.islam.util.bodyMedium
@@ -49,6 +49,7 @@ fun ChallengeScreen(
     }
 
     Column(modifier = modifier.padding(16.dp)) {
+        Lottie(modifier = Modifier.height(160.dp), resId = R.raw.lottie_configuring, applyColor = false)
         Text(text = stringResource(id = R.string.challenge_creation_title), style = titleLarge())
         Spacer(modifier = Modifier.height(4.dp))
         ChallengeDifficulty(modifier = Modifier.padding(vertical = 8.dp), difficulty = vm.difficulty) { difficulty: ChallengeDifficulty -> vm.difficulty = difficulty }
@@ -62,7 +63,7 @@ fun ChallengeScreen(
                 .align(Alignment.End)
                 .fillMaxWidth()
                 .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.End
         ) {
             AnimatedVisibility(visible = vm.hasOpenChallenges.collectAsState(initial = false).value) {
                 TextButton(onClick = {
@@ -89,8 +90,7 @@ private fun ChallengeDifficulty(
     onDifficultyChanged: (ChallengeDifficulty) -> Unit
 ) {
     val composeRadio = @Composable { contentDifficulty: ChallengeDifficulty, stringId: Int ->
-        IslamRadio(isSelected = contentDifficulty == difficulty, text = stringId, onClick = { onDifficultyChanged(contentDifficulty) })
-        IslamDivider()
+        IslamRadio(modifier = Modifier.widthIn(max = 120.dp), isSelected = contentDifficulty == difficulty, text = stringId, onClick = { onDifficultyChanged(contentDifficulty) })
     }
     ElevatedCard(modifier = modifier) {
         Column(modifier = Modifier.fillMaxWidth()) {
@@ -103,10 +103,26 @@ private fun ChallengeDifficulty(
                 Text(text = stringResource(id = R.string.challenge_creation_total_count, difficulty.count()), style = labelMedium())
                 Text(text = stringResource(id = R.string.challenge_creation_level, difficulty.diff()), style = labelMedium())
             }
-            composeRadio(ChallengeDifficulty.Low, R.string.challenge_creation_difficulty_low)
-            composeRadio(ChallengeDifficulty.Medium, R.string.challenge_creation_difficulty_mid)
-            composeRadio(ChallengeDifficulty.High, R.string.challenge_creation_difficulty_high)
-            composeRadio(ChallengeDifficulty.Max, R.string.challenge_creation_difficulty_max)
+            IslamDivider()
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                composeRadio(ChallengeDifficulty.Low, R.string.challenge_creation_difficulty_low)
+                composeRadio(ChallengeDifficulty.Medium, R.string.challenge_creation_difficulty_mid)
+            }
+            IslamDivider()
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                composeRadio(ChallengeDifficulty.High, R.string.challenge_creation_difficulty_high)
+                composeRadio(ChallengeDifficulty.Max, R.string.challenge_creation_difficulty_max)
+            }
         }
     }
 }

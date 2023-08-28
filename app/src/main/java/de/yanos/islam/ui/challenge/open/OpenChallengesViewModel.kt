@@ -39,7 +39,7 @@ class OpenChallengesViewModel @Inject constructor(
 data class OpenChallenge(
     val id: Int,
     val count: String,
-    val corrects: String,
-    val failures: String,
+    val corrects: List<Int>,
+    val failures: List<Int>,
     val topics: String? = null
 )

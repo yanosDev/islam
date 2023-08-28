@@ -76,7 +76,7 @@ class CreateChallengeViewModel @Inject constructor(
                                     || flatTopics.any { it.id == selection.parentId && it.isSelected }
                                     )
                         }.map { it.id },
-                        createdAt = System.currentTimeMillis(),
+                        lastAction = System.currentTimeMillis(),
                         quizCount = difficulty.quizCount,
                         quizDifficulty = difficulty.quizMinDifficulty,
                     )
