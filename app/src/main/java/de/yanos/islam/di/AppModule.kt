@@ -16,6 +16,7 @@ import de.yanos.core.utils.DebugInterceptor
 import de.yanos.core.utils.DefaultDispatcher
 import de.yanos.core.utils.IODispatcher
 import de.yanos.core.utils.MainDispatcher
+import de.yanos.islam.data.api.AwqatApi
 import de.yanos.islam.data.api.QiblaApi
 import de.yanos.islam.data.database.IslamDatabase
 import de.yanos.islam.data.database.IslamDatabaseImpl
@@ -61,9 +62,27 @@ internal class AppModule {
             .build()
     }
 
+    @Awqat
+    @Provides
+    fun provideAwqatRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        val moshi = Moshi.Builder()
+            .add(KotlinJsonAdapterFactory())
+            .build()
+        return Retrofit.Builder()
+            .client(okHttpClient)
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .baseUrl("https://awqatsalah.diyanet.gov.tr")
+            .build()
+    }
+
     @Provides
     fun provideQiblaApi(@QiblaRetrofit retrofit: Retrofit): QiblaApi {
         return retrofit.create(QiblaApi::class.java)
+    }
+
+    @Provides
+    fun provideAwqatApi(@Awqat retrofit: Retrofit): AwqatApi {
+        return retrofit.create(AwqatApi::class.java)
     }
 
     @Provides
@@ -84,6 +103,10 @@ internal class AppModule {
     @Provides
     @Singleton
     fun provideQuizFormDao(db: IslamDatabase) = db.quizFormDao()
+
+    @Provides
+    @Singleton
+    fun provideAwqatDao(db: IslamDatabase) = db.awqatDao()
 
     @Provides
     @Singleton
@@ -126,6 +149,7 @@ annotation class Awqat
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class Accelerometer
+
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class Magnetometer
