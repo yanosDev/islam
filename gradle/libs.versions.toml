@@ -34,6 +34,7 @@ coroutines = "1.7.1"
 crashlytics = "2.9.6"
 firebase-bom = "32.1.1"
 google-maps = "18.1.0"
+google-location = "21.0.1"
 google-services = "20.5.0"
 googleServicesGradle = "4.3.15"
 hilt = "2.43.2"
@@ -125,6 +126,7 @@ core = { module = "com.github.yanosDev.Libraries:core", version.ref = "yanos-lib
 core-jdk-desugaring = { module = "com.android.tools:desugar_jdk_libs", version.ref = "jdkDesugar" }
 crashLog = { module = "com.github.yanosDev.libraries:crashlog", version.ref = "yanos-lib" }
 crashlytics-gradlePlugin = { module = "com.google.firebase:firebase-crashlytics-gradle", version.ref = "crashlytics" }
+data = { module = "com.github.yanosDev.Libraries:data", version.ref = "yanos-lib" }
 firebase-auth = { module = "com.google.firebase:firebase-auth-ktx" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics-ndk" }
@@ -136,6 +138,7 @@ google-auth = { module = "com.google.android.gms:play-services-auth", version.re
 google-services = { module = "com.google.gms:google-services", version.ref = "googleServicesGradle" }
 googlemaps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "maps-compose" }
 googlemaps-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "google-maps" }
+google-location = { module = "com.google.android.gms:play-services-location", version.ref = "google-location" }
 gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "retrofit" }

@@ -4,6 +4,11 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import timber.log.Timber
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 
 val goldColorDark = Color(android.graphics.Color.parseColor("#FFD700"))
@@ -65,4 +70,16 @@ fun correctColor(): Color {
 @Composable
 fun errorColor(): Color {
     return if (isSystemInDarkTheme()) errorColorDark else errorColorLight
+}
+
+fun Long.epochSecondToDateString(
+    format: String
+): String {
+    return try {
+        val dueDate = Instant.ofEpochSecond(this).atZone(ZoneId.systemDefault()).toLocalDateTime()
+        dueDate.format(DateTimeFormatter.ofPattern(format, Locale.getDefault()))
+    } catch (e: Exception) {
+        Timber.e(e)
+        ""
+    }
 }

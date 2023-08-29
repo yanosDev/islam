@@ -36,7 +36,13 @@
     <string name="challenge_session_answer_failure">Bilemedim</string>
     <string name="challenge_session_finished">Sinaviniz Bitmistir</string>
     <string name="challenge_session_finished_result">Toplam %d sorudan tam %d tanesini dogru cevapladiniz ve %d tanesine yanlis cevap verdiniz</string>
-
+    <string name="praying_imsak_title">Imsak</string>
+    <string name="praying_morning_title">Sabah</string>
+    <string name="praying_lunch_title">Ögle</string>
+    <string name="praying_afternoon_title">Ikindi</string>
+    <string name="praying_evening_title">Aksam</string>
+    <string name="praying_night_title">Yatsi</string>
+    <string name="praying_times_header">Namaz Vakitleri</string>
     <string name="setting_font_title">Yazi ayarlari</string>
     <string name="setting_font_size_title">Yazi Boyutu</string>
     <string name="setting_font_style_title">Yazi türü</string>

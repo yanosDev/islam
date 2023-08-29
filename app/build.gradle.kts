@@ -60,6 +60,13 @@ dependencies {
     implementation(libs.hilt.compose)
     kapt(libs.hilt.compiler)
 
+    //Server
+    implementation(libs.okhttp3)
+    implementation(libs.okhttp.logging)
+    implementation(libs.retrofit)
+    implementation(libs.moshi)
+    implementation(libs.moshi.kotlin)
+
     //Database
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
@@ -68,7 +75,9 @@ dependencies {
     //Splash
     implementation(libs.splash)
 
+    //Location
+    implementation(libs.google.location)
     implementation(libs.timber)
-
     implementation(libs.lottie)
+    implementation(libs.accompanist.permissions)
 }

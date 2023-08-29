@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavHostController
@@ -24,6 +25,7 @@ import de.yanos.core.ui.view.DynamicNavigationScreen
 import de.yanos.islam.ui.challenge.create.ChallengeScreen
 import de.yanos.islam.ui.challenge.open.OpenChallengesScreen
 import de.yanos.islam.ui.challenge.session.ChallengeSessionScreen
+import de.yanos.islam.ui.prayer.PrayerScreen
 import de.yanos.islam.ui.questions.list.QuestionListScreen
 import de.yanos.islam.ui.questions.main.MainTopicsScreen
 import de.yanos.islam.ui.questions.sub.SubTopicsScreen
@@ -33,6 +35,7 @@ import de.yanos.islam.util.NAVIGATION_BAR_DESTINATIONS
 import de.yanos.islam.util.NavigationPath
 import de.yanos.islam.util.PatternedBackgroung
 import de.yanos.islam.util.Routes
+import de.yanos.islam.util.getUserLocation
 import de.yanos.islam.util.typoByConfig
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -56,7 +59,7 @@ class MainActivity : ComponentActivity() {
                     //NavHost Here
                     IslamNavHost(
                         modifier = contentModifier,
-                        startRoute = Routes.MAIN_TOPIC_LIST,
+                        startRoute = Routes.TIMES,
                         navController = navController
                     )
                 }
@@ -116,7 +119,7 @@ private fun IslamNavHost(
                 ChallengeScreen(onNavigationChange = navigationHandler)
             }
             composable(route = Routes.TIMES) {
-
+                PrayerScreen()
             }
             composable(route = Routes.HISTORY) {
 
