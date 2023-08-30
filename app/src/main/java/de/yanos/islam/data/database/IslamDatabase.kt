@@ -10,6 +10,11 @@ import de.yanos.islam.data.database.dao.TopicDao
 import de.yanos.islam.data.model.Quiz
 import de.yanos.islam.data.model.Challenge
 import de.yanos.islam.data.model.Topic
+import de.yanos.islam.data.model.awqat.AwqatCityDetails
+import de.yanos.islam.data.model.awqat.AwqatDailyContent
+import de.yanos.islam.data.model.awqat.AwqatLocation
+import de.yanos.islam.data.model.awqat.AwqatPrayerTime
+import de.yanos.islam.data.model.awqat.PrayerTime
 
 interface IslamDatabase {
     fun topicDao(): TopicDao
@@ -20,7 +25,15 @@ interface IslamDatabase {
 
 @TypeConverters(Converters::class)
 @Database(
-    entities = [Topic::class, Quiz::class, Challenge::class],
+    entities = [
+        Topic::class,
+        Quiz::class,
+        Challenge::class,
+        AwqatDailyContent::class,
+        AwqatCityDetails::class,
+        AwqatLocation::class,
+        PrayerTime::class,
+    ],
     version = 1
 )
 internal abstract class IslamDatabaseImpl : IslamDatabase, RoomDatabase() {

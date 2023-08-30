@@ -71,7 +71,7 @@ internal class AppModule {
         return Retrofit.Builder()
             .client(okHttpClient)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .baseUrl("https://awqatsalah.diyanet.gov.tr")
+            .baseUrl("https://awqatsalah.diyanet.gov.tr/")
             .build()
     }
 

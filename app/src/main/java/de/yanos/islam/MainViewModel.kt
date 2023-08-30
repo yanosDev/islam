@@ -14,8 +14,10 @@ import de.yanos.islam.data.model.Quiz
 import de.yanos.islam.data.model.TopicResource
 import de.yanos.islam.data.model.Topic
 import de.yanos.islam.data.model.TopicType
+import de.yanos.islam.data.repositories.AwqatRepository
 import de.yanos.islam.util.AppSettings
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -28,6 +30,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val appSettings: AppSettings,
+    private val repository: AwqatRepository,
     @ApplicationContext private val context: Context,
     private val db: IslamDatabase,
     @IODispatcher private val dispatcher: CoroutineDispatcher,
@@ -41,6 +44,10 @@ class MainViewModel @Inject constructor(
             }
             delay(1200L)
             isReady = true
+        }
+        viewModelScope.launch {
+            repository.auth()
+            async { repository.fetchDailyContent() }
         }
     }
 
