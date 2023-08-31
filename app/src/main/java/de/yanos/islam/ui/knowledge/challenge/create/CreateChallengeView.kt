@@ -1,4 +1,4 @@
-package de.yanos.islam.ui.challenge.create
+package de.yanos.islam.ui.knowledge.challenge.create
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
@@ -31,7 +31,9 @@ import de.yanos.islam.util.ChallengeDifficulty
 import de.yanos.islam.util.IslamCheckBox
 import de.yanos.islam.util.IslamDivider
 import de.yanos.islam.util.IslamRadio
+import de.yanos.islam.util.KnowledgeNavigationAction
 import de.yanos.islam.util.Lottie
+import de.yanos.islam.util.NavigationAction
 import de.yanos.islam.util.NavigationPath
 import de.yanos.islam.util.bodyLarge
 import de.yanos.islam.util.bodyMedium
@@ -42,7 +44,7 @@ import de.yanos.islam.util.titleLarge
 fun ChallengeScreen(
     modifier: Modifier = Modifier,
     vm: CreateChallengeViewModel = hiltViewModel(),
-    onNavigationChange: (path: NavigationPath) -> Unit
+    onNavigationChange: (path: NavigationAction) -> Unit
 ) {
     CreationDialogError(showError = vm.showCreationError) {
         vm.showCreationError = false
@@ -67,14 +69,14 @@ fun ChallengeScreen(
         ) {
             AnimatedVisibility(visible = vm.hasOpenChallenges.collectAsState(initial = false).value) {
                 TextButton(onClick = {
-                    onNavigationChange(NavigationPath.NavigateToOpenChallenges)
+                    onNavigationChange(KnowledgeNavigationAction.NavigateToOpenChallenges)
                 }) {
                     Text(text = stringResource(id = R.string.challenge_creation_to_open), style = bodyLarge())
                 }
             }
             TextButton(onClick = {
                 vm.createForm { id ->
-                    onNavigationChange(NavigationPath.NavigateToChallenge(id))
+                    onNavigationChange(KnowledgeNavigationAction.NavigateToChallenge(id))
                 }
             }) {
                 Text(text = stringResource(id = R.string.challenge_creation_create), style = bodyLarge())

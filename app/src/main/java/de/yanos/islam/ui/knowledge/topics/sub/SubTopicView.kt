@@ -1,4 +1,4 @@
-package de.yanos.islam.ui.questions.sub
+package de.yanos.islam.ui.knowledge.topics.sub
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
@@ -11,21 +11,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.R
-import de.yanos.islam.ui.questions.main.TopicButtons
-import de.yanos.islam.util.NavigationPath
+import de.yanos.islam.ui.knowledge.topics.main.TopicButtons
+import de.yanos.islam.util.KnowledgeNavigationAction
 import de.yanos.islam.util.Lottie
+import de.yanos.islam.util.NavigationAction
 import de.yanos.islam.util.headlineMedium
-import de.yanos.islam.util.titleLarge
 
 @Composable
 fun SubTopicsScreen(
     modifier: Modifier = Modifier,
     vm: SubTopicViewModel = hiltViewModel(),
-    onNavigationChange: (NavigationPath) -> Unit
+    onNavigationChange: (NavigationAction) -> Unit
 ) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Lottie(modifier = Modifier.height(180.dp), resId = R.raw.lottie_thinking, applyColor = false)
         Text(modifier = Modifier.padding(bottom = 32.dp), text = vm.topicName.collectAsState(initial = listOf()).value.firstOrNull() ?: "", style = headlineMedium())
-        TopicButtons(topics = vm.list.collectAsState(initial = listOf()).value) { topic -> onNavigationChange(NavigationPath.NavigateToTopicQuestions(topic.id, topic.parentId)) }
+        TopicButtons(topics = vm.list.collectAsState(initial = listOf()).value) { topic -> onNavigationChange(KnowledgeNavigationAction.NavigateToTopicQuestions(topic.id, topic.parentId)) }
     }
 }

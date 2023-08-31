@@ -1,4 +1,4 @@
-package de.yanos.islam.ui.challenge.open
+package de.yanos.islam.ui.knowledge.challenge.open
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
@@ -30,7 +30,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.R
 import de.yanos.islam.util.IslamDivider
-import de.yanos.islam.util.NavigationPath
+import de.yanos.islam.util.KnowledgeNavigationAction
+import de.yanos.islam.util.NavigationAction
 import de.yanos.islam.util.bodySmall
 import de.yanos.islam.util.correctColor
 import de.yanos.islam.util.errorColor
@@ -42,7 +43,7 @@ import de.yanos.islam.util.titleLarge
 fun OpenChallengesScreen(
     modifier: Modifier = Modifier,
     vm: OpenChallengesViewModel = hiltViewModel(),
-    onNavigationChange: (path: NavigationPath) -> Unit
+    onNavigationChange: (path: NavigationAction) -> Unit
 ) {
     Column(modifier = modifier.padding(16.dp)) {
         Text(
@@ -53,13 +54,13 @@ fun OpenChallengesScreen(
         ChallengeList(
             modifier = Modifier.weight(1f),
             challenges = vm.challenges.collectAsState(initial = listOf()).value,
-            onChallengeClicked = { onNavigationChange(NavigationPath.NavigateToChallenge(it)) },
+            onChallengeClicked = { onNavigationChange(KnowledgeNavigationAction.NavigateToChallenge(it)) },
             onDeleteChallengeClicked = vm::deleteOpenChallenge
         )
         Spacer(modifier = Modifier.height(4.dp))
         ChallengeActionButtons(
             onDeleteAllChallengesClicked = vm::deleteAllOpenChallenges,
-            onNavigateToNewChallenge = { onNavigationChange(NavigationPath.NavigateBack) }
+            onNavigateToNewChallenge = { onNavigationChange(NavigationAction.NavigateBack) }
         )
     }
 }

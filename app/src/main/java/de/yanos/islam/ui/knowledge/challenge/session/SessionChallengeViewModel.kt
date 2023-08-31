@@ -1,4 +1,4 @@
-package de.yanos.islam.ui.challenge.session
+package de.yanos.islam.ui.knowledge.challenge.session
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue

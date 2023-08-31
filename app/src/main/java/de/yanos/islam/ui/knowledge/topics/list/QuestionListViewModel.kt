@@ -1,4 +1,4 @@
-package de.yanos.islam.ui.questions.list
+package de.yanos.islam.ui.knowledge.topics.list
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

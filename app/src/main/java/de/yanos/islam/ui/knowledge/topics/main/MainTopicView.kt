@@ -1,4 +1,4 @@
-package de.yanos.islam.ui.questions.main
+package de.yanos.islam.ui.knowledge.topics.main
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
@@ -22,18 +22,18 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.R
 import de.yanos.islam.data.model.Topic
 import de.yanos.islam.data.model.TopicType
-import de.yanos.islam.util.NavigationPath
+import de.yanos.islam.util.KnowledgeNavigationAction
 import de.yanos.islam.util.Lottie
+import de.yanos.islam.util.NavigationAction
 import de.yanos.islam.util.goldColor
 import de.yanos.islam.util.headlineLarge
 import de.yanos.islam.util.labelMedium
-import de.yanos.islam.util.titleLarge
 
 @Composable
 fun MainTopicsScreen(
     modifier: Modifier = Modifier,
     vm: MainTopicViewModel = hiltViewModel(),
-    onNavigationChange: (NavigationPath) -> Unit
+    onNavigationChange: (NavigationAction) -> Unit
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Lottie(modifier = modifier.height(220.dp), resId = R.raw.lottie_stars_moving)
@@ -41,8 +41,8 @@ fun MainTopicsScreen(
         TopicButtons(topics = vm.list.collectAsState(initial = listOf()).value) { topic ->
             onNavigationChange(
                 if (topic.type == TopicType.GROUP)
-                    NavigationPath.NavigateToSubTopic(topic.id)
-                else NavigationPath.NavigateToTopicQuestions(topic.id, null)
+                    KnowledgeNavigationAction.NavigateToSubTopic(topic.id)
+                else KnowledgeNavigationAction.NavigateToTopicQuestions(topic.id, null)
             )
         }
     }

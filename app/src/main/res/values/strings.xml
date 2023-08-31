@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Islam</string>
     <string name="tab_topic">Konular</string>
-    <string name="tab_challenge">Sinav</string>
+    <string name="tab_quran">Kuran</string>
     <string name="tab_history">Sonuçlar</string>
     <string name="tab_time">Namaz Vakitler</string>
     <string name="tab_setting">Ayarlar</string>

@@ -1,7 +1,6 @@
-package de.yanos.islam.ui.questions.list
+package de.yanos.islam.ui.knowledge.topics.list
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -21,9 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.data.model.Quiz
 import de.yanos.islam.util.IslamDivider
-import de.yanos.islam.util.NavigationPath
 import de.yanos.islam.util.bodyMedium
-import de.yanos.islam.util.bodySmall
 import de.yanos.islam.util.labelLarge
 import de.yanos.islam.util.titleLarge
 

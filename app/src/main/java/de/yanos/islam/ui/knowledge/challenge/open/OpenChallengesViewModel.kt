@@ -1,4 +1,4 @@
-package de.yanos.islam.ui.challenge.open
+package de.yanos.islam.ui.knowledge.challenge.open
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
