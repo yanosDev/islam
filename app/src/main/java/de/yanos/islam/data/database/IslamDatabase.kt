@@ -14,6 +14,8 @@ import de.yanos.islam.data.model.awqat.AwqatCityDetails
 import de.yanos.islam.data.model.awqat.AwqatDailyContent
 import de.yanos.islam.data.model.awqat.AwqatLocation
 import de.yanos.islam.data.model.awqat.AwqatPrayerTime
+import de.yanos.islam.data.model.awqat.CityDetail
+import de.yanos.islam.data.model.awqat.Location
 import de.yanos.islam.data.model.awqat.PrayerTime
 
 interface IslamDatabase {
@@ -30,9 +32,9 @@ interface IslamDatabase {
         Quiz::class,
         Challenge::class,
         AwqatDailyContent::class,
-        AwqatCityDetails::class,
-        AwqatLocation::class,
+        Location::class,
         PrayerTime::class,
+        CityDetail::class,
     ],
     version = 1
 )

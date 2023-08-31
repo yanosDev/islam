@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-data class AwqatPrayerTimeResponse(val data: AwqatPrayerTime)
+data class AwqatPrayerTimeResponse(val data: List<AwqatPrayerTime>)
 
 @JsonClass(generateAdapter = true)
 data class AwqatPrayerTime(
@@ -27,8 +27,8 @@ data class AwqatPrayerTime(
 
 @Entity
 data class PrayerTime(
-    @PrimaryKey(autoGenerate = true) val id: Long,
-    val ts: Long,
+    @PrimaryKey val id: Int,
+    val ts: Long = System.currentTimeMillis(),
     val shapeMoonUrl: String,
     val fajr: String,
     val sunrise: String,

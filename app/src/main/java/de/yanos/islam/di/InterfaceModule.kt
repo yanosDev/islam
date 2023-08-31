@@ -10,6 +10,8 @@ import de.yanos.islam.data.repositories.source.LocalAwqatSource
 import de.yanos.islam.data.repositories.source.LocalAwqatSourceImpl
 import de.yanos.islam.data.repositories.source.RemoteAwqatSource
 import de.yanos.islam.data.repositories.source.RemoteAwqatSourceImpl
+import de.yanos.islam.data.usecase.LocationUseCase
+import de.yanos.islam.data.usecase.LocationUseCaseImpl
 import de.yanos.islam.util.AppSettings
 import de.yanos.islam.util.AppSettingsImpl
 
@@ -28,4 +30,6 @@ internal abstract class InterfaceModule {
     @Binds
     abstract fun bindAwqatRepository(repo: AwqatRepositoryImpl): AwqatRepository
 
+    @Binds
+    abstract fun bindLocationUsecase(useCase: LocationUseCaseImpl): LocationUseCase
 }

@@ -1,9 +1,6 @@
 package de.yanos.islam.ui.prayer
 
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
+import android.location.Geocoder
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -16,8 +13,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.R
 import de.yanos.islam.data.api.QiblaApi
-import de.yanos.islam.di.Accelerometer
-import de.yanos.islam.di.Magnetometer
+import de.yanos.islam.data.database.dao.AwqatDao
+import de.yanos.islam.data.repositories.AwqatRepository
+import de.yanos.islam.data.usecase.LocationUseCase
 import de.yanos.islam.util.AppSettings
 import de.yanos.islam.util.LatandLong
 import de.yanos.islam.util.correctColor
@@ -25,8 +23,13 @@ import de.yanos.islam.util.epochSecondToDateString
 import de.yanos.islam.util.errorColor
 import de.yanos.islam.util.goldColor
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.awaitResponse
 import timber.log.Timber
 import java.util.Timer
@@ -37,13 +40,14 @@ import kotlin.math.abs
 @HiltViewModel
 class PrayerViewModel @Inject constructor(
     private val appSettings: AppSettings,
+    private val geocoder: Geocoder,
     @IODispatcher private val dispatcher: CoroutineDispatcher,
+    private val locationUseCase: LocationUseCase,
     private val qiblaApi: QiblaApi,
-    private val sensorManager: SensorManager,
-    @Magnetometer private val magnetometer: Sensor,
-    @Accelerometer private val accelerometer: Sensor,
-) : ViewModel(), SensorEventListener {
-    private var lastLocation: LatandLong by mutableStateOf(LatandLong(0.0, 0.0))
+    private val dao: AwqatDao,
+    private val repository: AwqatRepository,
+) : ViewModel() {
+    private var lastLocation: LatandLong by mutableStateOf(LatandLong(appSettings.lastLatitude, appSettings.lastLongitude))
     private var qiblaDegree = appSettings.lastDirection
     private var phoneDegreeX = 0
     var direction by mutableStateOf(0F)
@@ -51,11 +55,12 @@ class PrayerViewModel @Inject constructor(
     var times = mutableStateListOf<PrayingTime>()
     val funtimer: Timer = Timer()
 
+    val cityDetails = dao.loadRecentCity().distinctUntilChanged()
+
     init {
-        sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_GAME)
-        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME)
+        locationUseCase.addCallback(this::onSensorChange)
         if (appSettings.lastLongitude != 0.0 && appSettings.lastLatitude != 0.0)
-            getLocation(LatandLong(appSettings.lastLatitude, appSettings.lastLongitude))
+            onCurrentLocationChanged(LatandLong(appSettings.lastLatitude, appSettings.lastLongitude))
 
         funtimer.scheduleAtFixedRate(
             timerTask()
@@ -75,14 +80,45 @@ class PrayerViewModel @Inject constructor(
     }
 
     private var fetchInProgress: Boolean = false
-    fun getLocation(location: LatandLong) {
+    fun onCurrentLocationChanged(location: LatandLong) {
         if (!fetchInProgress
             && (location.latitude != 0.0 || location.longitude != 0.0)
             && abs(location.latitude - lastLocation.latitude) > 1
             && abs(location.longitude - lastLocation.longitude) > 1
         ) {
             fetchInProgress = true
-            viewModelScope.launch(dispatcher) {
+            viewModelScope.launch {
+                listOf(
+                    refreshQiblaDirectionAsync(location),
+                    refreshCityDataAsync(location)
+                ).awaitAll()
+                fetchInProgress = false
+                refreshDegree()
+            }
+        }
+    }
+
+    private fun onSensorChange(phoneX: Int) {
+        phoneDegreeX = phoneX
+        refreshDegree()
+    }
+
+    private suspend fun refreshCityDataAsync(location: LatandLong): Deferred<Unit?> {
+        return withContext(dispatcher) {
+            async {
+                @Suppress("DEPRECATION")
+                geocoder.getFromLocation(location.latitude, location.longitude, 1)?.firstOrNull()?.let { address ->
+                    (address.subAdminArea ?: address.adminArea)?.let {
+                        repository.fetchCityData(it)
+                    }
+                }
+            }
+        }
+    }
+
+    private suspend fun refreshQiblaDirectionAsync(location: LatandLong): Deferred<Unit?> {
+        return withContext(dispatcher) {
+            async {
                 try {
                     val response = qiblaApi.getDirection(location.latitude, location.longitude).awaitResponse()
                     response.body()?.let {
@@ -91,8 +127,6 @@ class PrayerViewModel @Inject constructor(
                         appSettings.lastLatitude = location.latitude
                         appSettings.lastLongitude = location.longitude
                         appSettings.lastDirection = it.data.direction.toInt()
-                        fetchInProgress = false
-                        refreshDegree()
                     }
                     response.errorBody()?.let {
                         Timber.e(it.toString())
@@ -106,41 +140,6 @@ class PrayerViewModel @Inject constructor(
 
     private fun refreshDegree() {
         direction = -(qiblaDegree - phoneDegreeX).toFloat()
-    }
-
-    private val lastAccelerometer = FloatArray(3)
-    private val lastMagnetometer = FloatArray(3)
-    private var lastAccelerometerSet = false
-    private var lastMagnetometerSet = false
-    private val rotationMatrix = FloatArray(9)
-    private val orientation = FloatArray(3)
-
-    override fun onSensorChanged(e: SensorEvent?) {
-        e?.let { event ->
-            if (event.sensor === magnetometer) {
-                System.arraycopy(event.values, 0, lastMagnetometer, 0, event.values.size)
-                lastMagnetometerSet = true
-            } else if (event.sensor === accelerometer) {
-                System.arraycopy(event.values, 0, lastAccelerometer, 0, event.values.size)
-                lastAccelerometerSet = true
-            }
-            if (lastAccelerometerSet && lastMagnetometerSet) {
-                SensorManager.getRotationMatrix(rotationMatrix, null, lastAccelerometer, lastMagnetometer)
-                SensorManager.getOrientation(rotationMatrix, orientation)
-                phoneDegreeX = ((((Math.toDegrees(orientation[0].toDouble()) + 360).toFloat() % 360).toInt() / 2) * 2)
-                refreshDegree()
-            }
-        }
-    }
-
-    override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
-
-    }
-
-    override fun onCleared() {
-        sensorManager.unregisterListener(this, magnetometer)
-        sensorManager.unregisterListener(this, accelerometer)
-        super.onCleared()
     }
 }
 

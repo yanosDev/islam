@@ -2,7 +2,8 @@ package de.yanos.islam
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
+import android.location.Address
+import android.location.Geocoder
 import androidx.annotation.RawRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,20 +12,22 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.data.database.IslamDatabase
 import de.yanos.islam.data.model.Quiz
-import de.yanos.islam.data.model.TopicResource
 import de.yanos.islam.data.model.Topic
+import de.yanos.islam.data.model.TopicResource
 import de.yanos.islam.data.model.TopicType
 import de.yanos.islam.data.repositories.AwqatRepository
 import de.yanos.islam.util.AppSettings
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
+import java.time.LocalDate
+import java.util.Locale
 import javax.inject.Inject
+
 
 @SuppressLint("StaticFieldLeak")
 @HiltViewModel
@@ -38,35 +41,41 @@ class MainViewModel @Inject constructor(
     var isReady: Boolean = false
 
     init {
+        initDB()
+        loadDailyAwqatList()
+    }
+
+    private fun loadDailyAwqatList() {
         viewModelScope.launch(dispatcher) {
-            if (!appSettings.isDBInitialized) {
-                initDB()
+            if (LocalDate.now().isAfter(LocalDate.ofEpochDay(appSettings.awqatLastFetch))) {
+                repository.fetchAwqatData()
+                appSettings.awqatLastFetch = LocalDate.now().toEpochDay()
             }
-            delay(1200L)
-            isReady = true
-        }
-        viewModelScope.launch {
-            repository.auth()
-            async { repository.fetchDailyContent() }
         }
     }
 
     private fun initDB() {
-        TopicResource.values().forEach { topic ->
-            topic.raw?.let { raw ->
-                createQuizByTopic(raw, topic.id)
-            }
-            db.topicDao().insert(
-                Topic(
-                    id = topic.id, title = topic.title, ordinal = topic.ordinal, parentId = topic.parent, type = when {
-                        topic.parent == null && topic.raw != null -> TopicType.MAIN
-                        topic.parent == null -> TopicType.GROUP
-                        else -> TopicType.SUB
+        viewModelScope.launch(dispatcher) {
+            if (!appSettings.isDBInitialized) {
+                TopicResource.values().forEach { topic ->
+                    topic.raw?.let { raw ->
+                        createQuizByTopic(raw, topic.id)
                     }
-                )
-            )
+                    db.topicDao().insert(
+                        Topic(
+                            id = topic.id, title = topic.title, ordinal = topic.ordinal, parentId = topic.parent, type = when {
+                                topic.parent == null && topic.raw != null -> TopicType.MAIN
+                                topic.parent == null -> TopicType.GROUP
+                                else -> TopicType.SUB
+                            }
+                        )
+                    )
+                }
+                appSettings.isDBInitialized = true
+            }
+            delay(1200L)
+            isReady = true
         }
-        appSettings.isDBInitialized = true
     }
 
     private fun createQuizByTopic(@RawRes topicRaw: Int, topicId: Int) {

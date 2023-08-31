@@ -3,6 +3,7 @@ package de.yanos.islam.di
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorManager
+import android.location.Geocoder
 import androidx.room.Room
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -27,6 +28,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import java.util.Locale
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -91,6 +93,10 @@ internal class AppModule {
         return Room.databaseBuilder(context, IslamDatabaseImpl::class.java, "islam_db")
             .build()
     }
+
+    @Provides
+    fun provideGeocoder(@ApplicationContext context:Context): Geocoder =  Geocoder(context, Locale("en"))
+
 
     @Provides
     @Singleton

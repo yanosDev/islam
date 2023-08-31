@@ -19,6 +19,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -45,7 +46,7 @@ fun PrayerScreen(
     vm: PrayerViewModel = hiltViewModel()
 ) {
     val location = getUserLocation(context = LocalContext.current)
-    vm.getLocation(location)
+    vm.onCurrentLocationChanged(location)
     PrayerContent(modifier = modifier, vm = vm)
 }
 
@@ -55,6 +56,14 @@ fun PrayerContent(
     vm: PrayerViewModel = hiltViewModel()
 ) {
     LazyColumn(modifier = modifier.padding(16.dp)) {
+        item {
+            vm.cityDetails.collectAsState(initial = null).value?.let {
+                Column {
+                    Text(text = it.name)
+                    Text(text = it.fajr)
+                }
+            }
+        }
         item {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Lottie(

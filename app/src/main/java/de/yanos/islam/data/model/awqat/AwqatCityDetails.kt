@@ -8,8 +8,22 @@ import com.squareup.moshi.JsonClass
 data class AwqatCityDetailsResponse(val data: AwqatCityDetails)
 
 @JsonClass(generateAdapter = true)
-@Entity
+
 data class AwqatCityDetails(
+    val id: Int,
+    val name: String,
+    val code: String?,
+    val geographicQiblaAngle: String,
+    val distanceToKaaba: String,
+    val qiblaAngle: String,
+    val city: String,
+    val cityEn: String?,
+    val country: String,
+    val countryEn: String,
+)
+
+@Entity
+data class CityDetail(
     @PrimaryKey val id: Int,
     val name: String,
     val code: String?,
@@ -17,7 +31,8 @@ data class AwqatCityDetails(
     val distanceToKaaba: String,
     val qiblaAngle: String,
     val city: String,
-    val cityEn: String,
+    val cityEn: String?,
     val country: String,
     val countryEn: String,
+    val ts: Long =  System.currentTimeMillis()
 )
