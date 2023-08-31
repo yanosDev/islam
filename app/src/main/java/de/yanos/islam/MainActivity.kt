@@ -29,6 +29,7 @@ import de.yanos.islam.util.KnowledgeNavigation
 import de.yanos.islam.util.MainNavigation
 import de.yanos.islam.util.NavigationAction
 import de.yanos.islam.util.PatternedBackgroung
+import de.yanos.islam.util.allKnowledge
 import de.yanos.islam.util.getUserLocation
 import de.yanos.islam.util.typoByConfig
 import kotlinx.coroutines.launch
@@ -121,10 +122,10 @@ private fun IslamNavHost(
 
 
 fun NavGraphBuilder.navKnowledge(onNavigationChange: (NavigationAction) -> Unit) {
-    navigation(startDestination = MainNavigation.Knowledge.route, route = KnowledgeNavigation.MainList.route) {
-        KnowledgeNavigation.all.forEach { navigation ->
-            composable(route = navigation.route, arguments = navigation.args) {
-                navigation.View(onNavigationChange = onNavigationChange)
+    navigation(startDestination = KnowledgeNavigation.MainList.route, route = MainNavigation.Knowledge.route) {
+        allKnowledge.forEach { path ->
+            composable(route = path.route, arguments = path.args) {
+                path.View(onNavigationChange = onNavigationChange)
             }
         }
     }

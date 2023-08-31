@@ -60,7 +60,7 @@ fun OpenChallengesScreen(
         Spacer(modifier = Modifier.height(4.dp))
         ChallengeActionButtons(
             onDeleteAllChallengesClicked = vm::deleteAllOpenChallenges,
-            onNavigateToNewChallenge = { onNavigationChange(NavigationAction.NavigateBack) }
+            onNavigateToNewChallenge = { onNavigationChange(KnowledgeNavigationAction.NavigateToChallengeCreation) }
         )
     }
 }

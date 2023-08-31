@@ -7,6 +7,8 @@
     <string name="tab_setting">Ayarlar</string>
 
     <string name="main_topic_title">Konular</string>
+    <string name="main_to_open_challenges">Önceki Sinavlar</string>
+    <string name="main_to_new_challenge">Yeni Sinavlar</string>
 
     <string name="challenge_creation_title">Sinav Zorlugunu ve Konularinizi secin</string>
     <string name="challenge_creation_difficulty_low">Kolay</string>

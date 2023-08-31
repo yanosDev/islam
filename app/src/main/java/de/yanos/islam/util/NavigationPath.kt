@@ -1,11 +1,14 @@
 package de.yanos.islam.util
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Book
 import androidx.compose.material.icons.rounded.LockClock
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Topic
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
@@ -18,12 +21,13 @@ import de.yanos.islam.ui.knowledge.topics.list.QuestionListScreen
 import de.yanos.islam.ui.knowledge.topics.main.MainTopicsScreen
 import de.yanos.islam.ui.knowledge.topics.sub.SubTopicsScreen
 
-abstract interface NavigationPath {
+interface NavigationPath {
     val route: String
     val args: List<NamedNavArgument>
 
     @Composable
     fun View(onNavigationChange: (NavigationAction) -> Unit) {
+        Text(modifier = Modifier.fillMaxSize(), text = "Coming Soon", style = headlineLarge())
     }
 }
 
@@ -37,6 +41,7 @@ sealed interface NavigationAction {
 }
 
 sealed class KnowledgeNavigationAction(override val route: String) : NavigationAction {
+    object NavigateToChallengeCreation : KnowledgeNavigationAction(KnowledgeNavigation.Challenge.route)
     data class NavigateToChallenge(val id: Int) : KnowledgeNavigationAction(KnowledgeNavigation.ChallengeSession.route.replace("{id}", id.toString()))
     object NavigateToOpenChallenges : KnowledgeNavigationAction(KnowledgeNavigation.ChallengeOpen.route)
     data class NavigateToSubTopic(val id: Int) : KnowledgeNavigationAction(KnowledgeNavigation.SubList.route.replace("{id}", id.toString()))
@@ -50,7 +55,9 @@ sealed class MainNavigation(override val route: String, override val args: List<
     object Quran : MainNavigation("quran")
     object Praying : MainNavigation("praying")
     object Settings : MainNavigation("settings")
+
     companion object {
+
         val all = listOf(
             NavigationDestination.TopDestination(
                 route = Knowledge.route,
@@ -110,28 +117,29 @@ sealed class KnowledgeNavigation(override val route: String, override val args: 
         }
     }
 
-    object ChallengeSession : KnowledgeNavigation("topic/challenge/{id}", args = listOf(navArgument("id") { type = NavType.IntType })) {
+    object ChallengeSession : KnowledgeNavigation("topics/challenge/{id}", args = listOf(navArgument("id") { type = NavType.IntType })) {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
             ChallengeSessionScreen(onNavigationChange = onNavigationChange)
         }
     }
 
-    object ChallengeOpen : KnowledgeNavigation("topic/challenge/open/") {
+    object ChallengeOpen : KnowledgeNavigation("topics/challenge/open/") {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
             OpenChallengesScreen(onNavigationChange = onNavigationChange)
         }
     }
 
-    object ChallengeHistory : KnowledgeNavigation("topic/challenge/history/") {
-        @Composable
-        override fun View(onNavigationChange: (NavigationAction) -> Unit) {
-
-        }
-    }
-
-    companion object {
-        val all = listOf(MainList, SubList, QuestionList, Challenge, ChallengeSession, ChallengeOpen, ChallengeHistory)
-    }
+    object ChallengeHistory : KnowledgeNavigation("topics/challenge/history/")
 }
+
+val allKnowledge = listOf(
+    KnowledgeNavigation.MainList,
+    KnowledgeNavigation.SubList,
+    KnowledgeNavigation.QuestionList,
+    KnowledgeNavigation.Challenge,
+    KnowledgeNavigation.ChallengeSession,
+    KnowledgeNavigation.ChallengeOpen,
+    KnowledgeNavigation.ChallengeHistory
+)
