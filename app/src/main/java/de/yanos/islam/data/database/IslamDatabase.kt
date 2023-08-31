@@ -9,6 +9,7 @@ import de.yanos.islam.data.database.dao.ChallengeDao
 import de.yanos.islam.data.database.dao.TopicDao
 import de.yanos.islam.data.model.Quiz
 import de.yanos.islam.data.model.Challenge
+import de.yanos.islam.data.model.Degree
 import de.yanos.islam.data.model.Topic
 import de.yanos.islam.data.model.awqat.AwqatCityDetails
 import de.yanos.islam.data.model.awqat.AwqatDailyContent
@@ -35,6 +36,7 @@ interface IslamDatabase {
         Location::class,
         PrayerTime::class,
         CityDetail::class,
+        Degree::class
     ],
     version = 1
 )

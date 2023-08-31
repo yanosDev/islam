@@ -2,7 +2,6 @@ package de.yanos.islam
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.location.Address
 import android.location.Geocoder
 import androidx.annotation.RawRes
 import androidx.lifecycle.ViewModel
@@ -16,7 +15,9 @@ import de.yanos.islam.data.model.Topic
 import de.yanos.islam.data.model.TopicResource
 import de.yanos.islam.data.model.TopicType
 import de.yanos.islam.data.repositories.AwqatRepository
+import de.yanos.islam.data.usecase.LocationUseCase
 import de.yanos.islam.util.AppSettings
+import de.yanos.islam.util.LatandLong
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -25,7 +26,6 @@ import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.time.LocalDate
-import java.util.Locale
 import javax.inject.Inject
 
 
@@ -33,6 +33,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val appSettings: AppSettings,
+    private val geocoder: Geocoder,
     private val repository: AwqatRepository,
     @ApplicationContext private val context: Context,
     private val db: IslamDatabase,
@@ -43,6 +44,21 @@ class MainViewModel @Inject constructor(
     init {
         initDB()
         loadDailyAwqatList()
+    }
+
+    fun onCurrentLocationChanged(location: LatandLong) {
+        viewModelScope.launch {
+            @Suppress("DEPRECATION")
+            geocoder.getFromLocation(location.latitude, location.longitude, 1)?.firstOrNull()?.let { address ->
+                (address.subAdminArea ?: address.adminArea)?.let { name ->
+                    if (name != appSettings.awqatLastLocation || LocalDate.now().isAfter(LocalDate.ofEpochDay(appSettings.awqatLastLocationFetch))) {
+                        repository.fetchCityData(name)
+                        appSettings.awqatLastLocation = name
+                        appSettings.awqatLastFetch = LocalDate.now().toEpochDay()
+                    }
+                }
+            }
+        }
     }
 
     private fun loadDailyAwqatList() {

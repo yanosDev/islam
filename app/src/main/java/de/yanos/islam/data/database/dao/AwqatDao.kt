@@ -28,9 +28,10 @@ interface AwqatDao : BaseDao<PrayerTime> {
     fun insertLocations(locations: List<Location>)
 
     @Query(
-        "SELECT  d.id as id, " +
-                "d.name as name, " +
-                "d.qiblaAngle as qibla, " +
+        "SELECT  c.id as id, " +
+                "c.name as name, " +
+                "d.degree as degree, " +
+                "c.qiblaAngle as qibla, " +
                 "t.shapeMoonUrl as url, " +
                 "t.fajr as fajr, " +
                 "t.sunrise as sunrise, " +
@@ -40,13 +41,16 @@ interface AwqatDao : BaseDao<PrayerTime> {
                 "t.isha as isha, " +
                 "t.astronomicalSunset as sunsetLocation, " +
                 "t.astronomicalSunrise as sunriseLocation " +
-                "FROM CityDetail  d " +
+                "FROM CityDetail  c, Degree d " +
                 "JOIN PrayerTime t ON d.id = t.id " +
-                "ORDER BY d.ts " +
+                "ORDER BY c.ts " +
                 "LIMIT 1"
     )
     fun loadRecentCity(): Flow<CityData>
 
     @Query("SELECT id FROM Location WHERE (code = :locationName OR name = :locationName) AND type = 'CITY'  LIMIT 1")
     fun loadCityCode(locationName: String): Int?
+
+    @Query("UPDATE Degree SET degree = :degree")
+    fun updateDegree(degree: Int)
 }

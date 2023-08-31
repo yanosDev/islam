@@ -48,6 +48,8 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         setContent {
+            vm.onCurrentLocationChanged(getUserLocation(context = LocalContext.current))
+
             AppTheme(activity = this, typography = typoByConfig(appSettings)) { modifier, config ->
                 val navController = rememberNavController()
                 DynamicNavigationScreen(

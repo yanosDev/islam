@@ -2,6 +2,7 @@ package de.yanos.islam.data.model.awqat
 
 data class CityData(
     val id: Int,
+    val degree: Int,
     val name: String,
     val qibla: Double,
     val url: String,

@@ -38,6 +38,7 @@
     <string name="challenge_session_finished_result">Toplam %d sorudan tam %d tanesini dogru cevapladiniz ve %d tanesine yanlis cevap verdiniz</string>
     <string name="praying_imsak_title">Imsak</string>
     <string name="praying_morning_title">Sabah</string>
+    <string name="praying_sunrise_title">Günes</string>
     <string name="praying_lunch_title">Ögle</string>
     <string name="praying_afternoon_title">Ikindi</string>
     <string name="praying_evening_title">Aksam</string>

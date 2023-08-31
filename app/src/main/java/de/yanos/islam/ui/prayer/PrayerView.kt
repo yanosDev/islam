@@ -45,25 +45,7 @@ fun PrayerScreen(
     modifier: Modifier = Modifier,
     vm: PrayerViewModel = hiltViewModel()
 ) {
-    val location = getUserLocation(context = LocalContext.current)
-    vm.onCurrentLocationChanged(location)
-    PrayerContent(modifier = modifier, vm = vm)
-}
-
-@Composable
-fun PrayerContent(
-    modifier: Modifier = Modifier,
-    vm: PrayerViewModel = hiltViewModel()
-) {
     LazyColumn(modifier = modifier.padding(16.dp)) {
-        item {
-            vm.cityDetails.collectAsState(initial = null).value?.let {
-                Column {
-                    Text(text = it.name)
-                    Text(text = it.fajr)
-                }
-            }
-        }
         item {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Lottie(
@@ -71,12 +53,13 @@ fun PrayerContent(
                         .height(200.dp)
                         .width(200.dp), resId = R.raw.lottie_praying, applyColor = false
                 )
-                QiblaRug(modifier = Modifier.padding(16.dp), direction = vm.direction)
+                QiblaRug(modifier = Modifier.padding(16.dp), direction = vm.currentState.direction)
             }
         }
-        item { PrayingTimes(modifier = Modifier.padding(vertical = 16.dp), times = vm.times, remainingTime = vm.timeRemaining) }
+        item { PrayingTimes(modifier = Modifier.padding(vertical = 16.dp), times = vm.currentState.times) }
     }
 }
+
 
 @Composable
 fun QiblaRug(modifier: Modifier = Modifier, direction: Float) {
@@ -102,8 +85,7 @@ fun QiblaRug(modifier: Modifier = Modifier, direction: Float) {
 @Composable
 fun PrayingTimes(
     modifier: Modifier = Modifier,
-    times: List<PrayingTime>,
-    remainingTime: String
+    times: List<PrayingTime>
 ) {
     OutlinedCard(
         modifier = modifier.fillMaxWidth(),
@@ -126,9 +108,9 @@ fun PrayingTimes(
                         .padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(text = stringResource(id = it.textId), style = labelMedium())
-                    if (it.state == TimeState.Current)
-                        Text(text = remainingTime, style = bodySmall())
-                    Text(text = it.timeText, style = bodySmall(), color = it.color())
+
+                    Text(text = it.remainingTime ?: "Past", style = bodySmall())
+                    Text(text = it.timeText, style = bodySmall())
                 }
                 Spacer(modifier = Modifier.height(2.dp))
                 IslamDivider()
