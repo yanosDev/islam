@@ -1,4 +1,4 @@
-package de.yanos.islam.ui.challenge.session
+package de.yanos.islam.ui.knowledge.challenge.session
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
@@ -41,6 +41,7 @@ import de.yanos.islam.data.model.Challenge
 import de.yanos.islam.util.IslamCheckBox
 import de.yanos.islam.util.IslamDivider
 import de.yanos.islam.util.Lottie
+import de.yanos.islam.util.NavigationAction
 import de.yanos.islam.util.NavigationPath
 import de.yanos.islam.util.bodyLarge
 import de.yanos.islam.util.bodySmall
@@ -49,12 +50,11 @@ import de.yanos.islam.util.errorColor
 import de.yanos.islam.util.labelMedium
 import kotlinx.coroutines.launch
 
-
 @Composable
 fun ChallengeSessionScreen(
     modifier: Modifier = Modifier,
     vm: SessionChallengeViewModel = hiltViewModel(),
-    onNavigationChange: (path: NavigationPath) -> Unit
+    onNavigationChange: (path: NavigationAction) -> Unit
 ) {
     val state = rememberLazyListState()
     val scope = rememberCoroutineScope()
@@ -74,7 +74,7 @@ fun ChallengeSessionScreen(
         }
     }
     ChallengeFinished(vm.challenge.collectAsState(initial = null).value) {
-        onNavigationChange(NavigationPath.NavigateBack)
+        onNavigationChange(NavigationAction.NavigateBack)
     }
     if (vm.challengeQuizList.size > 0)
         Column(modifier = modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {

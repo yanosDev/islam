@@ -1,4 +1,4 @@
-package de.yanos.islam.ui.questions.main
+package de.yanos.islam.ui.knowledge.topics.main
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel

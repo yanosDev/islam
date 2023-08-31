@@ -4,7 +4,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.room.Dao
 import androidx.room.Query
 import de.yanos.islam.data.model.Challenge
-import de.yanos.islam.ui.challenge.open.OpenChallenge
+import de.yanos.islam.ui.knowledge.challenge.open.OpenChallenge
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 

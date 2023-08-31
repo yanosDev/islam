@@ -3,7 +3,7 @@ package de.yanos.islam.data.database.dao
 import androidx.room.Dao
 import androidx.room.Query
 import de.yanos.islam.data.model.Topic
-import de.yanos.islam.ui.challenge.create.TopicSelection
+import de.yanos.islam.ui.knowledge.challenge.create.TopicSelection
 import kotlinx.coroutines.flow.Flow
 
 @Dao

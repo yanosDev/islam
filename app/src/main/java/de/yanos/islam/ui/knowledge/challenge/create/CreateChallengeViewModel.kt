@@ -1,4 +1,4 @@
-package de.yanos.islam.ui.challenge.create
+package de.yanos.islam.ui.knowledge.challenge.create
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf

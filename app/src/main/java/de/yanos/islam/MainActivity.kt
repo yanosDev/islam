@@ -13,28 +13,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
 import de.yanos.core.ui.theme.AppTheme
 import de.yanos.core.ui.view.DynamicNavigationScreen
-import de.yanos.islam.ui.challenge.create.ChallengeScreen
-import de.yanos.islam.ui.challenge.open.OpenChallengesScreen
-import de.yanos.islam.ui.challenge.session.ChallengeSessionScreen
 import de.yanos.islam.ui.prayer.PrayerScreen
-import de.yanos.islam.ui.questions.list.QuestionListScreen
-import de.yanos.islam.ui.questions.main.MainTopicsScreen
-import de.yanos.islam.ui.questions.sub.SubTopicsScreen
 import de.yanos.islam.ui.settings.SettingsScreen
 import de.yanos.islam.util.AppSettings
-import de.yanos.islam.util.NAVIGATION_BAR_DESTINATIONS
-import de.yanos.islam.util.NavigationPath
+import de.yanos.islam.util.KnowledgeNavigation
+import de.yanos.islam.util.MainNavigation
+import de.yanos.islam.util.NavigationAction
 import de.yanos.islam.util.PatternedBackgroung
-import de.yanos.islam.util.Routes
 import de.yanos.islam.util.getUserLocation
 import de.yanos.islam.util.typoByConfig
 import kotlinx.coroutines.launch
@@ -55,13 +49,13 @@ class MainActivity : ComponentActivity() {
                 DynamicNavigationScreen(
                     modifier = modifier.padding(top = 48.dp), // TODO: Check statusbar problem
                     config = config,
-                    destinations = NAVIGATION_BAR_DESTINATIONS,
+                    destinations = MainNavigation.all,
                     navController = navController
                 ) { contentModifier ->
                     //NavHost Here
                     IslamNavHost(
                         modifier = contentModifier,
-                        startRoute = Routes.TIMES,
+                        startRoute = MainNavigation.all.first().route,
                         navController = navController
                     )
                 }
@@ -97,13 +91,12 @@ private fun IslamNavHost(
     navController: NavHostController,
 ) {
     val scope = rememberCoroutineScope()
-    val navigationHandler = { path: NavigationPath ->
+    val onNavigationChange = { path: NavigationAction ->
         scope.launch {
             when (path) {
-                NavigationPath.NavigateBack -> navController.popBackStack()
+                NavigationAction.NavigateBack -> navController.popBackStack()
                 else -> navController.navigate(path.route)
             }
-
         }
         Unit
     }
@@ -112,45 +105,26 @@ private fun IslamNavHost(
             navController = navController,
             startDestination = startRoute,
         ) {
-            composable(
-                route = Routes.MAIN_TOPIC_LIST
-            ) {
-                MainTopicsScreen(onNavigationChange = navigationHandler)
-            }
-            composable(route = Routes.CHALLENGE) {
-                ChallengeScreen(onNavigationChange = navigationHandler)
-            }
-            composable(route = Routes.TIMES) {
+            navKnowledge(onNavigationChange = onNavigationChange)
+            composable(route = MainNavigation.Praying.route) {
                 PrayerScreen()
             }
-            composable(route = Routes.HISTORY) {
+            composable(route = MainNavigation.Quran.route) {
 
             }
-            composable(route = Routes.SETTINGS) {
+            composable(route = MainNavigation.Settings.route) {
                 SettingsScreen()
             }
-            composable(
-                route = Routes.SUB_TOPIC_LIST,
-                arguments = listOf(navArgument("id") { type = NavType.IntType })
-            ) {
-                SubTopicsScreen(onNavigationChange = navigationHandler)
-            }
-            composable(
-                route = Routes.QUESTION_LIST,
-                arguments = listOf(navArgument("id") { type = NavType.IntType }, navArgument("parentId") { type = NavType.IntType })
-            ) {
-                QuestionListScreen()
-            }
-            composable(
-                route = Routes.CHALLENGE_OPEN,
-            ) {
-                OpenChallengesScreen(onNavigationChange = navigationHandler)
-            }
-            composable(
-                route = Routes.CHALLENGE_SESSION,
-                arguments = listOf(navArgument("id") { type = NavType.IntType })
-            ) {
-                ChallengeSessionScreen(onNavigationChange = navigationHandler)
+        }
+    }
+}
+
+
+fun NavGraphBuilder.navKnowledge(onNavigationChange: (NavigationAction) -> Unit) {
+    navigation(startDestination = MainNavigation.Knowledge.route, route = KnowledgeNavigation.MainList.route) {
+        KnowledgeNavigation.all.forEach { navigation ->
+            composable(route = navigation.route, arguments = navigation.args) {
+                navigation.View(onNavigationChange = onNavigationChange)
             }
         }
     }
