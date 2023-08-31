@@ -22,7 +22,7 @@ interface LocalAwqatSource {
     suspend fun insertDailyContent(dailyContentData: AwqatDailyContent)
     suspend fun insertLocations(data: List<Location>)
     suspend fun insertCityDetails(cityDetail: CityDetail)
-    suspend fun insertCityPrayerTimes(times: PrayerTime)
+    suspend fun insertCityPrayerTimes(times: List<PrayerTime>)
 }
 
 class LocalAwqatSourceImpl @Inject constructor(
@@ -60,9 +60,9 @@ class LocalAwqatSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun insertCityPrayerTimes(time: PrayerTime) {
+    override suspend fun insertCityPrayerTimes(times: List<PrayerTime>) {
         withContext(dispatcher) {
-            dao.insertCityPrayerTime(time)
+            dao.insertCityPrayerTime(times)
         }
     }
 

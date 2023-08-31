@@ -64,9 +64,9 @@ class AwqatRepositoryImpl @Inject constructor(
                         }
                     }
                     async {
-                        getData(remoteSource.loadCityPrayerTimes(cityId))?.data?.firstOrNull()?.let { time ->
+                        getData(remoteSource.loadCityPrayerTimes(cityId))?.data?.let { times ->
                             localSource.insertCityPrayerTimes(
-                                PrayerTime(
+                                times.map {time -> PrayerTime(
                                     id = cityId,
                                     shapeMoonUrl = time.shapeMoonUrl,
                                     fajr = time.fajr,
@@ -82,7 +82,7 @@ class AwqatRepositoryImpl @Inject constructor(
                                     qiblaTime = time.qiblaTime,
                                     gregorianDateShort = time.gregorianDateShort,
                                     gregorianDateLong = time.gregorianDateLong,
-                                )
+                                ) }
                             )
                         }
                     }

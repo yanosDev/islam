@@ -20,7 +20,7 @@ interface AwqatDao : BaseDao<PrayerTime> {
     fun insertDailyContent(dailyContentData: AwqatDailyContent)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertCityPrayerTime(time: PrayerTime)
+    fun insertCityPrayerTime(time: List<PrayerTime>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertCityDetail(cityDetail: CityDetail)
@@ -54,4 +54,7 @@ interface AwqatDao : BaseDao<PrayerTime> {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun updateDegree(degree: Degree)
+
+    @Query("SELECT * FROM AwqatDailyContent WHERE dayOfYear = :dayOfYear LIMIT 1")
+    fun dailyContent(dayOfYear: Int): AwqatDailyContent?
 }

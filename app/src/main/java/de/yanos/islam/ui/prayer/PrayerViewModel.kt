@@ -1,26 +1,24 @@
 package de.yanos.islam.ui.prayer
 
-import android.util.Log
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.R
 import de.yanos.islam.data.database.dao.AwqatDao
+import de.yanos.islam.data.model.awqat.AwqatDailyContent
 import de.yanos.islam.data.model.awqat.CityData
 import de.yanos.islam.util.AppSettings
-import de.yanos.islam.util.correctColor
-import de.yanos.islam.util.epochSecondToDateString
-import de.yanos.islam.util.errorColor
-import de.yanos.islam.util.goldColor
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import kotlinx.coroutines.withContext
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -33,14 +31,19 @@ import kotlin.math.abs
 class PrayerViewModel @Inject constructor(
     private val appSettings: AppSettings,
     private val dao: AwqatDao,
+    @IODispatcher private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
     private var cityData: CityData? = null
+    private var dailyContent: AwqatDailyContent? = null
     private val timer: Timer = Timer()
 
     var currentState: PrayerScreenData by mutableStateOf(PrayerScreenData())
 
     init {
         viewModelScope.launch {
+            withContext(dispatcher) {
+                dailyContent = dao.dailyContent(LocalDateTime.now().dayOfYear)
+            }
             dao.loadRecentCity().distinctUntilChanged().collect {
                 cityData = it
                 refreshData()
@@ -79,7 +82,10 @@ class PrayerViewModel @Inject constructor(
                         isCurrentTime = isCurrentTime,
                         remainingTime = if (now.isBefore(time)) {
                             val remaining = now.until(time, ChronoUnit.SECONDS)
-                            remaining.epochSecondToDateString("HH:mm:ss")
+                            val hour = String.format("%02d", remaining.toInt() / 3600)
+                            val minute = String.format("%02d", (remaining.toInt() % 3600) / 60)
+                            val second = String.format("%02d", remaining.toInt() % 60)
+                            "${hour}:${minute}:${second}"
                         } else null,
                     )
                 }
@@ -96,6 +102,7 @@ class PrayerViewModel @Inject constructor(
                         time(5, R.string.praying_night_title, data.isha),
                     ),
                     direction = (if (abs < 11) 0F else diff),
+                    dailyContent = dailyContent
                 )
             }
         }
@@ -113,4 +120,5 @@ data class PrayingTime(val id: Int, val textId: Int, val timeText: String, val t
 data class PrayerScreenData(
     val times: List<PrayingTime> = listOf(),
     val direction: Float = 0F,
+    val dailyContent: AwqatDailyContent? = null
 )

@@ -44,6 +44,9 @@
     <string name="praying_evening_title">Aksam</string>
     <string name="praying_night_title">Yatsi</string>
     <string name="praying_times_header">Namaz Vakitleri</string>
+    <string name="praying_daily_verse">Günün Ayeti:</string>
+    <string name="praying_daily_hadith">Günün Hadisi:</string>
+    <string name="praying_daily_prayer">Günün Duasi:</string>
     <string name="setting_font_title">Yazi ayarlari</string>
     <string name="setting_font_size_title">Yazi Boyutu</string>
     <string name="setting_font_style_title">Yazi türü</string>
