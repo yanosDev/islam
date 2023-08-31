@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import de.yanos.islam.data.model.Degree
 import de.yanos.islam.data.model.awqat.AwqatCityDetails
 import de.yanos.islam.data.model.awqat.AwqatDailyContent
 import de.yanos.islam.data.model.awqat.AwqatLocation
@@ -42,7 +43,7 @@ interface AwqatDao : BaseDao<PrayerTime> {
                 "t.astronomicalSunset as sunsetLocation, " +
                 "t.astronomicalSunrise as sunriseLocation " +
                 "FROM CityDetail  c, Degree d " +
-                "JOIN PrayerTime t ON d.id = t.id " +
+                "JOIN PrayerTime t ON c.id = t.id " +
                 "ORDER BY c.ts " +
                 "LIMIT 1"
     )
@@ -51,6 +52,6 @@ interface AwqatDao : BaseDao<PrayerTime> {
     @Query("SELECT id FROM Location WHERE (code = :locationName OR name = :locationName) AND type = 'CITY'  LIMIT 1")
     fun loadCityCode(locationName: String): Int?
 
-    @Query("UPDATE Degree SET degree = :degree")
-    fun updateDegree(degree: Int)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun updateDegree(degree: Degree)
 }

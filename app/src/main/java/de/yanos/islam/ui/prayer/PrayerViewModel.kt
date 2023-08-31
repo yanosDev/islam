@@ -1,5 +1,6 @@
 package de.yanos.islam.ui.prayer
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,12 +20,14 @@ import de.yanos.islam.util.goldColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Timer
 import javax.inject.Inject
 import kotlin.concurrent.timerTask
+import kotlin.math.abs
 
 @HiltViewModel
 class PrayerViewModel @Inject constructor(
@@ -62,11 +65,11 @@ class PrayerViewModel @Inject constructor(
                     val formatter = DateTimeFormatter.ofPattern("HH:mm")
                     val time = LocalTime.parse(textTime, formatter)
                     var isCurrentTime = false
-                    if (now.isAfter(time)) {
+                    if (now.isBefore(time)) {
                         if (!currentTimeFound) {
+                            currentTimeFound = true
                             isCurrentTime = true
-                        } else currentTimeFound = true
-
+                        }
                     }
                     PrayingTime(
                         id = id,
@@ -80,6 +83,8 @@ class PrayerViewModel @Inject constructor(
                         } else null,
                     )
                 }
+                val diff = -(data.qibla - data.degree).toFloat()
+                val abs = abs(diff)
 
                 currentState = PrayerScreenData(
                     times = listOf(
@@ -90,7 +95,7 @@ class PrayerViewModel @Inject constructor(
                         time(4, R.string.praying_evening_title, data.maghrib),
                         time(5, R.string.praying_night_title, data.isha),
                     ),
-                    direction = -(data.qibla - data.degree).toFloat()
+                    direction = (if (abs < 11) 0F else diff),
                 )
             }
         }

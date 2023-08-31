@@ -23,18 +23,21 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.R
 import de.yanos.islam.util.IslamDivider
 import de.yanos.islam.util.Lottie
 import de.yanos.islam.util.bodySmall
+import de.yanos.islam.util.correctColor
 import de.yanos.islam.util.getUserLocation
 import de.yanos.islam.util.goldColor
 import de.yanos.islam.util.labelMedium
@@ -107,10 +110,24 @@ fun PrayingTimes(
                         .fillMaxWidth()
                         .padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(text = stringResource(id = it.textId), style = labelMedium())
-
-                    Text(text = it.remainingTime ?: "Past", style = bodySmall())
-                    Text(text = it.timeText, style = bodySmall())
+                    Text(textAlign = TextAlign.Start, text = stringResource(id = it.textId), style = labelMedium())
+                    it.remainingTime?.let {
+                        Text(
+                            modifier = Modifier
+                                .padding(horizontal = 36.dp)
+                                .weight(1f),
+                            textAlign = TextAlign.End,
+                            text = it,
+                            style = bodySmall(),
+                            color = goldColor()
+                        )
+                    }
+                    Text(
+                        textAlign = TextAlign.End,
+                        text = it.timeText,
+                        style = bodySmall(),
+                        color = if (it.isCurrentTime) correctColor() else Color.Unspecified
+                    )
                 }
                 Spacer(modifier = Modifier.height(2.dp))
                 IslamDivider()

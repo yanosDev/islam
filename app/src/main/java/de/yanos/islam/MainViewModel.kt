@@ -54,7 +54,7 @@ class MainViewModel @Inject constructor(
                     if (name != appSettings.awqatLastLocation || LocalDate.now().isAfter(LocalDate.ofEpochDay(appSettings.awqatLastLocationFetch))) {
                         repository.fetchCityData(name)
                         appSettings.awqatLastLocation = name
-                        appSettings.awqatLastFetch = LocalDate.now().toEpochDay()
+                        appSettings.awqatLastLocationFetch = LocalDate.now().toEpochDay()
                     }
                 }
             }

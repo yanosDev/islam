@@ -2,6 +2,7 @@ package de.yanos.islam.data.repositories.source
 
 import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.data.database.dao.AwqatDao
+import de.yanos.islam.data.model.Degree
 import de.yanos.islam.data.model.awqat.AwqatDailyContent
 import de.yanos.islam.data.model.awqat.AwqatLocation
 import de.yanos.islam.data.model.awqat.AwqatPrayerTime
@@ -36,7 +37,7 @@ class LocalAwqatSourceImpl @Inject constructor(
     init {
         locationUseCase.addCallback {
             localScope.launch {
-                dao.updateDegree(it)
+                dao.updateDegree(Degree(degree = it))
             }
         }
     }
