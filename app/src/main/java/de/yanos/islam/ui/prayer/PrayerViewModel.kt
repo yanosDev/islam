@@ -1,6 +1,7 @@
 package de.yanos.islam.ui.prayer
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -10,6 +11,7 @@ import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.R
 import de.yanos.islam.data.database.dao.AwqatDao
 import de.yanos.islam.data.model.CityData
+import de.yanos.islam.data.model.Schedule
 import de.yanos.islam.data.model.awqat.AwqatDailyContent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -36,9 +38,16 @@ class PrayerViewModel @Inject constructor(
     private val timer: Timer = Timer()
     private var currentIndex: Int = -1
     var currentState: PrayerScreenData by mutableStateOf(PrayerScreenData())
-    var schedules = dao.schedules().distinctUntilChanged()
+    var schedules = mutableStateListOf<Schedule>()
 
     init {
+
+        viewModelScope.launch {
+            dao.schedules().distinctUntilChanged().collect {
+                schedules.clear()
+                schedules.addAll(it)
+            }
+        }
         viewModelScope.launch {
             withContext(dispatcher) {
                 dailyContent = dao.dailyContent(LocalDateTime.now().dayOfYear)
@@ -122,6 +131,12 @@ class PrayerViewModel @Inject constructor(
         timer.cancel()
         timer.purge()
         super.onCleared()
+    }
+
+    fun changeSchedule(id: String, isEnabled: Boolean, relativeTime: Int) {
+        viewModelScope.launch(dispatcher) {
+            dao.updateSchedule(id = id, isEnabled = isEnabled, relativeTime = relativeTime)
+        }
     }
 }
 

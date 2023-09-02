@@ -34,7 +34,6 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,6 +63,7 @@ import de.yanos.islam.util.labelLarge
 import de.yanos.islam.util.labelSmall
 import de.yanos.islam.util.titleLarge
 import de.yanos.islam.util.titleSmall
+import kotlin.math.abs
 
 @Composable
 fun PrayerScreen(
@@ -80,11 +80,13 @@ fun PrayerScreen(
             )
             PrayingTimes(
                 modifier = Modifier.wrapContentHeight(),
-                times = vm.currentState.times, index = vm.currentState.index
+                times = vm.currentState.times,
+                index = vm.currentState.index
             )
             PrayerScheduler(
                 modifier = Modifier.wrapContentHeight(),
-                schedules = vm.schedules.collectAsState(initial = listOf()).value
+                schedules = vm.schedules,
+                onScheduleChange = vm::changeSchedule
             )
             vm.currentState.dailyContent?.let {
                 PrayingDaily(
@@ -92,7 +94,6 @@ fun PrayerScreen(
                     content = it
                 )
             }
-
         }
     }
 }
@@ -101,7 +102,8 @@ fun PrayerScreen(
 @Composable
 fun PrayerScheduler(
     modifier: Modifier = Modifier,
-    schedules: List<Schedule>
+    schedules: List<Schedule>,
+    onScheduleChange: (id: String, isEnabled: Boolean, relativeTime: Int) -> Unit
 ) {
     val pageCount = schedules.size
     val pagerState = rememberPagerState(initialPage = 0)
@@ -116,7 +118,7 @@ fun PrayerScheduler(
             border = BorderStroke(1.dp, goldColor()),
         ) {
             HorizontalPager(pageCount = pageCount, state = pagerState) {
-                ScheduleItem(schedule = schedules[it])
+                ScheduleItem(schedule = schedules[it], onScheduleChange = onScheduleChange)
             }
         }
         DrawDots(pageCount = pageCount, pagerState = pagerState)
@@ -125,7 +127,10 @@ fun PrayerScheduler(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScheduleItem(schedule: Schedule) {
+fun ScheduleItem(
+    schedule: Schedule,
+    onScheduleChange: (id: String, isEnabled: Boolean, relativeTime: Int) -> Unit
+) {
     var isExpanded by remember { mutableStateOf(false) }
     val items = mutableListOf<Int>().apply {
         for (i in 12 downTo 1) {
@@ -147,10 +152,10 @@ fun ScheduleItem(schedule: Schedule) {
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
             isChecked = schedule.enabled,
-            onCheckChange = {}) {
+            onCheckChange = { onScheduleChange(schedule.id, it, schedule.relativeTime) }) {
             Text(
                 text = stringResource(
-                    id = when (selectedIndex) {
+                    id = when (schedule.ordinal) {
                         0 -> R.string.praying_schedule_fajr
                         1 -> R.string.praying_schedule_sunrise
                         2 -> R.string.praying_schedule_dhuhr
@@ -165,7 +170,7 @@ fun ScheduleItem(schedule: Schedule) {
         }
         ExposedDropdownMenuBox(modifier = Modifier.padding(vertical = 8.dp), expanded = isExpanded, onExpandedChange = { isExpanded = it }) {
             OutlinedTextField(
-                value = stringResource(id = if (items[selectedIndex] < 0) R.string.praying_schedule_before else R.string.praying_schedule_after, items[selectedIndex]),
+                value = stringResource(id = if (schedule.relativeTime < 0) R.string.praying_schedule_before else R.string.praying_schedule_after, abs(schedule.relativeTime)),
                 onValueChange = {},
                 readOnly = true,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) },
@@ -179,14 +184,14 @@ fun ScheduleItem(schedule: Schedule) {
                 expanded = isExpanded,
                 onDismissRequest = { isExpanded = false }
             ) {
-                items.forEachIndexed { index, s ->
+                items.forEach { value ->
                     DropdownMenuItem(
                         modifier = Modifier.wrapContentWidth(),
                         text = {
-                            Text(text = s.toString())
+                            Text(text = value.toString())
                         },
                         onClick = {
-                            selectedIndex = index
+                            onScheduleChange(schedule.id, schedule.enabled, value)
                             isExpanded = false
                         }
                     )

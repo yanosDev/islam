@@ -71,4 +71,7 @@ interface AwqatDao : BaseDao<PrayerTime> {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSchedules(schedules: List<Schedule>)
+
+    @Query("UPDATE SCHEDULE SET  enabled = :isEnabled, relativeTime = :relativeTime WHERE id = :id")
+    suspend fun updateSchedule(id: String, isEnabled: Boolean, relativeTime: Int)
 }
