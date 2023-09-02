@@ -1,4 +1,4 @@
-package de.yanos.islam.data.model.awqat
+package de.yanos.islam.data.model
 
 data class CityData(
     val id: Int,
@@ -14,5 +14,7 @@ data class CityData(
     val isha: String,
     val sunsetLocation: String,
     val sunriseLocation: String,
+    val hijriDateLong: String,
+    val gregorianDateLong: String,
     val gregorianDateShort: String,
 )

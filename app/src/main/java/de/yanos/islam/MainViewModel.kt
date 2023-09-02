@@ -11,6 +11,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.data.database.IslamDatabase
 import de.yanos.islam.data.model.Quiz
+import de.yanos.islam.data.model.Schedule
 import de.yanos.islam.data.model.Topic
 import de.yanos.islam.data.model.TopicResource
 import de.yanos.islam.data.model.TopicType
@@ -82,6 +83,36 @@ class MainViewModel @Inject constructor(
                         )
                     )
                 }
+
+                db.awqatDao().insertSchedules(
+                    listOf(
+                        Schedule(
+                            id = "fajr",
+                            ordinal = 0
+                        ),
+                        Schedule(
+                            id = "sunrise",
+                            ordinal = 1
+                        ),
+                        Schedule(
+                            id = "dhuhr",
+                            ordinal = 2
+                        ),
+                        Schedule(
+                            id = "asr",
+                            ordinal = 3
+                        ),
+                        Schedule(
+                            id = "maghrib",
+                            ordinal = 4
+                        ),
+                        Schedule(
+                            id = "isha",
+                            ordinal = 5
+                        ),
+                    )
+                )
+
                 appSettings.isDBInitialized = true
             }
             delay(1200L)

@@ -12,6 +12,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -65,6 +66,26 @@ fun IslamCheckBox(
         TextButton(onClick = { onCheckChange(!isChecked) }, enabled = isEnabled) {
             content()
         }
+    }
+}
+
+@Composable
+fun IslamSwitch(
+    modifier: Modifier = Modifier,
+    isEnabled: Boolean = true,
+    isChecked: Boolean,
+    onCheckChange: (Boolean) -> Unit,
+    content: @Composable () -> Unit,
+) {
+    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+        TextButton(onClick = { onCheckChange(!isChecked) }, enabled = isEnabled) {
+            content()
+        }
+        Switch(
+            enabled = isEnabled,
+            checked = isChecked,
+            onCheckedChange = onCheckChange
+        )
     }
 }
 

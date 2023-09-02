@@ -4,9 +4,10 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import de.yanos.islam.data.model.CityData
 import de.yanos.islam.data.model.Degree
+import de.yanos.islam.data.model.Schedule
 import de.yanos.islam.data.model.awqat.AwqatDailyContent
-import de.yanos.islam.data.model.awqat.CityData
 import de.yanos.islam.data.model.awqat.CityDetail
 import de.yanos.islam.data.model.awqat.CityEid
 import de.yanos.islam.data.model.awqat.Location
@@ -41,7 +42,9 @@ interface AwqatDao : BaseDao<PrayerTime> {
                 "t.isha as isha, " +
                 "t.astronomicalSunset as sunsetLocation, " +
                 "t.astronomicalSunrise as sunriseLocation, " +
-                "t.gregorianDateShort as gregorianDateShort " +
+                "t.gregorianDateLong as gregorianDateLong, " +
+                "t.gregorianDateShort as gregorianDateShort, " +
+                "t.hijriDateLong as hijriDateLong " +
                 "FROM CityDetail  c, Degree d " +
                 "JOIN PrayerTime t ON c.id = t.id " +
                 "ORDER BY c.ts"
@@ -62,4 +65,10 @@ interface AwqatDao : BaseDao<PrayerTime> {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCityEid(cityEid: CityEid)
+
+    @Query("SELECT * FROM Schedule ORDER BY ordinal")
+    fun schedules(): Flow<List<Schedule>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertSchedules(schedules: List<Schedule>)
 }

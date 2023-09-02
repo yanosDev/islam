@@ -9,8 +9,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.R
 import de.yanos.islam.data.database.dao.AwqatDao
+import de.yanos.islam.data.model.CityData
 import de.yanos.islam.data.model.awqat.AwqatDailyContent
-import de.yanos.islam.data.model.awqat.CityData
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -36,6 +36,7 @@ class PrayerViewModel @Inject constructor(
     private val timer: Timer = Timer()
     private var currentIndex: Int = -1
     var currentState: PrayerScreenData by mutableStateOf(PrayerScreenData())
+    var schedules = dao.schedules().distinctUntilChanged()
 
     init {
         viewModelScope.launch {
@@ -93,7 +94,7 @@ class PrayerViewModel @Inject constructor(
                     )
                 }
                 DayData(
-                    day = data.gregorianDateShort,
+                    day = "${data.hijriDateLong} - ${data.gregorianDateLong}",
                     isToday = isToday,
                     times = listOf(
                         time(0, R.string.praying_imsak_title, data.fajr),
