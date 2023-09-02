@@ -80,4 +80,6 @@ dependencies {
     implementation(libs.timber)
     implementation(libs.lottie)
     implementation(libs.accompanist.permissions)
+
+    implementation(libs.work)
 }

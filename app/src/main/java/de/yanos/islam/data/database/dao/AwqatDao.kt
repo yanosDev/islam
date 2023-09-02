@@ -74,4 +74,7 @@ interface AwqatDao : BaseDao<PrayerTime> {
 
     @Query("UPDATE SCHEDULE SET  enabled = :isEnabled, relativeTime = :relativeTime WHERE id = :id")
     suspend fun updateSchedule(id: String, isEnabled: Boolean, relativeTime: Int)
+
+    @Query("SELECT * FROM Schedule WHERE enabled = 1")
+    suspend fun activeSchedules(): List<Schedule>
 }

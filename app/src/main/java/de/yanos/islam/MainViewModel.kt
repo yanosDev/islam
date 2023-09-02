@@ -6,6 +6,9 @@ import android.location.Geocoder
 import androidx.annotation.RawRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import de.yanos.core.utils.IODispatcher
@@ -16,6 +19,7 @@ import de.yanos.islam.data.model.Topic
 import de.yanos.islam.data.model.TopicResource
 import de.yanos.islam.data.model.TopicType
 import de.yanos.islam.data.repositories.AwqatRepository
+import de.yanos.islam.service.DailyScheduleWorker
 import de.yanos.islam.util.AppSettings
 import de.yanos.islam.util.LatandLong
 import kotlinx.coroutines.CoroutineDispatcher
@@ -25,7 +29,10 @@ import timber.log.Timber
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
+import java.time.Duration
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 
@@ -38,12 +45,26 @@ class MainViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val db: IslamDatabase,
     @IODispatcher private val dispatcher: CoroutineDispatcher,
+    private val workManager: WorkManager
 ) : ViewModel() {
     var isReady: Boolean = false
 
     init {
         initDB()
+        initDailyWorker()
         loadDailyAwqatList()
+    }
+
+    private fun initDailyWorker() {
+        val now = LocalDateTime.now()
+        val delay = when {
+            now.hour < 1 -> Duration.ofHours(0L)
+            else -> Duration.ofHours(24L - now.hour)
+        }.plusMinutes(20)
+        val periodicWorkRequest = PeriodicWorkRequestBuilder<DailyScheduleWorker>(24, TimeUnit.HOURS)
+            .setInitialDelay(delay)
+            .build()
+        workManager.enqueueUniquePeriodicWork("daily", ExistingPeriodicWorkPolicy.KEEP, periodicWorkRequest)
     }
 
     fun onCurrentLocationChanged(location: LatandLong) {
