@@ -11,7 +11,6 @@ import de.yanos.islam.R
 import de.yanos.islam.data.database.dao.AwqatDao
 import de.yanos.islam.data.model.awqat.AwqatDailyContent
 import de.yanos.islam.data.model.awqat.CityData
-import de.yanos.islam.util.AppSettings
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -29,7 +28,6 @@ import kotlin.math.abs
 
 @HiltViewModel
 class PrayerViewModel @Inject constructor(
-    private val appSettings: AppSettings,
     private val dao: AwqatDao,
     @IODispatcher private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
@@ -64,12 +62,16 @@ class PrayerViewModel @Inject constructor(
         viewModelScope.launch {
             cityData.map { data ->
                 val now = LocalTime.now()
+                val diff = -(data.qibla - data.degree).toFloat()
+                val abs = abs(diff)
+                val date = LocalDate.parse(data.gregorianDateShort, DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                val isToday = date.dayOfYear == LocalDate.now().dayOfYear && date.year == LocalDate.now().year
                 var currentTimeFound = false
                 val time = { id: Int, textId: Int, textTime: String ->
                     val formatter = DateTimeFormatter.ofPattern("HH:mm")
                     val time = LocalTime.parse(textTime, formatter)
                     var isCurrentTime = false
-                    if (now.isBefore(time)) {
+                    if (now.isBefore(time) && isToday) {
                         if (!currentTimeFound) {
                             currentTimeFound = true
                             isCurrentTime = true
@@ -81,7 +83,7 @@ class PrayerViewModel @Inject constructor(
                         timeText = textTime,
                         time = time,
                         isCurrentTime = isCurrentTime,
-                        remainingTime = if (now.isBefore(time)) {
+                        remainingTime = if (now.isBefore(time) && isToday) {
                             val remaining = now.until(time, ChronoUnit.SECONDS)
                             val hour = String.format("%02d", remaining.toInt() / 3600)
                             val minute = String.format("%02d", (remaining.toInt() % 3600) / 60)
@@ -90,12 +92,6 @@ class PrayerViewModel @Inject constructor(
                         } else null,
                     )
                 }
-
-                val diff = -(data.qibla - data.degree).toFloat()
-                val abs = abs(diff)
-                val date = LocalDate.parse(data.gregorianDateShort, DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-                val isToday = date.dayOfYear == LocalDate.now().dayOfYear && date.year == LocalDate.now().year
-
                 DayData(
                     day = data.gregorianDateShort,
                     isToday = isToday,
