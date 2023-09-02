@@ -48,19 +48,24 @@ private fun Questions(
         items(
             items = questions,
             key = { it.id }) { quiz ->
-            ElevatedCard(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-            ) {
-                Spacer(modifier = Modifier.height(12.dp))
-                Text(modifier = Modifier.padding(horizontal = 8.dp), text = "${quiz.question}?", style = labelLarge())
-                Spacer(modifier = Modifier.height(8.dp))
-                IslamDivider()
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(modifier = Modifier.padding(horizontal = 8.dp), text = quiz.answer, style = bodyMedium())
-                Spacer(modifier = Modifier.height(12.dp))
-            }
+            Question(quiz)
         }
+    }
+}
+
+@Composable
+private fun Question(quiz: Quiz) {
+    ElevatedCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+    ) {
+        Spacer(modifier = Modifier.height(12.dp))
+        Text(modifier = Modifier.padding(horizontal = 8.dp), text = "${quiz.question}?", style = labelLarge())
+        Spacer(modifier = Modifier.height(8.dp))
+        IslamDivider()
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(modifier = Modifier.padding(horizontal = 8.dp), text = quiz.answer, style = bodyMedium())
+        Spacer(modifier = Modifier.height(12.dp))
     }
 }

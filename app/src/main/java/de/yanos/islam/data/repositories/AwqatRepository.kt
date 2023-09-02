@@ -14,7 +14,10 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
+
 
 interface AwqatRepository {
     suspend fun fetchAwqatData()
@@ -45,45 +48,55 @@ class AwqatRepositoryImpl @Inject constructor(
         withContext(dispatcher) {
             if (appSettings.authToken.isNotBlank()) {
                 localSource.loadCityId(locationName.uppercase())?.let { cityId ->
-                    async {
-                        getData(remoteSource.loadCityDetails(cityId))?.let {
-                            localSource.insertCityDetails(
-                                CityDetail(
-                                    id = cityId,
-                                    name = it.data.name,
-                                    code = it.data.code,
-                                    geographicQiblaAngle = it.data.geographicQiblaAngle,
-                                    distanceToKaaba = it.data.distanceToKaaba,
-                                    qiblaAngle = it.data.qiblaAngle,
-                                    city = it.data.city,
-                                    cityEn = it.data.cityEn,
-                                    country = it.data.country,
-                                    countryEn = it.data.countryEn
+                    if (localSource.loadCityTimes(cityId).none {
+                            val inputString = it.gregorianDateShort
+                            val parser = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+                            val date = LocalDate.parse(inputString, parser)
+                            date.dayOfYear == LocalDate.now().dayOfYear && date.year == LocalDate.now().year
+                        }) {
+                        async {
+                            getData(remoteSource.loadCityDetails(cityId))?.let {
+                                localSource.insertCityDetails(
+                                    CityDetail(
+                                        id = cityId,
+                                        name = it.data.name,
+                                        code = it.data.code,
+                                        geographicQiblaAngle = it.data.geographicQiblaAngle,
+                                        distanceToKaaba = it.data.distanceToKaaba,
+                                        qiblaAngle = it.data.qiblaAngle,
+                                        city = it.data.city,
+                                        cityEn = it.data.cityEn,
+                                        country = it.data.country,
+                                        countryEn = it.data.countryEn
+                                    )
                                 )
-                            )
+                            }
                         }
-                    }
-                    async {
-                        getData(remoteSource.loadCityPrayerTimes(cityId))?.data?.let { times ->
-                            localSource.insertCityPrayerTimes(
-                                times.map {time -> PrayerTime(
-                                    id = cityId,
-                                    shapeMoonUrl = time.shapeMoonUrl,
-                                    fajr = time.fajr,
-                                    sunrise = time.sunrise,
-                                    dhuhr = time.dhuhr,
-                                    asr = time.asr,
-                                    maghrib = time.maghrib,
-                                    isha = time.isha,
-                                    astronomicalSunset = time.astronomicalSunset,
-                                    astronomicalSunrise = time.astronomicalSunrise,
-                                    hijriDateShort = time.hijriDateShort,
-                                    hijriDateLong = time.hijriDateLong,
-                                    qiblaTime = time.qiblaTime,
-                                    gregorianDateShort = time.gregorianDateShort,
-                                    gregorianDateLong = time.gregorianDateLong,
-                                ) }
-                            )
+                        async {
+                            getData(remoteSource.loadCityPrayerTimes(cityId))?.data?.let { times ->
+                                localSource.insertCityPrayerTimes(
+                                    times.map { time ->
+                                        PrayerTime(
+                                            id = cityId,
+                                            key = "${cityId}_${time.gregorianDateShort}",
+                                            shapeMoonUrl = time.shapeMoonUrl,
+                                            fajr = time.fajr,
+                                            sunrise = time.sunrise,
+                                            dhuhr = time.dhuhr,
+                                            asr = time.asr,
+                                            maghrib = time.maghrib,
+                                            isha = time.isha,
+                                            astronomicalSunset = time.astronomicalSunset,
+                                            astronomicalSunrise = time.astronomicalSunrise,
+                                            hijriDateShort = time.hijriDateShort,
+                                            hijriDateLong = time.hijriDateLong,
+                                            qiblaTime = time.qiblaTime,
+                                            gregorianDateShort = time.gregorianDateShort,
+                                            gregorianDateLong = time.gregorianDateLong,
+                                        )
+                                    }
+                                )
+                            }
                         }
                     }
                 }

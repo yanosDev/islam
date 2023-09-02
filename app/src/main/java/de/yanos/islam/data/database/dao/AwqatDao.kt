@@ -5,9 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import de.yanos.islam.data.model.Degree
-import de.yanos.islam.data.model.awqat.AwqatCityDetails
 import de.yanos.islam.data.model.awqat.AwqatDailyContent
-import de.yanos.islam.data.model.awqat.AwqatLocation
 import de.yanos.islam.data.model.awqat.CityData
 import de.yanos.islam.data.model.awqat.CityDetail
 import de.yanos.islam.data.model.awqat.Location
@@ -57,4 +55,7 @@ interface AwqatDao : BaseDao<PrayerTime> {
 
     @Query("SELECT * FROM AwqatDailyContent WHERE dayOfYear = :dayOfYear LIMIT 1")
     fun dailyContent(dayOfYear: Int): AwqatDailyContent?
+
+    @Query("SELECT * FROM PrayerTime WHERE id = :cityId")
+    fun loadCityTimes(cityId: Int): List<PrayerTime>
 }

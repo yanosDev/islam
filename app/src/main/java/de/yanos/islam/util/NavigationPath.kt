@@ -19,6 +19,7 @@ import de.yanos.islam.ui.knowledge.challenge.open.OpenChallengesScreen
 import de.yanos.islam.ui.knowledge.challenge.session.ChallengeSessionScreen
 import de.yanos.islam.ui.knowledge.topics.list.QuestionListScreen
 import de.yanos.islam.ui.knowledge.topics.main.MainTopicsScreen
+import de.yanos.islam.ui.knowledge.topics.search.SearchQuestionsScreen
 import de.yanos.islam.ui.knowledge.topics.sub.SubTopicsScreen
 
 interface NavigationPath {
@@ -44,6 +45,7 @@ sealed class KnowledgeNavigationAction(override val route: String) : NavigationA
     object NavigateToChallengeCreation : KnowledgeNavigationAction(KnowledgeNavigation.Challenge.route)
     data class NavigateToChallenge(val id: Int) : KnowledgeNavigationAction(KnowledgeNavigation.ChallengeSession.route.replace("{id}", id.toString()))
     object NavigateToOpenChallenges : KnowledgeNavigationAction(KnowledgeNavigation.ChallengeOpen.route)
+    object NavigateToSearchQuestions : KnowledgeNavigationAction(KnowledgeNavigation.SearchQuestions.route)
     data class NavigateToSubTopic(val id: Int) : KnowledgeNavigationAction(KnowledgeNavigation.SubList.route.replace("{id}", id.toString()))
     data class NavigateToTopicQuestions(val id: Int, val parentId: Int?) :
         KnowledgeNavigationAction(KnowledgeNavigation.QuestionList.route.replace("{id}", id.toString()).replace("{parentId}", (parentId?.toString() ?: "-1")))
@@ -131,6 +133,13 @@ sealed class KnowledgeNavigation(override val route: String, override val args: 
         }
     }
 
+    object SearchQuestions : KnowledgeNavigation("topics/search/") {
+        @Composable
+        override fun View(onNavigationChange: (NavigationAction) -> Unit) {
+            SearchQuestionsScreen(onNavigationChange = onNavigationChange)
+        }
+    }
+
     object ChallengeHistory : KnowledgeNavigation("topics/challenge/history/")
 }
 
@@ -138,6 +147,7 @@ val allKnowledge = listOf(
     KnowledgeNavigation.MainList,
     KnowledgeNavigation.SubList,
     KnowledgeNavigation.QuestionList,
+    KnowledgeNavigation.SearchQuestions,
     KnowledgeNavigation.Challenge,
     KnowledgeNavigation.ChallengeSession,
     KnowledgeNavigation.ChallengeOpen,

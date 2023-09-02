@@ -101,7 +101,7 @@ fun Lottie(modifier: Modifier, @RawRes resId: Int, applyColor: Boolean = true) {
         )
     )
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(resId))
-    val progress by animateLottieCompositionAsState(composition)
+    val progress by animateLottieCompositionAsState(composition, speed = 1.6f)
     if (applyColor)
         LottieAnimation(
             modifier = modifier,

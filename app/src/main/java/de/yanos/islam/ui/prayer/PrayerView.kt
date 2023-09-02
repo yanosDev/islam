@@ -61,7 +61,7 @@ fun PrayerScreen(
                 direction = vm.currentState.direction
             )
         }
-        item { PrayingTimes(modifier = Modifier.padding(vertical = 4.dp), times = vm.currentState.times, direction = vm.currentState.direction) }
+        item { PrayingTimes(modifier = Modifier.padding(vertical = 4.dp), times = vm.currentState.times) }
         vm.currentState.dailyContent?.let {
             item { PrayingDaily(modifier = Modifier.padding(vertical = 8.dp), content = it) }
         }
@@ -85,7 +85,7 @@ private fun PrayingHeader(modifier: Modifier = Modifier, direction: Float) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun PrayingDaily(
+private fun PrayingDaily(
     modifier: Modifier,
     content: AwqatDailyContent
 ) {
@@ -141,7 +141,7 @@ fun PrayingDaily(
 }
 
 @Composable
-fun QiblaRug(modifier: Modifier = Modifier, direction: Float) {
+private fun QiblaRug(modifier: Modifier = Modifier, direction: Float) {
     val matrix = Matrix()
     matrix.postRotate(direction)
     val originalBitmap = ImageBitmap.imageResource(id = R.drawable.rug).asAndroidBitmap()
@@ -162,10 +162,9 @@ fun QiblaRug(modifier: Modifier = Modifier, direction: Float) {
 }
 
 @Composable
-fun PrayingTimes(
+private fun PrayingTimes(
     modifier: Modifier = Modifier,
     times: List<PrayingTime>,
-    direction: Float
 ) {
     OutlinedCard(
         modifier = modifier.fillMaxWidth(),

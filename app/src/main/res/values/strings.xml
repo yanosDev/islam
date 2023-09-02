@@ -6,9 +6,10 @@
     <string name="tab_time">Namaz Vakitler</string>
     <string name="tab_setting">Ayarlar</string>
 
+    <string name="search_placeholder">Ara…</string>
     <string name="main_topic_title">Konular</string>
-    <string name="main_to_open_challenges">Önceki Sinavlar</string>
-    <string name="main_to_new_challenge">Yeni Sinavlar</string>
+    <string name="main_search_question">Sorulari aramak istermisin?</string>
+    <string name="main_to_new_challenge">Kendinizi Denemek istermisin?</string>
 
     <string name="challenge_creation_title">Sinav Zorlugunu ve Konularinizi secin</string>
     <string name="challenge_creation_difficulty_low">Kolay</string>
