@@ -146,6 +146,8 @@ moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "retr
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hilt" }
+hilt-common = { module = "androidx.hilt:hilt-common", version.ref = "hiltExt" }
+hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hiltExt" }
 hilt-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltExt" }
 hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
 hilt-ext-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltExt" }

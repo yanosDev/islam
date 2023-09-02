@@ -58,6 +58,8 @@ dependencies {
     //DI
     implementation(libs.hilt.android)
     implementation(libs.hilt.compose)
+    implementation(libs.hilt.work)
+    kapt(libs.hilt.ext.compiler)
     kapt(libs.hilt.compiler)
 
     //Server
