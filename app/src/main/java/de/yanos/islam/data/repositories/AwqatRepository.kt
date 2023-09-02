@@ -3,6 +3,7 @@ package de.yanos.islam.data.repositories
 import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.data.model.awqat.AwqatLocation
 import de.yanos.islam.data.model.awqat.CityDetail
+import de.yanos.islam.data.model.awqat.CityEid
 import de.yanos.islam.data.model.awqat.Location
 import de.yanos.islam.data.model.awqat.LocationType
 import de.yanos.islam.data.model.awqat.PrayerTime
@@ -49,9 +50,7 @@ class AwqatRepositoryImpl @Inject constructor(
             if (appSettings.authToken.isNotBlank()) {
                 localSource.loadCityId(locationName.uppercase())?.let { cityId ->
                     if (localSource.loadCityTimes(cityId).none {
-                            val inputString = it.gregorianDateShort
-                            val parser = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-                            val date = LocalDate.parse(inputString, parser)
+                            val date = LocalDate.parse(it.gregorianDateShort, DateTimeFormatter.ofPattern("dd.MM.yyyy"))
                             date.dayOfYear == LocalDate.now().dayOfYear && date.year == LocalDate.now().year
                         }) {
                         async {
@@ -95,6 +94,22 @@ class AwqatRepositoryImpl @Inject constructor(
                                             gregorianDateLong = time.gregorianDateLong,
                                         )
                                     }
+                                )
+                            }
+                        }
+                        async {
+                            getData(remoteSource.loadCityPrayerTimesEid(cityId))?.data?.let { time ->
+                                localSource.insertCityEid(
+                                    CityEid(
+                                        cityId = cityId,
+                                        key = "${cityId}_${time.eidAlAdhaHijri}",
+                                        eidAlAdhaHijri = time.eidAlAdhaHijri,
+                                        eidAlAdhaTime = time.eidAlAdhaTime,
+                                        eidAlAdhaDate = time.eidAlAdhaDate,
+                                        eidAlFitrHijri = time.eidAlFitrHijri,
+                                        eidAlFitrTime = time.eidAlFitrTime,
+                                        eidAlFitrDate = time.eidAlFitrDate,
+                                    )
                                 )
                             }
                         }

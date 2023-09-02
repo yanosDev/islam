@@ -11,7 +11,6 @@ import de.yanos.islam.R
 import de.yanos.islam.data.database.dao.AwqatDao
 import de.yanos.islam.data.model.awqat.AwqatDailyContent
 import de.yanos.islam.data.model.awqat.CityData
-import de.yanos.islam.util.AppSettings
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -29,14 +28,13 @@ import kotlin.math.abs
 
 @HiltViewModel
 class PrayerViewModel @Inject constructor(
-    private val appSettings: AppSettings,
     private val dao: AwqatDao,
     @IODispatcher private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
-    private var cityData: CityData? = null
+    private var cityData: MutableList<CityData> = mutableListOf()
     private var dailyContent: AwqatDailyContent? = null
     private val timer: Timer = Timer()
-
+    private var currentIndex: Int = -1
     var currentState: PrayerScreenData by mutableStateOf(PrayerScreenData())
 
     init {
@@ -44,8 +42,9 @@ class PrayerViewModel @Inject constructor(
             withContext(dispatcher) {
                 dailyContent = dao.dailyContent(LocalDateTime.now().dayOfYear)
             }
-            dao.loadRecentCity().distinctUntilChanged().collect {
-                cityData = it
+            dao.loadCityData().distinctUntilChanged().collect {
+                cityData.clear()
+                cityData.addAll(it)
                 refreshData()
             }
         }
@@ -61,14 +60,18 @@ class PrayerViewModel @Inject constructor(
 
     private fun refreshData() {
         viewModelScope.launch {
-            cityData?.let { data ->
+            cityData.map { data ->
                 val now = LocalTime.now()
+                val diff = -(data.qibla - data.degree).toFloat()
+                val abs = abs(diff)
+                val date = LocalDate.parse(data.gregorianDateShort, DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                val isToday = date.dayOfYear == LocalDate.now().dayOfYear && date.year == LocalDate.now().year
                 var currentTimeFound = false
                 val time = { id: Int, textId: Int, textTime: String ->
                     val formatter = DateTimeFormatter.ofPattern("HH:mm")
                     val time = LocalTime.parse(textTime, formatter)
                     var isCurrentTime = false
-                    if (now.isBefore(time)) {
+                    if (now.isBefore(time) && isToday) {
                         if (!currentTimeFound) {
                             currentTimeFound = true
                             isCurrentTime = true
@@ -80,7 +83,7 @@ class PrayerViewModel @Inject constructor(
                         timeText = textTime,
                         time = time,
                         isCurrentTime = isCurrentTime,
-                        remainingTime = if (now.isBefore(time)) {
+                        remainingTime = if (now.isBefore(time) && isToday) {
                             val remaining = now.until(time, ChronoUnit.SECONDS)
                             val hour = String.format("%02d", remaining.toInt() / 3600)
                             val minute = String.format("%02d", (remaining.toInt() % 3600) / 60)
@@ -89,10 +92,9 @@ class PrayerViewModel @Inject constructor(
                         } else null,
                     )
                 }
-                val diff = -(data.qibla - data.degree).toFloat()
-                val abs = abs(diff)
-
-                currentState = PrayerScreenData(
+                DayData(
+                    day = data.gregorianDateShort,
+                    isToday = isToday,
                     times = listOf(
                         time(0, R.string.praying_imsak_title, data.fajr),
                         time(1, R.string.praying_sunrise_title, data.sunrise),
@@ -101,8 +103,15 @@ class PrayerViewModel @Inject constructor(
                         time(4, R.string.praying_evening_title, data.maghrib),
                         time(5, R.string.praying_night_title, data.isha),
                     ),
-                    direction = (if (abs < 11) 0F else diff),
-                    dailyContent = dailyContent
+                    direction = -(if (abs < 11) 0F else diff)
+                )
+            }.let { days ->
+                currentIndex = if (currentIndex < 0) days.indexOfFirst { it.isToday } else currentIndex
+
+                currentState = PrayerScreenData(
+                    times = days,
+                    index = currentIndex,
+                    dailyContent = dailyContent,
                 )
             }
         }
@@ -118,7 +127,14 @@ class PrayerViewModel @Inject constructor(
 data class PrayingTime(val id: Int, val textId: Int, val timeText: String, val time: LocalTime, val isCurrentTime: Boolean, val remainingTime: String?)
 
 data class PrayerScreenData(
-    val times: List<PrayingTime> = listOf(),
-    val direction: Float = 0F,
+    val times: List<DayData> = listOf(),
+    val index: Int = 0,
     val dailyContent: AwqatDailyContent? = null
+)
+
+data class DayData(
+    val day: String,
+    val isToday: Boolean,
+    val times: List<PrayingTime>,
+    val direction: Float = 0F
 )

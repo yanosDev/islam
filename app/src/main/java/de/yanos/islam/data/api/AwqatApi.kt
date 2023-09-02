@@ -1,12 +1,9 @@
 package de.yanos.islam.data.api
 
-import de.yanos.islam.data.model.awqat.AwqatCityDetails
 import de.yanos.islam.data.model.awqat.AwqatCityDetailsResponse
-import de.yanos.islam.data.model.awqat.AwqatDailyContent
 import de.yanos.islam.data.model.awqat.AwqatDailyContentResponse
-import de.yanos.islam.data.model.awqat.AwqatLocation
+import de.yanos.islam.data.model.awqat.AwqatEidResponse
 import de.yanos.islam.data.model.awqat.AwqatLocationResponse
-import de.yanos.islam.data.model.awqat.AwqatLogin
 import de.yanos.islam.data.model.awqat.AwqatLoginResponse
 import de.yanos.islam.data.model.awqat.AwqatPrayerTimeResponse
 import de.yanos.islam.data.model.awqat.Login
@@ -16,7 +13,6 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
-import retrofit2.http.Query
 
 interface AwqatApi {
     @POST("/Auth/Login")
@@ -46,6 +42,8 @@ interface AwqatApi {
     @GET("/api/Place/CityDetail/{cityId}")
     fun loadCityDetails(@Header("Authorization") authToken: String, @Path("cityId") cityId: Int): Call<AwqatCityDetailsResponse>
 
-    @GET("/api/PrayerTime/Daily/{cityId}")
+    @GET("/api/PrayerTime/Monthly/{cityId}")
     fun loadCityPrayerTimes(@Header("Authorization") authToken: String, @Path("cityId") cityId: Int): Call<AwqatPrayerTimeResponse>
+    @GET("/api/PrayerTime/Eid/{cityId}")
+    fun loadCityPrayerTimesEid(@Header("Authorization") authToken: String, @Path("cityId") cityId: Int): Call<AwqatEidResponse>
 }

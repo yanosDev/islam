@@ -18,7 +18,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -54,16 +54,26 @@ fun PrayerScreen(
     modifier: Modifier = Modifier,
     vm: PrayerViewModel = hiltViewModel()
 ) {
-    LazyColumn(modifier = modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-        item {
+    if (vm.currentState.times.isNotEmpty()) {
+        Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
             PrayingHeader(
-                modifier = Modifier.padding(8.dp),
-                direction = vm.currentState.direction
+                modifier = Modifier
+                    .padding(8.dp)
+                    .wrapContentHeight(),
+                direction = vm.currentState.times.first().direction
             )
-        }
-        item { PrayingTimes(modifier = Modifier.padding(vertical = 4.dp), times = vm.currentState.times) }
-        vm.currentState.dailyContent?.let {
-            item { PrayingDaily(modifier = Modifier.padding(vertical = 8.dp), content = it) }
+            PrayingTimes(
+                modifier = Modifier.wrapContentHeight(),
+                times = vm.currentState.times, index = vm.currentState.index
+            )
+            vm.currentState.dailyContent?.let {
+                PrayingDaily(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .wrapContentHeight(),
+                    content = it
+                )
+            }
         }
     }
 }
@@ -93,16 +103,11 @@ private fun PrayingDaily(
         OutlinedCard(
             modifier = modifier
                 .fillMaxWidth()
-                .padding(4.dp)
                 .heightIn(min = 240.dp),
             elevation = CardDefaults.elevatedCardElevation(),
             border = BorderStroke(1.dp, goldColor()),
         ) {
-            Column(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxSize()
-            ) {
+            Column(modifier = Modifier.padding(8.dp)) {
                 Text(text = header, style = titleSmall())
                 Text(text = text, style = bodySmall())
                 Text(modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.End, text = textSource ?: "", style = titleSmall())
@@ -111,7 +116,7 @@ private fun PrayingDaily(
     }
     val pageCount = 3
     val pagerState = rememberPagerState(initialPage = 0)
-    Column {
+    Column(modifier = Modifier.wrapContentHeight()) {
         HorizontalPager(pageCount = pageCount, state = pagerState) {
             when (it) {
                 0 -> dailyCard(stringResource(id = R.string.praying_daily_hadith), content.hadith, content.hadithSource)
@@ -161,46 +166,58 @@ private fun QiblaRug(modifier: Modifier = Modifier, direction: Float) {
 
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun PrayingTimes(
     modifier: Modifier = Modifier,
-    times: List<PrayingTime>,
+    times: List<DayData>,
+    index: Int
 ) {
-    OutlinedCard(
-        modifier = modifier.fillMaxWidth(),
-        elevation = CardDefaults.elevatedCardElevation(),
-        border = BorderStroke(1.dp, goldColor()),
-    ) {
-        Column(modifier = Modifier.padding(horizontal = 12.dp)) {
-            times.forEach {
-                Spacer(modifier = Modifier.height(2.dp))
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(4.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(textAlign = TextAlign.Start, text = stringResource(id = it.textId), style = labelSmall())
-                    it.remainingTime?.let {
-                        Text(
+    val pageCount = times.size
+    val pagerState = rememberPagerState(initialPage = index)
+    HorizontalPager(modifier = modifier, pageCount = pageCount, state = pagerState) {
+        val currentDay = times[it]
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(text = currentDay.day, style = titleSmall(), color = goldColor())
+            OutlinedCard(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
+                elevation = CardDefaults.elevatedCardElevation(),
+                border = BorderStroke(1.dp, goldColor()),
+            ) {
+                Column(modifier = Modifier.padding(horizontal = 12.dp)) {
+                    currentDay.times.forEach { time ->
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Row(
                             modifier = Modifier
-                                .padding(horizontal = 18.dp)
-                                .weight(1f),
-                            textAlign = TextAlign.End,
-                            text = it,
-                            style = bodySmall(),
-                            color = goldColor()
-                        )
+                                .fillMaxWidth()
+                                .padding(4.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(textAlign = TextAlign.Start, text = stringResource(id = time.textId), style = labelSmall())
+                            time.remainingTime?.let {
+                                Text(
+                                    modifier = Modifier
+                                        .padding(horizontal = 18.dp)
+                                        .weight(1f),
+                                    textAlign = TextAlign.End,
+                                    text = it,
+                                    style = bodySmall(),
+                                    color = goldColor()
+                                )
+                            }
+                            Text(
+                                textAlign = TextAlign.End,
+                                text = time.timeText,
+                                style = bodySmall(),
+                                color = if (time.isCurrentTime) correctColor() else Color.Unspecified
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(2.dp))
+                        IslamDivider()
                     }
-                    Text(
-                        textAlign = TextAlign.End,
-                        text = it.timeText,
-                        style = bodySmall(),
-                        color = if (it.isCurrentTime) correctColor() else Color.Unspecified
-                    )
                 }
-                Spacer(modifier = Modifier.height(2.dp))
-                IslamDivider()
             }
         }
     }

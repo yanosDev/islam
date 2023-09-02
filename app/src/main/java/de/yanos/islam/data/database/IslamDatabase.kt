@@ -14,6 +14,7 @@ import de.yanos.islam.data.model.Search
 import de.yanos.islam.data.model.Topic
 import de.yanos.islam.data.model.awqat.AwqatDailyContent
 import de.yanos.islam.data.model.awqat.CityDetail
+import de.yanos.islam.data.model.awqat.CityEid
 import de.yanos.islam.data.model.awqat.Location
 import de.yanos.islam.data.model.awqat.PrayerTime
 
@@ -35,7 +36,8 @@ interface IslamDatabase {
         PrayerTime::class,
         CityDetail::class,
         Degree::class,
-        Search::class
+        Search::class,
+        CityEid::class
     ],
     version = 1
 )

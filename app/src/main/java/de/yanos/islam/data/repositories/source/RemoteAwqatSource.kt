@@ -2,10 +2,9 @@ package de.yanos.islam.data.repositories.source
 
 import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.data.api.AwqatApi
-import de.yanos.islam.data.model.awqat.AwqatCityDetails
 import de.yanos.islam.data.model.awqat.AwqatCityDetailsResponse
-import de.yanos.islam.data.model.awqat.AwqatDailyContent
 import de.yanos.islam.data.model.awqat.AwqatDailyContentResponse
+import de.yanos.islam.data.model.awqat.AwqatEidResponse
 import de.yanos.islam.data.model.awqat.AwqatLocationResponse
 import de.yanos.islam.data.model.awqat.AwqatPrayerTimeResponse
 import de.yanos.islam.data.model.awqat.Login
@@ -26,6 +25,7 @@ interface RemoteAwqatSource {
     suspend fun loadCities(): LoadState<AwqatLocationResponse>
     suspend fun loadCityDetails(cityId: Int): LoadState<AwqatCityDetailsResponse>
     suspend fun loadCityPrayerTimes(cityId: Int): LoadState<AwqatPrayerTimeResponse>
+    suspend fun loadCityPrayerTimesEid(cityId: Int): LoadState<AwqatEidResponse>
 }
 
 class RemoteAwqatSourceImpl @Inject constructor(
@@ -118,6 +118,18 @@ class RemoteAwqatSourceImpl @Inject constructor(
         return withContext(dispatcher) {
             try {
                 val response = api.loadCityPrayerTimes(appSettings.authToken, cityId).awaitResponse()
+                localResponse(response)
+            } catch (e: Exception) {
+                Timber.e(e)
+                LoadState.Failure(Exception("Error"))
+            }
+        }
+    }
+
+    override suspend fun loadCityPrayerTimesEid(cityId: Int): LoadState<AwqatEidResponse> {
+        return withContext(dispatcher) {
+            try {
+                val response = api.loadCityPrayerTimesEid(appSettings.authToken, cityId).awaitResponse()
                 localResponse(response)
             } catch (e: Exception) {
                 Timber.e(e)
