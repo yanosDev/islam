@@ -29,6 +29,7 @@ import de.yanos.islam.util.KnowledgeNavigation
 import de.yanos.islam.util.MainNavigation
 import de.yanos.islam.util.NavigationAction
 import de.yanos.islam.util.PatternedBackgroung
+import de.yanos.islam.util.Permission
 import de.yanos.islam.util.allKnowledge
 import de.yanos.islam.util.getUserLocation
 import de.yanos.islam.util.typoByConfig
@@ -44,7 +45,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             vm.onCurrentLocationChanged(getUserLocation(context = LocalContext.current))
-
+            Permission()
             AppTheme(activity = this, typography = typoByConfig(appSettings)) { modifier, config ->
                 val navController = rememberNavController()
                 DynamicNavigationScreen(

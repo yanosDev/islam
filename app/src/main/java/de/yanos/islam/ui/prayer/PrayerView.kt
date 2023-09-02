@@ -109,15 +109,15 @@ fun PrayerScheduler(
     val pagerState = rememberPagerState(initialPage = 0)
 
     Column(modifier = modifier) {
-        OutlinedCard(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 8.dp)
-                .wrapContentHeight(),
-            elevation = CardDefaults.elevatedCardElevation(),
-            border = BorderStroke(1.dp, goldColor()),
-        ) {
-            HorizontalPager(pageCount = pageCount, state = pagerState) {
+        HorizontalPager(pageCount = pageCount, state = pagerState) {
+            OutlinedCard(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 8.dp)
+                    .wrapContentHeight(),
+                elevation = CardDefaults.elevatedCardElevation(),
+                border = BorderStroke(1.dp, goldColor()),
+            ) {
                 ScheduleItem(schedule = schedules[it], onScheduleChange = onScheduleChange)
             }
         }
@@ -141,7 +141,6 @@ fun ScheduleItem(
             add(i * 5)
         }
     }
-    var selectedIndex by remember { mutableStateOf(items.indexOfFirst { it == schedule.relativeTime }) }
     Column(
         modifier = Modifier
             .fillMaxWidth()

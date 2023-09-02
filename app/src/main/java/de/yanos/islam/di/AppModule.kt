@@ -1,6 +1,7 @@
 package de.yanos.islam.di
 
 import android.app.AlarmManager
+import android.app.NotificationManager
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorManager
@@ -108,6 +109,9 @@ internal class AppModule {
     @Provides
     fun provideGeocoder(@ApplicationContext context: Context): Geocoder = Geocoder(context, Locale("en"))
 
+    @Provides
+    @Singleton
+    fun provideNotificationManager(@ApplicationContext context: Context) = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
     @Provides
     @Singleton

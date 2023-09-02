@@ -73,6 +73,7 @@ class MainViewModel @Inject constructor(
             geocoder.getFromLocation(location.latitude, location.longitude, 1)?.firstOrNull()?.let { address ->
                 (address.subAdminArea ?: address.adminArea)?.let { name ->
                     repository.fetchCityData(name)
+                    appSettings.lastLocation = name
                 }
             }
         }

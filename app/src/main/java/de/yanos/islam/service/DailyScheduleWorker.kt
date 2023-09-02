@@ -10,7 +10,6 @@ import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import de.yanos.core.utils.IODispatcher
-import de.yanos.islam.MainActivity
 import de.yanos.islam.data.database.dao.AwqatDao
 import de.yanos.islam.data.model.Schedule
 import de.yanos.islam.data.model.awqat.PrayerTime
@@ -19,10 +18,13 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 
 @HiltWorker
@@ -37,7 +39,7 @@ class DailyScheduleWorker @AssistedInject constructor(
     override suspend fun doWork(): Result {
         return withContext(dispatcher) {
             cancelAllAlarms()
-            dao.loadCityCode(appSettings.lastLocation)?.let { cityCode ->
+            dao.loadCityCode(appSettings.lastLocation.uppercase())?.let { cityCode ->
                 val prayingTime = dao.loadCityTimes(cityCode).first {
                     val date = LocalDate.parse(it.gregorianDateShort, DateTimeFormatter.ofPattern("dd.MM.yyyy"))
                     date.dayOfYear == LocalDate.now().dayOfYear && date.year == LocalDate.now().year
@@ -53,7 +55,7 @@ class DailyScheduleWorker @AssistedInject constructor(
     private fun cancelAllAlarms() {
         listOf("fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha").forEach {
             try {
-                val updateServiceIntent = Intent(applicationContext, MainActivity::class.java)
+                val updateServiceIntent = Intent(applicationContext, PrayerTimeAlarmReceiver::class.java)
                 val pendingUpdateIntent =
                     PendingIntent.getService(applicationContext, it.hashCode(), updateServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE)
                 alarmManager.cancel(pendingUpdateIntent)
@@ -72,13 +74,14 @@ class DailyScheduleWorker @AssistedInject constructor(
             4 -> prayingTime.maghrib
             else -> prayingTime.isha
         }
-        val time = LocalTime.parse(prayerTime, DateTimeFormatter.ofPattern("HH:mm")).apply {
-            if (schedule.relativeTime < 0)
-                minusMinutes(abs(schedule.relativeTime).toLong())
-            else plusMinutes(abs(schedule.relativeTime).toLong())
-        }.atDate(LocalDate.now())
-        val intent = Intent(applicationContext, MainActivity::class.java)
-        val alarmTime = time.atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L
+        val time = LocalTime.parse(prayerTime, DateTimeFormatter.ofPattern("HH:mm"))
+            .plusMinutes(max(0, schedule.relativeTime).toLong())
+            .minusMinutes(abs(min(0, schedule.relativeTime)).toLong())
+            .atDate(LocalDate.now())
+        val intent = Intent(applicationContext, PrayerTimeAlarmReceiver::class.java).apply {
+            putExtra(PrayerTimeAlarmReceiver.ID, schedule.id)
+        }
+        val alarmTime = LocalDateTime.now().plusMinutes(1).atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L
         alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             alarmTime,
