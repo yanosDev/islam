@@ -14,4 +14,5 @@ data class CityData(
     val isha: String,
     val sunsetLocation: String,
     val sunriseLocation: String,
+    val gregorianDateShort: String,
 )

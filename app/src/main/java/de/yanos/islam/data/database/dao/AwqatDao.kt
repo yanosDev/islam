@@ -8,6 +8,7 @@ import de.yanos.islam.data.model.Degree
 import de.yanos.islam.data.model.awqat.AwqatDailyContent
 import de.yanos.islam.data.model.awqat.CityData
 import de.yanos.islam.data.model.awqat.CityDetail
+import de.yanos.islam.data.model.awqat.CityEid
 import de.yanos.islam.data.model.awqat.Location
 import de.yanos.islam.data.model.awqat.PrayerTime
 import kotlinx.coroutines.flow.Flow
@@ -39,13 +40,13 @@ interface AwqatDao : BaseDao<PrayerTime> {
                 "t.maghrib as maghrib, " +
                 "t.isha as isha, " +
                 "t.astronomicalSunset as sunsetLocation, " +
-                "t.astronomicalSunrise as sunriseLocation " +
+                "t.astronomicalSunrise as sunriseLocation, " +
+                "t.gregorianDateShort as gregorianDateShort " +
                 "FROM CityDetail  c, Degree d " +
                 "JOIN PrayerTime t ON c.id = t.id " +
-                "ORDER BY c.ts " +
-                "LIMIT 1"
+                "ORDER BY c.ts"
     )
-    fun loadRecentCity(): Flow<CityData>
+    fun loadCityData(): Flow<List<CityData>>
 
     @Query("SELECT id FROM Location WHERE (code = :locationName OR name = :locationName) AND type = 'CITY'  LIMIT 1")
     fun loadCityCode(locationName: String): Int?
@@ -58,4 +59,7 @@ interface AwqatDao : BaseDao<PrayerTime> {
 
     @Query("SELECT * FROM PrayerTime WHERE id = :cityId")
     fun loadCityTimes(cityId: Int): List<PrayerTime>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertCityEid(cityEid: CityEid)
 }

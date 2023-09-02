@@ -5,6 +5,7 @@ import de.yanos.islam.data.database.dao.AwqatDao
 import de.yanos.islam.data.model.Degree
 import de.yanos.islam.data.model.awqat.AwqatDailyContent
 import de.yanos.islam.data.model.awqat.CityDetail
+import de.yanos.islam.data.model.awqat.CityEid
 import de.yanos.islam.data.model.awqat.Location
 import de.yanos.islam.data.model.awqat.PrayerTime
 import de.yanos.islam.data.usecase.LocationUseCase
@@ -22,6 +23,7 @@ interface LocalAwqatSource {
     suspend fun insertCityDetails(cityDetail: CityDetail)
     suspend fun insertCityPrayerTimes(times: List<PrayerTime>)
     suspend fun loadCityTimes(cityId: Int): List<PrayerTime>
+    suspend fun insertCityEid(cityEid: CityEid)
 }
 
 class LocalAwqatSourceImpl @Inject constructor(
@@ -66,8 +68,14 @@ class LocalAwqatSourceImpl @Inject constructor(
     }
 
     override suspend fun loadCityTimes(cityId: Int): List<PrayerTime> {
-        return withContext(dispatcher){
+        return withContext(dispatcher) {
             dao.loadCityTimes(cityId)
+        }
+    }
+
+    override suspend fun insertCityEid(cityEid: CityEid) {
+        withContext(dispatcher) {
+            dao.insertCityEid(cityEid)
         }
     }
 

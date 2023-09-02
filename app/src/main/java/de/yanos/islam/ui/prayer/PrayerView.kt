@@ -23,6 +23,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -54,18 +55,22 @@ fun PrayerScreen(
     modifier: Modifier = Modifier,
     vm: PrayerViewModel = hiltViewModel()
 ) {
-    LazyColumn(modifier = modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-        item {
-            PrayingHeader(
-                modifier = Modifier.padding(8.dp),
-                direction = vm.currentState.direction
-            )
+    if (vm.currentState.times.isNotEmpty()) {
+        val currentItem = vm.currentState.times[vm.currentState.index]
+        LazyColumn(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+            item {
+                PrayingHeader(
+                    modifier = Modifier.padding(8.dp),
+                    direction = currentItem.direction
+                )
+            }
+            item { Text(text = currentItem.day, style = titleSmall(), color = goldColor()) }
+            item { PrayingTimes(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp), times = currentItem.times) }
+            vm.currentState.dailyContent?.let {
+                item { PrayingDaily(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp), content = it) }
+            }
         }
-        item { PrayingTimes(modifier = Modifier.padding(vertical = 4.dp), times = vm.currentState.times) }
-        vm.currentState.dailyContent?.let {
-            item { PrayingDaily(modifier = Modifier.padding(vertical = 8.dp), content = it) }
-        }
-    }
+    } else CircularProgressIndicator()
 }
 
 @Composable
