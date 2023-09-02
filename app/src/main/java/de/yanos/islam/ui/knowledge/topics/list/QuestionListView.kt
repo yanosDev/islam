@@ -48,20 +48,20 @@ private fun Questions(
         items(
             items = questions,
             key = { it.id }) { quiz ->
-            Question(quiz)
+            Question(quiz, questions.indexOf(quiz) + 1)
         }
     }
 }
 
 @Composable
-private fun Question(quiz: Quiz) {
+private fun Question(quiz: Quiz, index: Int) {
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
     ) {
         Spacer(modifier = Modifier.height(12.dp))
-        Text(modifier = Modifier.padding(horizontal = 8.dp), text = "${quiz.question}?", style = labelLarge())
+        Text(modifier = Modifier.padding(horizontal = 8.dp), text = "${index}. ${quiz.question}?", style = labelLarge())
         Spacer(modifier = Modifier.height(8.dp))
         IslamDivider()
         Spacer(modifier = Modifier.height(8.dp))

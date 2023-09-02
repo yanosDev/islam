@@ -102,7 +102,7 @@ fun SearchQuestionsScreen(
                     items(items = vm.findings, key = { it.id }) {
                         MatchingQuestions(
                             modifier = Modifier.animateItemPlacement(),
-                            question = vm.getAnnotatedString("${it.question}?", SpanStyle(color = goldColor(), fontWeight = FontWeight.Bold)),
+                            question = vm.getAnnotatedString("${vm.findings.indexOf(it) + 1}. ${it.question}?", SpanStyle(color = goldColor(), fontWeight = FontWeight.Bold)),
                             answer = vm.getAnnotatedString(it.answer, SpanStyle(color = goldColor(), fontWeight = FontWeight.Bold)),
                         )
                     }
@@ -113,7 +113,7 @@ fun SearchQuestionsScreen(
                 items(items = vm.findings, key = { it.id }) {
                     MatchingQuestions(
                         modifier = Modifier.animateItemPlacement(),
-                        question = vm.getAnnotatedString("${it.question}?", SpanStyle(color = goldColor(), fontWeight = FontWeight.Bold)),
+                        question = vm.getAnnotatedString("${vm.findings.indexOf(it) + 1}. ${it.question}?", SpanStyle(color = goldColor(), fontWeight = FontWeight.Bold)),
                         answer = vm.getAnnotatedString(it.answer, SpanStyle(color = goldColor(), fontWeight = FontWeight.Bold)),
                     )
                 }
