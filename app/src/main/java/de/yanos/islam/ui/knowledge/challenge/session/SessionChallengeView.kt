@@ -103,7 +103,7 @@ fun ChallengeSessionScreen(
 }
 
 @Composable
-fun ChallengeFinished(
+private fun ChallengeFinished(
     challenge: Challenge?,
     onDismiss: () -> Unit
 ) {
@@ -118,7 +118,6 @@ fun ChallengeFinished(
             )
     }
 }
-
 
 @Composable
 private fun ChallengeBoard(

@@ -91,11 +91,12 @@ internal class AppModule {
     @Singleton
     fun provideDB(@ApplicationContext context: Context): IslamDatabase {
         return Room.databaseBuilder(context, IslamDatabaseImpl::class.java, "islam_db")
+            .fallbackToDestructiveMigration()
             .build()
     }
 
     @Provides
-    fun provideGeocoder(@ApplicationContext context:Context): Geocoder =  Geocoder(context, Locale("en"))
+    fun provideGeocoder(@ApplicationContext context: Context): Geocoder = Geocoder(context, Locale("en"))
 
 
     @Provides

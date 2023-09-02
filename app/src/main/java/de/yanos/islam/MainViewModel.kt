@@ -15,7 +15,6 @@ import de.yanos.islam.data.model.Topic
 import de.yanos.islam.data.model.TopicResource
 import de.yanos.islam.data.model.TopicType
 import de.yanos.islam.data.repositories.AwqatRepository
-import de.yanos.islam.data.usecase.LocationUseCase
 import de.yanos.islam.util.AppSettings
 import de.yanos.islam.util.LatandLong
 import kotlinx.coroutines.CoroutineDispatcher
@@ -51,11 +50,7 @@ class MainViewModel @Inject constructor(
             @Suppress("DEPRECATION")
             geocoder.getFromLocation(location.latitude, location.longitude, 1)?.firstOrNull()?.let { address ->
                 (address.subAdminArea ?: address.adminArea)?.let { name ->
-                    if (name != appSettings.awqatLastLocation || LocalDate.now().isAfter(LocalDate.ofEpochDay(appSettings.awqatLastLocationFetch))) {
-                        repository.fetchCityData(name)
-                        appSettings.awqatLastLocation = name
-                        appSettings.awqatLastLocationFetch = LocalDate.now().toEpochDay()
-                    }
+                    repository.fetchCityData(name)
                 }
             }
         }

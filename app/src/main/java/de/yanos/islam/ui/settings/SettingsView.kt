@@ -56,7 +56,7 @@ fun SettingsScreen(
 }
 
 @Composable
-fun FontSettings(
+private fun FontSettings(
     modifier: Modifier = Modifier,
     currentSize: Int,
     onFontSizeChange: (Int) -> Unit,
@@ -80,9 +80,8 @@ fun FontSettings(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun FontStyleSetting(
+private fun FontStyleSetting(
     modifier: Modifier = Modifier,
     currentFontIndex: Int,
     onFontStyleChange: (Int) -> Unit
@@ -96,7 +95,7 @@ fun FontStyleSetting(
 }
 
 @Composable
-fun FontSizeSetting(
+private fun FontSizeSetting(
     modifier: Modifier = Modifier,
     currentSize: Int,
     onFontSizeChange: (Int) -> Unit

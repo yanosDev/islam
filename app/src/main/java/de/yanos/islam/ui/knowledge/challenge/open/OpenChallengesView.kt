@@ -121,7 +121,10 @@ private fun ChallengeList(
                 onClick = { onChallengeClicked(form.id) }) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(text = form.topics ?: "", style = labelMedium())
-                    scoreItem(goldColor(), form.count.takeIf { it.toInt() != Int.MAX_VALUE } ?: stringResource(id = R.string.challenge_creation_difficulty_max), R.string.challenge_creation_count)
+                    scoreItem(
+                        goldColor(),
+                        form.count.takeIf { it.toInt() != Int.MAX_VALUE } ?: stringResource(id = R.string.challenge_creation_difficulty_max),
+                        R.string.challenge_creation_count)
                     scoreItem(correctColor(), form.corrects.size.toString(), R.string.challenge_creation_corrects)
                     scoreItem(errorColor(), form.failures.size.toString(), R.string.challenge_creation_failures)
                     Spacer(modifier = Modifier.height(4.dp))

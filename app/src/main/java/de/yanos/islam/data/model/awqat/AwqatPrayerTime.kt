@@ -27,7 +27,8 @@ data class AwqatPrayerTime(
 
 @Entity
 data class PrayerTime(
-    @PrimaryKey val id: Int,
+    val id: Int,
+    @PrimaryKey val key: String,
     val ts: Long = System.currentTimeMillis(),
     val shapeMoonUrl: String,
     val fajr: String,
