@@ -67,4 +67,7 @@
     <string name="font_roboto">Roboto</string>
     <string name="font_ubuntu">Ubuntu</string>
     <string name="font_montserrat">Montserrat</string>
+
+    <string name="notification_alarm_title">Namaz Vakti</string>
+    <string name="notification_alarm_content">%s icin Namaz Vakti</string>
 </resources>

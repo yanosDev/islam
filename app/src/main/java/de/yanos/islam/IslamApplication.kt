@@ -25,7 +25,9 @@ class IslamApplication : Application(), Configuration.Provider {
             NotificationManager.IMPORTANCE_HIGH
         )
         notificationManager.createNotificationChannel(channel)
+        notificationManager.cancelAll()
     }
+
     override fun getWorkManagerConfiguration(): Configuration {
         return Configuration.Builder()
             .setMinimumLoggingLevel(if (BuildConfig.DEBUG) Log.INFO else Log.ERROR)
