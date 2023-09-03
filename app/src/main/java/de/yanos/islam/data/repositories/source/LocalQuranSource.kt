@@ -2,7 +2,7 @@ package de.yanos.islam.data.repositories.source
 
 import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.data.database.dao.QuranDao
-import de.yanos.islam.data.model.Ayet
+import de.yanos.islam.data.model.quran.Ayet
 import de.yanos.islam.data.model.tanzil.SureDetail
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext

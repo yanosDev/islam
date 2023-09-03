@@ -123,7 +123,9 @@ class MainViewModel @Inject constructor(
                         ),
                         Schedule(
                             id = "sunrise",
-                            ordinal = 1
+                            ordinal = 1,
+                            enabled = true,
+                            relativeTime = -45
                         ),
                         Schedule(
                             id = "dhuhr",
@@ -135,7 +137,9 @@ class MainViewModel @Inject constructor(
                         ),
                         Schedule(
                             id = "maghrib",
-                            ordinal = 4
+                            ordinal = 4,
+                            enabled = true,
+                            relativeTime = -5
                         ),
                         Schedule(
                             id = "isha",

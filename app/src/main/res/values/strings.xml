@@ -71,4 +71,8 @@
     <string name="notification_alarm_title">Namaz Vakti</string>
     <string name="notification_alarm_content">%s icin Namaz Vakti</string>
     <string name="close_alarm">Ezani durdur</string>
+
+    <string name="quran_read_main">Kuran i oku</string>
+    <string name="quran_sure_list">Kuran daki Sureler</string>
+    <string name="quran_search">Herhangi bi Ayeti mi ariyorsunuz?</string>
 </resources>

@@ -34,7 +34,9 @@ import de.yanos.islam.util.MainNavigation
 import de.yanos.islam.util.NavigationAction
 import de.yanos.islam.util.PatternedBackgroung
 import de.yanos.islam.util.Permission
+import de.yanos.islam.util.QuranNavigation
 import de.yanos.islam.util.allKnowledge
+import de.yanos.islam.util.allQuran
 import de.yanos.islam.util.getUserLocation
 import de.yanos.islam.util.typoByConfig
 import kotlinx.coroutines.launch
@@ -64,7 +66,7 @@ class MainActivity : ComponentActivity() {
                     //NavHost Here
                     IslamNavHost(
                         modifier = contentModifier,
-                        startRoute = MainNavigation.all.first().route,
+                        startRoute = MainNavigation.all[1].route,
                         navController = navController!!
                     )
                 }
@@ -120,17 +122,25 @@ private fun IslamNavHost(
             startDestination = startRoute,
         ) {
             navKnowledge(onNavigationChange = onNavigationChange)
+            navQuran(onNavigationChange = onNavigationChange)
             composable(
                 route = MainNavigation.Praying.route,
                 deepLinks = listOf(navDeepLink { uriPattern = "yanos://de.islam/praying" })
             ) {
                 PrayerScreen()
             }
-            composable(route = MainNavigation.Quran.route) {
-
-            }
             composable(route = MainNavigation.Settings.route) {
                 SettingsScreen()
+            }
+        }
+    }
+}
+
+fun NavGraphBuilder.navQuran(onNavigationChange: (NavigationAction) -> Unit) {
+    navigation(startDestination = QuranNavigation.QuranMainList.route, route = MainNavigation.Quran.route) {
+        allQuran.forEach { path ->
+            composable(route = path.route, arguments = path.args) {
+                path.View(onNavigationChange = onNavigationChange)
             }
         }
     }

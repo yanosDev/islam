@@ -7,8 +7,8 @@ import de.yanos.islam.data.database.dao.AwqatDao
 import de.yanos.islam.data.database.dao.ChallengeDao
 import de.yanos.islam.data.database.dao.QuizDao
 import de.yanos.islam.data.database.dao.QuranDao
+import de.yanos.islam.data.database.dao.SearchDao
 import de.yanos.islam.data.database.dao.TopicDao
-import de.yanos.islam.data.model.Ayet
 import de.yanos.islam.data.model.Challenge
 import de.yanos.islam.data.model.Degree
 import de.yanos.islam.data.model.Quiz
@@ -20,6 +20,7 @@ import de.yanos.islam.data.model.awqat.CityDetail
 import de.yanos.islam.data.model.awqat.CityEid
 import de.yanos.islam.data.model.awqat.Location
 import de.yanos.islam.data.model.awqat.PrayerTime
+import de.yanos.islam.data.model.quran.Ayet
 import de.yanos.islam.data.model.tanzil.SureDetail
 
 interface IslamDatabase {
@@ -28,6 +29,7 @@ interface IslamDatabase {
     fun quranDao(): QuranDao
     fun quizFormDao(): ChallengeDao
     fun awqatDao(): AwqatDao
+    fun searchDao(): SearchDao
 }
 
 @TypeConverters(Converters::class)
@@ -54,6 +56,7 @@ internal abstract class IslamDatabaseImpl : IslamDatabase, RoomDatabase() {
     abstract override fun quizDao(): QuizDao
     abstract override fun quizFormDao(): ChallengeDao
     abstract override fun awqatDao(): AwqatDao
+    abstract override fun searchDao(): SearchDao
 
     abstract override fun quranDao(): QuranDao
 }

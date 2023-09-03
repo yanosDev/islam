@@ -1,4 +1,4 @@
-package de.yanos.islam.ui.knowledge.topics.search
+package de.yanos.islam.ui.quran.search
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -8,9 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.yanos.core.utils.IODispatcher
-import de.yanos.islam.data.database.dao.QuizDao
+import de.yanos.islam.data.database.dao.QuranDao
 import de.yanos.islam.data.database.dao.SearchDao
-import de.yanos.islam.data.model.Quiz
 import de.yanos.islam.data.model.Search
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -18,13 +17,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SearchQuestionsViewModel @Inject constructor(
+class QuranSearchViewModel @Inject constructor(
     @IODispatcher private val dispatcher: CoroutineDispatcher,
-    private val quizDao: QuizDao,
+    private val quranDao: QuranDao,
     private val searchDao: SearchDao
 ) : ViewModel() {
     var query by mutableStateOf("")
-    var findings = mutableStateListOf<Quiz>()
+    var findings = mutableStateListOf<AyetSearch>()
     var recentSearches = searchDao.getRecentSearches().distinctUntilChanged()
 
     fun search(query: String, saveToRecent: Boolean = false) {
@@ -37,8 +36,14 @@ class SearchQuestionsViewModel @Inject constructor(
             this.query = query
             if (this.query.isNotBlank()) {
                 viewModelScope.launch(dispatcher) {
-                    val newFindings = quizDao.findMatches(query)
                     findings.clear()
+                    val newFindings = quranDao.findMatches(query).groupBy { it.sureaditr }.map { (sureAdiTr, ayetList) ->
+                        AyetSearch(
+                            id = sureAdiTr,
+                            sureName = sureAdiTr,
+                            ayet = ayetList.subList(0, minOf(4, ayetList.size)).joinToString("\n") { "${it.ayetNr}. \n${it.suretur}\n${it.suretrans}" },
+                        )
+                    }
                     findings.addAll(newFindings)
                 }
             }
@@ -50,3 +55,5 @@ class SearchQuestionsViewModel @Inject constructor(
         findings.clear()
     }
 }
+
+data class AyetSearch(val id: String, val sureName: String, val ayet: String)

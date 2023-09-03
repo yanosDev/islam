@@ -1,4 +1,4 @@
-package de.yanos.islam.data.model
+package de.yanos.islam.data.model.quran
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 data class Ayet(
     @PrimaryKey val id: String,
     val sureaditr: String,
+    val sureOrdinal: Int,
     val ayetNr: Int,
     val surear: String,
     val suretrans: String,

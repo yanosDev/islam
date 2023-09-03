@@ -1,6 +1,6 @@
 package de.yanos.islam.data.repositories
 
-import de.yanos.islam.data.model.Ayet
+import de.yanos.islam.data.model.quran.Ayet
 import de.yanos.islam.data.repositories.source.LocalQuranSource
 import de.yanos.islam.data.repositories.source.RemoteQuranSource
 import de.yanos.islam.util.getData
@@ -23,7 +23,8 @@ class QuranRepositoryImpl @Inject constructor(
                 getData(remote.loadSure(key))?.let { (sureaditr, sureList) ->
                     local.saveSure(sureList.map { sure ->
                         Ayet(
-                            id = "${key}_${sureaditr}",
+                            id = "${key}_${sure.ayetID}",
+                            sureOrdinal = key.toInt(),
                             sureaditr = sureaditr,
                             ayetNr = sure.ayetID,
                             surear = sure.surear,

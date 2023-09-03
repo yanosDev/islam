@@ -131,6 +131,9 @@ internal class AppModule {
     @Provides
     @Singleton
     fun provideQuizDao(db: IslamDatabase) = db.quizDao()
+    @Provides
+    @Singleton
+    fun provideSearchDao(db: IslamDatabase) = db.searchDao()
 
     @Provides
     @Singleton
