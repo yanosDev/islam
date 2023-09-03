@@ -61,6 +61,7 @@ targetSdk = "33"
 timber-version = "5.0.1"
 versionCatalog = "0.8.0"
 yanos-lib = "0.1.40"
+work = "2.8.1"
 
 [libraries]
 accompanist-flowlayout = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "accompanist" }
@@ -145,6 +146,8 @@ moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "retr
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hilt" }
+hilt-common = { module = "androidx.hilt:hilt-common", version.ref = "hiltExt" }
+hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hiltExt" }
 hilt-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltExt" }
 hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
 hilt-ext-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltExt" }
@@ -164,7 +167,7 @@ rometools-rome = { module = "com.rometools:rome", version.ref = "rome" }
 secrets-gradlePlugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secrets" }
 splash = { module = "androidx.core:core-splashscreen", version.ref = "splash" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber-version" }
-
+work = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
 [plugins]
 android = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 androidLibrary = { id = "com.android.library", version.ref = "androidGradlePlugin" }

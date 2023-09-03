@@ -1,6 +1,11 @@
 package de.yanos.islam.util
 
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RawRes
+import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
@@ -12,9 +17,11 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,10 +33,12 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import com.airbnb.lottie.LottieProperty
@@ -65,6 +74,26 @@ fun IslamCheckBox(
         TextButton(onClick = { onCheckChange(!isChecked) }, enabled = isEnabled) {
             content()
         }
+    }
+}
+
+@Composable
+fun IslamSwitch(
+    modifier: Modifier = Modifier,
+    isEnabled: Boolean = true,
+    isChecked: Boolean,
+    onCheckChange: (Boolean) -> Unit,
+    content: @Composable () -> Unit,
+) {
+    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+        TextButton(onClick = { onCheckChange(!isChecked) }, enabled = isEnabled) {
+            content()
+        }
+        Switch(
+            enabled = isEnabled,
+            checked = isChecked,
+            onCheckedChange = onCheckChange
+        )
     }
 }
 
@@ -147,5 +176,32 @@ fun BackGroundPattern(modifier: Modifier = Modifier) {
             it.nativeCanvas.drawPaint(paint)
         }
         paint.reset()
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@Composable
+fun Permission() {
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            // permission granted
+        } else {
+            // permission denied, but should I show a rationale?
+        }
+    }
+
+    val context = LocalContext.current
+    if (ContextCompat.checkSelfPermission(
+            context,
+            android.Manifest.permission.POST_NOTIFICATIONS
+        ) == PackageManager.PERMISSION_GRANTED
+    ) {
+        // permission granted
+    } else {
+        LaunchedEffect(key1 = true) {
+            launcher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
     }
 }

@@ -10,7 +10,6 @@
     <string name="main_topic_title">Konular</string>
     <string name="main_search_question">Sorulari aramak istermisin?</string>
     <string name="main_to_new_challenge">Kendinizi Denemek istermisin?</string>
-
     <string name="challenge_creation_title">Sinav Zorlugunu ve Konularinizi secin</string>
     <string name="challenge_creation_difficulty_low">Kolay</string>
     <string name="challenge_creation_difficulty_mid">Orta</string>
@@ -39,6 +38,15 @@
     <string name="challenge_session_answer_failure">Bilemedim</string>
     <string name="challenge_session_finished">Sinaviniz Bitmistir</string>
     <string name="challenge_session_finished_result">Toplam %d sorudan tam %d tanesini dogru cevapladiniz ve %d tanesine yanlis cevap verdiniz</string>
+    <string name="praying_schedule_before">Namaz vaktine %d dakika kala</string>
+    <string name="praying_schedule_after">Namaz vaktinden %d dakika sonra</string>
+    <string name="praying_schedule_header">Alarmlar</string>
+    <string name="praying_schedule_fajr">Imsak Hatirlatmasi</string>
+    <string name="praying_schedule_sunrise">Günes Hatirlatmasi</string>
+    <string name="praying_schedule_dhuhr">Öglen Namazi Hatirlatmasi</string>
+    <string name="praying_schedule_asr">Ikindi Namazi Hatirlatmasi</string>
+    <string name="praying_schedule_maghrib">Aksam Namazi Hatirlatmasi</string>
+    <string name="praying_schedule_isha">Yatsi Namazi Hatirlatmasi</string>
     <string name="praying_imsak_title">Imsak</string>
     <string name="praying_morning_title">Sabah</string>
     <string name="praying_sunrise_title">Günes</string>
@@ -59,4 +67,8 @@
     <string name="font_roboto">Roboto</string>
     <string name="font_ubuntu">Ubuntu</string>
     <string name="font_montserrat">Montserrat</string>
+
+    <string name="notification_alarm_title">Namaz Vakti</string>
+    <string name="notification_alarm_content">%s icin Namaz Vakti</string>
+    <string name="close_alarm">Ezani durdur</string>
 </resources>

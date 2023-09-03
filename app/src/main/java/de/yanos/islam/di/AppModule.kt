@@ -1,10 +1,14 @@
 package de.yanos.islam.di
 
+import android.app.AlarmManager
+import android.app.NotificationManager
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.location.Geocoder
+import android.media.MediaPlayer
 import androidx.room.Room
+import androidx.work.WorkManager
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -18,7 +22,6 @@ import de.yanos.core.utils.DefaultDispatcher
 import de.yanos.core.utils.IODispatcher
 import de.yanos.core.utils.MainDispatcher
 import de.yanos.islam.data.api.AwqatApi
-import de.yanos.islam.data.api.QiblaApi
 import de.yanos.islam.data.database.IslamDatabase
 import de.yanos.islam.data.database.IslamDatabaseImpl
 import kotlinx.coroutines.Dispatchers
@@ -51,19 +54,6 @@ internal class AppModule {
             }.build()
     }
 
-    @QiblaRetrofit
-    @Provides
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
-        val moshi = Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
-            .build()
-        return Retrofit.Builder()
-            .client(okHttpClient)
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .baseUrl("https://api.aladhan.com")
-            .build()
-    }
-
     @Awqat
     @Provides
     fun provideAwqatRetrofit(okHttpClient: OkHttpClient): Retrofit {
@@ -77,9 +67,12 @@ internal class AppModule {
             .build()
     }
 
+    @AzanPlayer
     @Provides
-    fun provideQiblaApi(@QiblaRetrofit retrofit: Retrofit): QiblaApi {
-        return retrofit.create(QiblaApi::class.java)
+    @Singleton
+    fun provideAzanPlayer(@ApplicationContext context: Context): MediaPlayer {
+        val resID: Int = context.resources.getIdentifier("azan", "raw", context.packageName)
+        return MediaPlayer.create(context, resID)
     }
 
     @Provides
@@ -96,8 +89,19 @@ internal class AppModule {
     }
 
     @Provides
+    @Singleton
+    fun provideWorkManager(@ApplicationContext context: Context) = WorkManager.getInstance(context)
+
+    @Provides
+    @Singleton
+    fun provideAlarmManager(@ApplicationContext context: Context) = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+    @Provides
     fun provideGeocoder(@ApplicationContext context: Context): Geocoder = Geocoder(context, Locale("en"))
 
+    @Provides
+    @Singleton
+    fun provideNotificationManager(@ApplicationContext context: Context) = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
     @Provides
     @Singleton
@@ -152,6 +156,10 @@ annotation class QiblaRetrofit
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class Awqat
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class AzanPlayer
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)

@@ -1,16 +1,23 @@
 package de.yanos.islam.ui.prayer
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
+import androidx.work.WorkManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.R
 import de.yanos.islam.data.database.dao.AwqatDao
+import de.yanos.islam.data.model.CityData
+import de.yanos.islam.data.model.Schedule
 import de.yanos.islam.data.model.awqat.AwqatDailyContent
-import de.yanos.islam.data.model.awqat.CityData
+import de.yanos.islam.service.DailyScheduleWorker
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -29,15 +36,23 @@ import kotlin.math.abs
 @HiltViewModel
 class PrayerViewModel @Inject constructor(
     private val dao: AwqatDao,
-    @IODispatcher private val dispatcher: CoroutineDispatcher
+    @IODispatcher private val dispatcher: CoroutineDispatcher,
+    private val workManager: WorkManager,
 ) : ViewModel() {
     private var cityData: MutableList<CityData> = mutableListOf()
     private var dailyContent: AwqatDailyContent? = null
     private val timer: Timer = Timer()
     private var currentIndex: Int = -1
     var currentState: PrayerScreenData by mutableStateOf(PrayerScreenData())
+    var schedules = mutableStateListOf<Schedule>()
 
     init {
+        viewModelScope.launch {
+            dao.schedules().distinctUntilChanged().collect {
+                schedules.clear()
+                schedules.addAll(it)
+            }
+        }
         viewModelScope.launch {
             withContext(dispatcher) {
                 dailyContent = dao.dailyContent(LocalDateTime.now().dayOfYear)
@@ -93,7 +108,7 @@ class PrayerViewModel @Inject constructor(
                     )
                 }
                 DayData(
-                    day = data.gregorianDateShort,
+                    day = "${data.hijriDateLong} - ${data.gregorianDateLong}",
                     isToday = isToday,
                     times = listOf(
                         time(0, R.string.praying_imsak_title, data.fajr),
@@ -107,7 +122,6 @@ class PrayerViewModel @Inject constructor(
                 )
             }.let { days ->
                 currentIndex = if (currentIndex < 0) days.indexOfFirst { it.isToday } else currentIndex
-
                 currentState = PrayerScreenData(
                     times = days,
                     index = currentIndex,
@@ -121,6 +135,20 @@ class PrayerViewModel @Inject constructor(
         timer.cancel()
         timer.purge()
         super.onCleared()
+    }
+
+    fun changeSchedule(id: String, isEnabled: Boolean, relativeTime: Int) {
+        viewModelScope.launch(dispatcher) {
+            dao.updateSchedule(id = id, isEnabled = isEnabled, relativeTime = relativeTime)
+            startDailyWorkerOnce()
+        }
+    }
+
+    private fun startDailyWorkerOnce() {
+        val uniqueWork = OneTimeWorkRequestBuilder<DailyScheduleWorker>()
+            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+            .build()
+        workManager.enqueueUniqueWork("Daily_once", ExistingWorkPolicy.REPLACE, uniqueWork)
     }
 }
 

@@ -1,11 +1,14 @@
 package de.yanos.islam
 
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.ViewTreeObserver
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -19,6 +22,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navDeepLink
 import dagger.hilt.android.AndroidEntryPoint
 import de.yanos.core.ui.theme.AppTheme
 import de.yanos.core.ui.view.DynamicNavigationScreen
@@ -29,6 +33,7 @@ import de.yanos.islam.util.KnowledgeNavigation
 import de.yanos.islam.util.MainNavigation
 import de.yanos.islam.util.NavigationAction
 import de.yanos.islam.util.PatternedBackgroung
+import de.yanos.islam.util.Permission
 import de.yanos.islam.util.allKnowledge
 import de.yanos.islam.util.getUserLocation
 import de.yanos.islam.util.typoByConfig
@@ -39,25 +44,28 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
     private val vm: MainViewModel by viewModels()
     @Inject lateinit var appSettings: AppSettings
+    private var navController: NavHostController? = null
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         setContent {
             vm.onCurrentLocationChanged(getUserLocation(context = LocalContext.current))
-
+            Permission()
             AppTheme(activity = this, typography = typoByConfig(appSettings)) { modifier, config ->
-                val navController = rememberNavController()
+                navController = rememberNavController()
                 DynamicNavigationScreen(
                     modifier = modifier.padding(top = 48.dp), // TODO: Check statusbar problem
                     config = config,
                     destinations = MainNavigation.all,
-                    navController = navController
+                    navController = navController!!
                 ) { contentModifier ->
                     //NavHost Here
                     IslamNavHost(
                         modifier = contentModifier,
                         startRoute = MainNavigation.all.first().route,
-                        navController = navController
+                        navController = navController!!
                     )
                 }
             }
@@ -83,6 +91,11 @@ class MainActivity : ComponentActivity() {
             }
         )
     }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        navController?.handleDeepLink(intent)
+    }
 }
 
 @Composable
@@ -107,7 +120,10 @@ private fun IslamNavHost(
             startDestination = startRoute,
         ) {
             navKnowledge(onNavigationChange = onNavigationChange)
-            composable(route = MainNavigation.Praying.route) {
+            composable(
+                route = MainNavigation.Praying.route,
+                deepLinks = listOf(navDeepLink { uriPattern = "yanos://de.islam/praying" })
+            ) {
                 PrayerScreen()
             }
             composable(route = MainNavigation.Quran.route) {
