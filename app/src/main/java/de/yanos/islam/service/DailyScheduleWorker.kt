@@ -18,7 +18,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -81,7 +80,7 @@ class DailyScheduleWorker @AssistedInject constructor(
         val intent = Intent(applicationContext, PrayerTimeAlarmReceiver::class.java).apply {
             putExtra(PrayerTimeAlarmReceiver.ID, schedule.id)
         }
-        val alarmTime = LocalDateTime.now().plusMinutes(1).atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L
+        val alarmTime = time.atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L
         alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             alarmTime,
@@ -92,6 +91,5 @@ class DailyScheduleWorker @AssistedInject constructor(
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         )
-        Timber.e("Alarm set at $alarmTime")
     }
 }

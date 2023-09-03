@@ -70,4 +70,5 @@
 
     <string name="notification_alarm_title">Namaz Vakti</string>
     <string name="notification_alarm_content">%s icin Namaz Vakti</string>
+    <string name="close_alarm">Ezani durdur</string>
 </resources>

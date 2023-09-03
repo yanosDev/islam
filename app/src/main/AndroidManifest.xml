@@ -40,7 +40,10 @@
                     android:scheme="yanos" />
             </intent-filter>
         </activity>
+
         <receiver android:name=".service.PrayerTimeAlarmReceiver" />
+        <receiver android:name=".service.PrayerAzanCancelReceiver" />
+
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
