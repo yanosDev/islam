@@ -25,12 +25,12 @@ class QuranRepositoryImpl @Inject constructor(
                         Ayet(
                             id = "${key}_${sure.ayetID}",
                             sureOrdinal = key.toInt(),
-                            sureaditr = sureaditr,
+                            sureaditr = sureaditr.trim(),
                             ayetNr = sure.ayetID,
-                            surear = sure.surear,
-                            suretrans = sure.suretrans,
-                            suretur = sure.suretur,
-                            sureen = sure.sureen,
+                            surear = sure.surear.trim(),
+                            suretrans = sure.suretrans.trim(),
+                            suretur = sure.suretur.trim(),
+                            sureen = sure.sureen.trim(),
                         )
                     })
                 }

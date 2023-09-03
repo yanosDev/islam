@@ -5,7 +5,7 @@ import androidx.compose.ui.Modifier
 import de.yanos.islam.util.NavigationAction
 
 @Composable
-fun SureListView(
+fun SureListScreen(
     modifier: Modifier = Modifier,
     onNavigationChange: (NavigationAction) -> Unit
 ) {

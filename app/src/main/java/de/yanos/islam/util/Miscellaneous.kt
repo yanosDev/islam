@@ -112,14 +112,15 @@ fun getAnnotatedString(query: String, name: String, highlightStyle: SpanStyle): 
     //Find where searchQuery appears in courseName
     var startIndex = 0
     val builder = AnnotatedString.Builder(name)
-    while (startIndex >= 0){
-        startIndex = name.indexOf(query, startIndex, true)
-        //If the query is in the name, add a style, otherwise do nothing
-        if (startIndex >= 0) {
-            val endIndex = startIndex + query.length
-            builder.addStyle(highlightStyle, startIndex, endIndex)
-            startIndex = endIndex
+    if (query.isNotBlank())
+        while (startIndex >= 0) {
+            startIndex = name.indexOf(query, startIndex, true)
+            //If the query is in the name, add a style, otherwise do nothing
+            if (startIndex >= 0) {
+                val endIndex = startIndex + query.length
+                builder.addStyle(highlightStyle, startIndex, endIndex)
+                startIndex = endIndex
+            }
         }
-    }
     return builder.toAnnotatedString()
 }

@@ -2,6 +2,7 @@ package de.yanos.islam.ui.quran.search
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -40,6 +41,7 @@ import de.yanos.islam.R
 import de.yanos.islam.ui.knowledge.topics.search.SearchHistory
 import de.yanos.islam.util.IslamDivider
 import de.yanos.islam.util.NavigationAction
+import de.yanos.islam.util.QuranNavigationAction
 import de.yanos.islam.util.bodyMedium
 import de.yanos.islam.util.getAnnotatedString
 import de.yanos.islam.util.goldColor
@@ -63,6 +65,7 @@ fun QuranSearchScreen(
                 padding(horizontal = 12.dp)
         },
     ) { values ->
+        val onClick = { name: String -> onNavigationChange(QuranNavigationAction.NavigateToSure(name)) }
         Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             SearchBar(
                 query = vm.query,
@@ -104,6 +107,7 @@ fun QuranSearchScreen(
                                 SpanStyle(color = goldColor(), fontWeight = FontWeight.Bold)
                             ),
                             ayetList = getAnnotatedString(vm.query, it.ayet, SpanStyle(color = goldColor(), fontWeight = FontWeight.Bold)),
+                            onClick = onClick
                         )
                     }
                 }
@@ -115,6 +119,7 @@ fun QuranSearchScreen(
                         modifier = Modifier.animateItemPlacement(),
                         sureName = getAnnotatedString(vm.query, it.sureName, SpanStyle(color = goldColor(), fontWeight = FontWeight.Bold)),
                         ayetList = getAnnotatedString(vm.query, it.ayet, SpanStyle(color = goldColor(), fontWeight = FontWeight.Bold)),
+                        onClick = onClick
                     )
                 }
             }
@@ -127,9 +132,11 @@ private fun MatchingSure(
     modifier: Modifier = Modifier,
     sureName: AnnotatedString,
     ayetList: AnnotatedString,
+    onClick: (String) -> Unit
 ) {
     OutlinedCard(
         modifier = modifier
+            .clickable { onClick(sureName.text) }
             .fillMaxWidth()
             .padding(vertical = 8.dp, horizontal = 12.dp),
     ) {

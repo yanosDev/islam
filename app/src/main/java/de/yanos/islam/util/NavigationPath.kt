@@ -23,7 +23,7 @@ import de.yanos.islam.ui.knowledge.topics.search.SearchQuestionsScreen
 import de.yanos.islam.ui.knowledge.topics.sub.SubTopicsScreen
 import de.yanos.islam.ui.quran.classic.QuranClassicScreen
 import de.yanos.islam.ui.quran.list.main.QuranMainListScreen
-import de.yanos.islam.ui.quran.list.sure.SureListView
+import de.yanos.islam.ui.quran.list.sure.SureListScreen
 import de.yanos.islam.ui.quran.partial.QuranPartialScreen
 import de.yanos.islam.ui.quran.search.QuranSearchScreen
 
@@ -50,7 +50,7 @@ sealed class QuranNavigationAction(override val route: String) : NavigationActio
     object NavigateToQuran : QuranNavigationAction(QuranNavigation.QuranClassic.route)
     object NavigateToQuranSearch : QuranNavigationAction(QuranNavigation.SearchThroughQuran.route)
     object NavigateToSureList : QuranNavigationAction(QuranNavigation.SureList.route)
-    class NavigateToSure(val id: Int) : QuranNavigation(QuranNavigation.QuranPartial.route.replace("{id}", id.toString()))
+    class NavigateToSure(val name: String) : QuranNavigationAction(QuranNavigation.QuranPartial.route.replace("{name}", name))
 }
 
 sealed class KnowledgeNavigationAction(override val route: String) : NavigationAction {
@@ -113,11 +113,11 @@ sealed class QuranNavigation(override val route: String, override val args: List
     object SureList : QuranNavigation("quran/sure") {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
-            SureListView(onNavigationChange = onNavigationChange)
+            SureListScreen(onNavigationChange = onNavigationChange)
         }
     }
 
-    object QuranPartial : QuranNavigation("quran/sure/{id}") {
+    object QuranPartial : QuranNavigation("quran/sure/{name}", args = listOf(navArgument("name") { type = NavType.StringType })) {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
             QuranPartialScreen(onNavigationChange = onNavigationChange)

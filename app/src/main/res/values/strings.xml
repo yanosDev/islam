@@ -67,6 +67,7 @@
     <string name="font_roboto">Roboto</string>
     <string name="font_ubuntu">Ubuntu</string>
     <string name="font_montserrat">Montserrat</string>
+    <string name="font_qalam">Al Qalam</string>
 
     <string name="notification_alarm_title">Namaz Vakti</string>
     <string name="notification_alarm_content">%s icin Namaz Vakti</string>
@@ -75,4 +76,5 @@
     <string name="quran_read_main">Kuran i oku</string>
     <string name="quran_sure_list">Kuran daki Sureler</string>
     <string name="quran_search">Herhangi bi Ayeti mi ariyorsunuz?</string>
+    <string name="sure_ayet">%d. Ayet</string>
 </resources>
