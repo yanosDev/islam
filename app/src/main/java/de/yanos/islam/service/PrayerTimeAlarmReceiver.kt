@@ -1,5 +1,6 @@
 package de.yanos.islam.service
 
+import android.app.Notification
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.TaskStackBuilder
@@ -24,28 +25,33 @@ class PrayerTimeAlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         val id = intent?.getStringExtra(ID) ?: return
         context?.let { ctx ->
-            mediaPlayer.start()
-
-            val dismissIntent = Intent(context, PrayerAzanCancelReceiver::class.java).apply {
-                putExtra(ID, id)
-
-            }
-            val piDismiss = PendingIntent.getBroadcast(context, 100, dismissIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
-
             val taskDetailIntent = Intent(Intent.ACTION_VIEW, "yanos://de.islam/praying".toUri())
             val pending: PendingIntent = TaskStackBuilder.create(context).run {
                 addNextIntentWithParentStack(taskDetailIntent)
                 getPendingIntent(id.hashCode(), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
             }
-            val builder = NotificationCompat.Builder(ctx, Constants.CHANNEL_ID_ALARM)
-                .setSmallIcon(R.drawable.ic_launcher)
-                .setContentIntent(pending)
-                .setContentTitle(context.getString(R.string.notification_alarm_title))
-                .setContentText(context.getString(R.string.notification_alarm_content, id))
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .addAction(android.R.drawable.ic_menu_close_clear_cancel, ctx.getString(R.string.close_alarm), piDismiss)
-            notificationManager.notify(id.hashCode(), builder.build())
+            notificationManager.notify(id.hashCode(), notification(ctx, id, pending))
+            mediaPlayer.start()
         }
+    }
+
+    private fun notification(context: Context, id: String, pending: PendingIntent): Notification {
+        val piDismiss = PendingIntent.getBroadcast(
+            context,
+            100,
+            Intent(context, PrayerAzanCancelReceiver::class.java).apply {
+                putExtra(ID, id)
+            },
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+        )
+
+        return NotificationCompat.Builder(context, Constants.CHANNEL_ID_ALARM)
+            .setSmallIcon(R.drawable.ic_launcher)
+            .setContentIntent(pending)
+            .setContentTitle(context.getString(R.string.notification_alarm_title))
+            .setContentText(context.getString(R.string.notification_alarm_content, id))
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .addAction(android.R.drawable.ic_menu_close_clear_cancel, context.getString(R.string.close_alarm), piDismiss).build()
     }
 
     companion object {

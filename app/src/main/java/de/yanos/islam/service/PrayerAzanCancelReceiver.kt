@@ -15,8 +15,7 @@ class PrayerAzanCancelReceiver : BroadcastReceiver() {
     @Inject lateinit var notificationManager: NotificationManager
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        val id = intent?.getStringExtra(PrayerTimeAlarmReceiver.ID) ?: return
-        notificationManager.cancel(id.hashCode())
+        notificationManager.cancel((intent?.getStringExtra(PrayerTimeAlarmReceiver.ID) ?: return).hashCode())
         mediaPlayer.stop()
     }
 }

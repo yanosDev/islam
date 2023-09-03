@@ -64,7 +64,7 @@ class DailyScheduleWorker @AssistedInject constructor(
         }
     }
 
-    private suspend fun scheduleTime(schedule: Schedule, prayingTime: PrayerTime) {
+    private fun scheduleTime(schedule: Schedule, prayingTime: PrayerTime) {
         val prayerTime = when (schedule.ordinal) {
             0 -> prayingTime.fajr
             1 -> prayingTime.sunrise
@@ -80,10 +80,9 @@ class DailyScheduleWorker @AssistedInject constructor(
         val intent = Intent(applicationContext, PrayerTimeAlarmReceiver::class.java).apply {
             putExtra(PrayerTimeAlarmReceiver.ID, schedule.id)
         }
-        val alarmTime = time.atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L
         alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
-            alarmTime,
+            time.atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L,
             PendingIntent.getBroadcast(
                 applicationContext,
                 schedule.id.hashCode(),
