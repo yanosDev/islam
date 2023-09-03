@@ -22,6 +22,7 @@ import de.yanos.core.utils.DefaultDispatcher
 import de.yanos.core.utils.IODispatcher
 import de.yanos.core.utils.MainDispatcher
 import de.yanos.islam.data.api.AwqatApi
+import de.yanos.islam.data.api.TanzilApi
 import de.yanos.islam.data.database.IslamDatabase
 import de.yanos.islam.data.database.IslamDatabaseImpl
 import kotlinx.coroutines.Dispatchers
@@ -67,6 +68,19 @@ internal class AppModule {
             .build()
     }
 
+    @Tanzil
+    @Provides
+    fun provideTanzilRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        val moshi = Moshi.Builder()
+            .add(KotlinJsonAdapterFactory())
+            .build()
+        return Retrofit.Builder()
+            .client(okHttpClient)
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .baseUrl("https://api.ubilisim.com/")
+            .build()
+    }
+
     @AzanPlayer
     @Provides
     @Singleton
@@ -79,6 +93,9 @@ internal class AppModule {
     fun provideAwqatApi(@Awqat retrofit: Retrofit): AwqatApi {
         return retrofit.create(AwqatApi::class.java)
     }
+
+    @Provides
+    fun provideTanzilApi(@Tanzil retrofit: Retrofit) = retrofit.create(TanzilApi::class.java)
 
     @Provides
     @Singleton
@@ -106,6 +123,10 @@ internal class AppModule {
     @Provides
     @Singleton
     fun provideTopicDao(db: IslamDatabase) = db.topicDao()
+
+    @Provides
+    @Singleton
+    fun provideQuranDao(db: IslamDatabase) = db.quranDao()
 
     @Provides
     @Singleton
@@ -151,11 +172,11 @@ internal class AppModule {
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class QiblaRetrofit
+annotation class Awqat
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class Awqat
+annotation class Tanzil
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)

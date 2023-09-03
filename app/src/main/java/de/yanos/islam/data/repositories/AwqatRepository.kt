@@ -10,11 +10,10 @@ import de.yanos.islam.data.model.awqat.PrayerTime
 import de.yanos.islam.data.repositories.source.LocalAwqatSource
 import de.yanos.islam.data.repositories.source.RemoteAwqatSource
 import de.yanos.islam.util.AppSettings
-import de.yanos.islam.util.LoadState
+import de.yanos.islam.util.getData
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -152,15 +151,6 @@ class AwqatRepositoryImpl @Inject constructor(
             getData(remoteSource.loadCities())?.let {
                 localSource.insertLocations(toLocation(it.data, LocationType.CITY))
             }
-        }
-    }
-
-    private fun <T> getData(response: LoadState<T>): T? {
-        return (response as? LoadState.Data)?.let {
-            it.data
-        } ?: (response as? LoadState.Failure)?.let {
-            Timber.e(it.e)
-            null
         }
     }
 }

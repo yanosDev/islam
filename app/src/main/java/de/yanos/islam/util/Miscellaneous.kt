@@ -4,6 +4,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import retrofit2.Response
 import timber.log.Timber
 import java.time.Instant
 import java.time.ZoneId
@@ -48,6 +49,7 @@ fun titleMedium() = typo().titleMedium
 
 @Composable
 fun titleLarge() = typo().titleLarge
+
 @Composable
 fun headlineSmall() = typo().headlineSmall
 
@@ -81,5 +83,24 @@ fun Long.epochSecondToDateString(
     } catch (e: Exception) {
         Timber.e(e)
         ""
+    }
+}
+
+fun <T> localResponse(response: Response<T>): LoadState<T> {
+    return if (response.isSuccessful) {
+        response.body()?.let { body ->
+            LoadState.Data(body)
+        } ?: LoadState.Failure(Exception(response.errorBody().toString()))
+    } else {
+        LoadState.Failure(Exception(response.errorBody().toString()))
+    }
+}
+
+fun <T> getData(response: LoadState<T>): T? {
+    return (response as? LoadState.Data)?.let {
+        it.data
+    } ?: (response as? LoadState.Failure)?.let {
+        Timber.e(it.e)
+        null
     }
 }

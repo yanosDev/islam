@@ -10,9 +10,9 @@ import de.yanos.islam.data.model.awqat.AwqatPrayerTimeResponse
 import de.yanos.islam.data.model.awqat.Login
 import de.yanos.islam.util.AppSettings
 import de.yanos.islam.util.LoadState
+import de.yanos.islam.util.localResponse
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import retrofit2.Response
 import retrofit2.awaitResponse
 import timber.log.Timber
 import javax.inject.Inject
@@ -135,16 +135,6 @@ class RemoteAwqatSourceImpl @Inject constructor(
                 Timber.e(e)
                 LoadState.Failure(Exception("Error"))
             }
-        }
-    }
-
-    private fun <T> localResponse(response: Response<T>): LoadState<T> {
-        return if (response.isSuccessful) {
-            response.body()?.let { body ->
-                LoadState.Data(body)
-            } ?: LoadState.Failure(Exception(response.errorBody().toString()))
-        } else {
-            LoadState.Failure(Exception(response.errorBody().toString()))
         }
     }
 }

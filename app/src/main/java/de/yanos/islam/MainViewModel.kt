@@ -19,6 +19,7 @@ import de.yanos.islam.data.model.Topic
 import de.yanos.islam.data.model.TopicResource
 import de.yanos.islam.data.model.TopicType
 import de.yanos.islam.data.repositories.AwqatRepository
+import de.yanos.islam.data.repositories.QuranRepository
 import de.yanos.islam.service.DailyScheduleWorker
 import de.yanos.islam.util.AppSettings
 import de.yanos.islam.util.LatandLong
@@ -41,7 +42,8 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val appSettings: AppSettings,
     private val geocoder: Geocoder,
-    private val repository: AwqatRepository,
+    private val awqatRepository: AwqatRepository,
+    private val quranRepository: QuranRepository,
     @ApplicationContext private val context: Context,
     private val db: IslamDatabase,
     @IODispatcher private val dispatcher: CoroutineDispatcher,
@@ -53,6 +55,13 @@ class MainViewModel @Inject constructor(
         initDB()
         initDailyWorker()
         loadDailyAwqatList()
+        loadQuran()
+    }
+
+    private fun loadQuran() {
+        viewModelScope.launch {
+            quranRepository.fetchQuran()
+        }
     }
 
     private fun initDailyWorker() {
@@ -72,7 +81,7 @@ class MainViewModel @Inject constructor(
             @Suppress("DEPRECATION")
             geocoder.getFromLocation(location.latitude, location.longitude, 1)?.firstOrNull()?.let { address ->
                 (address.subAdminArea ?: address.adminArea)?.let { name ->
-                    repository.fetchCityData(name)
+                    awqatRepository.fetchCityData(name)
                     appSettings.lastLocation = name
                 }
             }
@@ -82,7 +91,7 @@ class MainViewModel @Inject constructor(
     private fun loadDailyAwqatList() {
         viewModelScope.launch(dispatcher) {
             if (LocalDate.now().isAfter(LocalDate.ofEpochDay(appSettings.awqatLastFetch))) {
-                repository.fetchAwqatData()
+                awqatRepository.fetchAwqatData()
                 appSettings.awqatLastFetch = LocalDate.now().toEpochDay()
             }
         }
