@@ -1,21 +1,18 @@
-package de.yanos.islam.ui.knowledge.topics.search
+package de.yanos.islam.ui.quran.search
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Clear
-import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -38,27 +35,27 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.R
-import de.yanos.islam.data.model.Search
+import de.yanos.islam.ui.knowledge.topics.search.SearchHistory
 import de.yanos.islam.util.IslamDivider
 import de.yanos.islam.util.NavigationAction
+import de.yanos.islam.util.QuranNavigationAction
 import de.yanos.islam.util.bodyMedium
-import de.yanos.islam.util.bodySmall
 import de.yanos.islam.util.getAnnotatedString
 import de.yanos.islam.util.goldColor
 import de.yanos.islam.util.labelLarge
 import de.yanos.islam.util.labelMedium
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun SearchQuestionsScreen(
+fun QuranSearchScreen(
     modifier: Modifier = Modifier,
-    vm: SearchQuestionsViewModel = hiltViewModel(),
-    onNavigationChange: (path: NavigationAction) -> Unit = {}
+    vm: QuranSearchViewModel = hiltViewModel(),
+    onNavigationChange: (NavigationAction) -> Unit
 ) {
     var isActive by remember { mutableStateOf(false) }
     val recentSearches = vm.recentSearches.collectAsState(initial = listOf()).value
@@ -68,6 +65,7 @@ fun SearchQuestionsScreen(
                 padding(horizontal = 12.dp)
         },
     ) { values ->
+        val onClick = { name: String -> onNavigationChange(QuranNavigationAction.NavigateToSure(name)) }
         Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             SearchBar(
                 query = vm.query,
@@ -101,14 +99,15 @@ fun SearchQuestionsScreen(
                         }
                     }
                     items(items = vm.findings, key = { it.id }) {
-                        MatchingQuestions(
+                        MatchingSure(
                             modifier = Modifier.animateItemPlacement(),
-                            question = getAnnotatedString(
+                            sureName = getAnnotatedString(
                                 vm.query,
-                                "${vm.findings.indexOf(it) + 1}. ${it.question}?",
+                                it.sureName,
                                 SpanStyle(color = goldColor(), fontWeight = FontWeight.Bold)
                             ),
-                            answer = getAnnotatedString(vm.query, it.answer, SpanStyle(color = goldColor(), fontWeight = FontWeight.Bold)),
+                            ayetList = getAnnotatedString(vm.query, it.ayet, SpanStyle(color = goldColor(), fontWeight = FontWeight.Bold)),
+                            onClick = onClick
                         )
                     }
                 }
@@ -116,10 +115,11 @@ fun SearchQuestionsScreen(
             }
             LazyColumn {
                 items(items = vm.findings, key = { it.id }) {
-                    MatchingQuestions(
+                    MatchingSure(
                         modifier = Modifier.animateItemPlacement(),
-                        question = getAnnotatedString(vm.query, "${vm.findings.indexOf(it) + 1}. ${it.question}?", SpanStyle(color = goldColor(), fontWeight = FontWeight.Bold)),
-                        answer = getAnnotatedString(vm.query, it.answer, SpanStyle(color = goldColor(), fontWeight = FontWeight.Bold)),
+                        sureName = getAnnotatedString(vm.query, it.sureName, SpanStyle(color = goldColor(), fontWeight = FontWeight.Bold)),
+                        ayetList = getAnnotatedString(vm.query, it.ayet, SpanStyle(color = goldColor(), fontWeight = FontWeight.Bold)),
+                        onClick = onClick
                     )
                 }
             }
@@ -128,29 +128,25 @@ fun SearchQuestionsScreen(
 }
 
 @Composable
-fun SearchHistory(modifier: Modifier = Modifier, search: Search, onHistoryClicked: (String) -> Unit) {
-    Row(modifier = Modifier
-        .padding(horizontal = 18.dp, vertical = 6.dp)
-        .clickable { onHistoryClicked(search.query) }) {
-        Icon(imageVector = Icons.Rounded.History, contentDescription = "Search History")
-        Spacer(modifier = Modifier.width(6.dp))
-        Text(modifier = Modifier.weight(1f), textAlign = TextAlign.Start, text = search.query, style = bodySmall())
-    }
-}
-
-@Composable
-private fun MatchingQuestions(modifier: Modifier, question: AnnotatedString, answer: AnnotatedString) {
+private fun MatchingSure(
+    modifier: Modifier = Modifier,
+    sureName: AnnotatedString,
+    ayetList: AnnotatedString,
+    onClick: (String) -> Unit
+) {
     OutlinedCard(
         modifier = modifier
+            .clickable { onClick(sureName.text) }
             .fillMaxWidth()
             .padding(vertical = 8.dp, horizontal = 12.dp),
     ) {
         Spacer(modifier = Modifier.height(12.dp))
-        Text(modifier = Modifier.padding(horizontal = 8.dp), text = question, style = labelLarge())
+        Text(modifier = Modifier.padding(horizontal = 8.dp), text = sureName, style = labelLarge())
         Spacer(modifier = Modifier.height(8.dp))
         IslamDivider()
         Spacer(modifier = Modifier.height(8.dp))
-        Text(modifier = Modifier.padding(horizontal = 8.dp), text = answer, style = bodyMedium())
+        Text(modifier = Modifier.padding(horizontal = 8.dp), text = ayetList, style = bodyMedium())
         Spacer(modifier = Modifier.height(12.dp))
+
     }
 }

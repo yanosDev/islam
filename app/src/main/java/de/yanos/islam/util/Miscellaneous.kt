@@ -4,6 +4,9 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import retrofit2.Response
 import timber.log.Timber
 import java.time.Instant
 import java.time.ZoneId
@@ -48,6 +51,7 @@ fun titleMedium() = typo().titleMedium
 
 @Composable
 fun titleLarge() = typo().titleLarge
+
 @Composable
 fun headlineSmall() = typo().headlineSmall
 
@@ -82,4 +86,41 @@ fun Long.epochSecondToDateString(
         Timber.e(e)
         ""
     }
+}
+
+fun <T> localResponse(response: Response<T>): LoadState<T> {
+    return if (response.isSuccessful) {
+        response.body()?.let { body ->
+            LoadState.Data(body)
+        } ?: LoadState.Failure(Exception(response.errorBody().toString()))
+    } else {
+        LoadState.Failure(Exception(response.errorBody().toString()))
+    }
+}
+
+fun <T> getData(response: LoadState<T>): T? {
+    return (response as? LoadState.Data)?.let {
+        it.data
+    } ?: (response as? LoadState.Failure)?.let {
+        Timber.e(it.e)
+        null
+    }
+}
+
+@Composable
+fun getAnnotatedString(query: String, name: String, highlightStyle: SpanStyle): AnnotatedString {
+    //Find where searchQuery appears in courseName
+    var startIndex = 0
+    val builder = AnnotatedString.Builder(name)
+    if (query.isNotBlank())
+        while (startIndex >= 0) {
+            startIndex = name.indexOf(query, startIndex, true)
+            //If the query is in the name, add a style, otherwise do nothing
+            if (startIndex >= 0) {
+                val endIndex = startIndex + query.length
+                builder.addStyle(highlightStyle, startIndex, endIndex)
+                startIndex = endIndex
+            }
+        }
+    return builder.toAnnotatedString()
 }

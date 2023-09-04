@@ -17,12 +17,14 @@ fun typoByConfig(appSettings: AppSettings): Typography {
     )
 }
 
+val quranFont =  FontFamily(Font(R.font.quran_al_qalam, FontWeight.Normal))
 enum class FontStyle(val textId: Int, val fontId: Int) {
     Alogical(R.string.font_alogical, R.font.alogical),
     OpenSans(R.string.font_open_sans, R.font.open_sans),
     Roboto(R.string.font_roboto, R.font.roboto),
     Ubuntu(R.string.font_ubuntu, R.font.ubuntu),
-    Montserrat(R.string.font_montserrat, R.font.mont)
+    Montserrat(R.string.font_montserrat, R.font.mont),
+    AlQalam(R.string.font_qalam, R.font.quran_al_qalam)
 }
 
 fun typo(sizeFactor: Int, family: FontFamily): Typography {
