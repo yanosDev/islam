@@ -73,7 +73,7 @@ class MainViewModel @Inject constructor(
         val periodicWorkRequest = PeriodicWorkRequestBuilder<DailyScheduleWorker>(24, TimeUnit.HOURS)
             .setInitialDelay(delay)
             .build()
-        workManager.enqueueUniquePeriodicWork("daily", ExistingPeriodicWorkPolicy.KEEP, periodicWorkRequest)
+        workManager.enqueueUniquePeriodicWork("daily", ExistingPeriodicWorkPolicy.UPDATE, periodicWorkRequest)
     }
 
     fun onCurrentLocationChanged(location: LatandLong) {
