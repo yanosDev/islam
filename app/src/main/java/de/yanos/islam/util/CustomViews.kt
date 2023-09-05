@@ -1,5 +1,6 @@
 package de.yanos.islam.util
 
+import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -181,7 +182,35 @@ fun BackGroundPattern(modifier: Modifier = Modifier) {
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
-fun Permission() {
+fun NotificationPermission(
+    onPermissionGranted: () -> Unit,
+    onPermissionDenied: () -> Unit
+) {
+    PermissionCompose(
+        permission = Manifest.permission.POST_NOTIFICATIONS,
+        onPermissionGranted = onPermissionGranted,
+        onPermissionDenied = onPermissionDenied
+    )
+}
+
+@Composable
+fun LocationPermission(
+    onPermissionGranted: () -> Unit,
+    onPermissionDenied: () -> Unit
+) {
+    PermissionCompose(
+        permission = Manifest.permission.ACCESS_FINE_LOCATION,
+        onPermissionGranted = onPermissionGranted,
+        onPermissionDenied = onPermissionDenied
+    )
+}
+
+@Composable
+fun PermissionCompose(
+    permission: String,
+    onPermissionGranted: () -> Unit,
+    onPermissionDenied: () -> Unit
+) {
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -195,13 +224,13 @@ fun Permission() {
     val context = LocalContext.current
     if (ContextCompat.checkSelfPermission(
             context,
-            android.Manifest.permission.POST_NOTIFICATIONS
+            permission
         ) == PackageManager.PERMISSION_GRANTED
     ) {
         // permission granted
     } else {
         LaunchedEffect(key1 = true) {
-            launcher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            launcher.launch(permission)
         }
     }
 }

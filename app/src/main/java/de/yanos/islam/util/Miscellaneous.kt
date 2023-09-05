@@ -1,11 +1,19 @@
 package de.yanos.islam.util
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.core.content.ContextCompat
+import com.google.android.gms.location.LocationServices
 import retrofit2.Response
 import timber.log.Timber
 import java.time.Instant
@@ -123,4 +131,38 @@ fun getAnnotatedString(query: String, name: String, highlightStyle: SpanStyle): 
             }
         }
     return builder.toAnnotatedString()
+}
+
+fun hasLocationPermission(context: Context): Boolean {
+    return ContextCompat.checkSelfPermission(
+        context,
+        Manifest.permission.ACCESS_FINE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED
+}
+
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+fun hasNotificationPermission(context: Context): Boolean {
+    return ContextCompat.checkSelfPermission(
+        context,
+        Manifest.permission.POST_NOTIFICATIONS
+    ) == PackageManager.PERMISSION_GRANTED
+}
+
+
+@SuppressLint("MissingPermission")
+fun getCurrentLocation(context: Context, callback: (Double, Double) -> Unit) {
+    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+    fusedLocationClient.lastLocation
+        .addOnSuccessListener { location ->
+            if (location != null) {
+                val lat = location.latitude
+                val long = location.longitude
+                callback(lat, long)
+            }
+        }
+        .addOnFailureListener { exception ->
+            // Handle location retrieval failure
+            exception.printStackTrace()
+        }
 }

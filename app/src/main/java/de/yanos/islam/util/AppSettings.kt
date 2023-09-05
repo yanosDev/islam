@@ -12,7 +12,6 @@ interface AppSettings {
     var tokenLastFetch: Long
     var authToken: String
     var refreshToken: String
-    var awqatLastFetch: Long
     var awqatEmail: String
     var awqatPwd: String
     var lastLocation: String
@@ -25,7 +24,6 @@ class AppSettingsImpl @Inject constructor(@ApplicationContext context: Context) 
     override var tokenLastFetch: Long by PreferenceItem<Long>(context) { 0L }
     override var authToken: String by PreferenceItem<String>(context) { "" }
     override var refreshToken: String by PreferenceItem<String>(context) { "" }
-    override var awqatLastFetch: Long by PreferenceItem<Long>(context) { 0L }
     override var awqatEmail: String by PreferenceItem<String>(context) { "sonaysenguen@gmail.com" }
     override var awqatPwd: String by PreferenceItem<String>(context) { "La@2-Z1r" }
     override var lastLocation: String by PreferenceItem<String>(context) { "" }

@@ -8,7 +8,7 @@ import javax.inject.Inject
 
 
 interface QuranRepository {
-    suspend fun fetchQuran()
+    suspend fun fetchQuran(): Boolean
 }
 
 class QuranRepositoryImpl @Inject constructor(
@@ -16,10 +16,10 @@ class QuranRepositoryImpl @Inject constructor(
     private val remote: RemoteQuranSource
 ) : QuranRepository {
 
-    override suspend fun fetchQuran() {
-        getData(remote.loadQuranSummary())?.let { response ->
+    override suspend fun fetchQuran(): Boolean {
+        return getData(remote.loadQuranSummary())?.let { response ->
             local.saveQuranSummary(response.kuran)
-            response.links.forEach { (key, value) ->
+            response.links.forEach { (key, _) ->
                 getData(remote.loadSure(key))?.let { (sureaditr, sureList) ->
                     local.saveSure(sureList.map { sure ->
                         Ayet(
@@ -33,10 +33,10 @@ class QuranRepositoryImpl @Inject constructor(
                             sureen = sure.sureen.trim(),
                         )
                     })
-                }
+                } ?: false
             }
-
-        }
+            true
+        } ?: false
     }
 
 }

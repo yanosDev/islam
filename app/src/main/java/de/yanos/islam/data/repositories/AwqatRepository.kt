@@ -13,14 +13,13 @@ import de.yanos.islam.util.AppSettings
 import de.yanos.islam.util.getData
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 
 interface AwqatRepository {
-    suspend fun fetchAwqatData()
+    suspend fun fetchAwqatLocationIndependentData(): Boolean
     suspend fun fetchCityData(locationName: String)
 }
 
@@ -31,86 +30,84 @@ class AwqatRepositoryImpl @Inject constructor(
     private val remoteSource: RemoteAwqatSource
 ) : AwqatRepository {
 
-    override suspend fun fetchAwqatData() {
-        withContext(dispatcher) {
+    override suspend fun fetchAwqatLocationIndependentData(): Boolean {
+        return withContext(dispatcher) {
             remoteSource.auth()
             if (appSettings.authToken.isNotBlank()) {
-                async { fetchDailyContent() }
-                async { fetchCountries() }
-                async { fetchStates() }
-                async { fetchCities() }
+                val results = listOf(
+                    async { fetchDailyContent() },
+                    async { fetchCountries() },
+                    async { fetchStates() },
+                    async { fetchCities() }
+                ).awaitAll()
+                results.all { it }
             }
+            false
         }
     }
-
 
     override suspend fun fetchCityData(locationName: String) {
         withContext(dispatcher) {
             if (appSettings.authToken.isNotBlank()) {
                 localSource.loadCityId(locationName.uppercase())?.let { cityId ->
-                    if (localSource.loadCityTimes(cityId).none {
-                            val date = LocalDate.parse(it.gregorianDateShort, DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-                            date.dayOfYear == LocalDate.now().dayOfYear && date.year == LocalDate.now().year
-                        }) {
-                        async {
-                            getData(remoteSource.loadCityDetails(cityId))?.let {
-                                localSource.insertCityDetails(
-                                    CityDetail(
+                    async {
+                        getData(remoteSource.loadCityDetails(cityId))?.let {
+                            localSource.insertCityDetails(
+                                CityDetail(
+                                    id = cityId,
+                                    name = it.data.name,
+                                    code = it.data.code,
+                                    geographicQiblaAngle = it.data.geographicQiblaAngle,
+                                    distanceToKaaba = it.data.distanceToKaaba,
+                                    qiblaAngle = it.data.qiblaAngle,
+                                    city = it.data.city,
+                                    cityEn = it.data.cityEn,
+                                    country = it.data.country,
+                                    countryEn = it.data.countryEn
+                                )
+                            )
+                        }
+                    }
+                    async {
+                        getData(remoteSource.loadCityPrayerTimes(cityId))?.data?.let { times ->
+                            localSource.insertCityPrayerTimes(
+                                times.map { time ->
+                                    PrayerTime(
                                         id = cityId,
-                                        name = it.data.name,
-                                        code = it.data.code,
-                                        geographicQiblaAngle = it.data.geographicQiblaAngle,
-                                        distanceToKaaba = it.data.distanceToKaaba,
-                                        qiblaAngle = it.data.qiblaAngle,
-                                        city = it.data.city,
-                                        cityEn = it.data.cityEn,
-                                        country = it.data.country,
-                                        countryEn = it.data.countryEn
+                                        key = "${cityId}_${time.gregorianDateShort}",
+                                        shapeMoonUrl = time.shapeMoonUrl,
+                                        fajr = time.fajr,
+                                        sunrise = time.sunrise,
+                                        dhuhr = time.dhuhr,
+                                        asr = time.asr,
+                                        maghrib = time.maghrib,
+                                        isha = time.isha,
+                                        astronomicalSunset = time.astronomicalSunset,
+                                        astronomicalSunrise = time.astronomicalSunrise,
+                                        hijriDateShort = time.hijriDateShort,
+                                        hijriDateLong = time.hijriDateLong,
+                                        qiblaTime = time.qiblaTime,
+                                        gregorianDateShort = time.gregorianDateShort,
+                                        gregorianDateLong = time.gregorianDateLong,
                                     )
-                                )
-                            }
+                                }
+                            )
                         }
-                        async {
-                            getData(remoteSource.loadCityPrayerTimes(cityId))?.data?.let { times ->
-                                localSource.insertCityPrayerTimes(
-                                    times.map { time ->
-                                        PrayerTime(
-                                            id = cityId,
-                                            key = "${cityId}_${time.gregorianDateShort}",
-                                            shapeMoonUrl = time.shapeMoonUrl,
-                                            fajr = time.fajr,
-                                            sunrise = time.sunrise,
-                                            dhuhr = time.dhuhr,
-                                            asr = time.asr,
-                                            maghrib = time.maghrib,
-                                            isha = time.isha,
-                                            astronomicalSunset = time.astronomicalSunset,
-                                            astronomicalSunrise = time.astronomicalSunrise,
-                                            hijriDateShort = time.hijriDateShort,
-                                            hijriDateLong = time.hijriDateLong,
-                                            qiblaTime = time.qiblaTime,
-                                            gregorianDateShort = time.gregorianDateShort,
-                                            gregorianDateLong = time.gregorianDateLong,
-                                        )
-                                    }
+                    }
+                    async {
+                        getData(remoteSource.loadCityPrayerTimesEid(cityId))?.data?.let { time ->
+                            localSource.insertCityEid(
+                                CityEid(
+                                    cityId = cityId,
+                                    key = "${cityId}_${time.eidAlAdhaHijri}",
+                                    eidAlAdhaHijri = time.eidAlAdhaHijri,
+                                    eidAlAdhaTime = time.eidAlAdhaTime,
+                                    eidAlAdhaDate = time.eidAlAdhaDate,
+                                    eidAlFitrHijri = time.eidAlFitrHijri,
+                                    eidAlFitrTime = time.eidAlFitrTime,
+                                    eidAlFitrDate = time.eidAlFitrDate,
                                 )
-                            }
-                        }
-                        async {
-                            getData(remoteSource.loadCityPrayerTimesEid(cityId))?.data?.let { time ->
-                                localSource.insertCityEid(
-                                    CityEid(
-                                        cityId = cityId,
-                                        key = "${cityId}_${time.eidAlAdhaHijri}",
-                                        eidAlAdhaHijri = time.eidAlAdhaHijri,
-                                        eidAlAdhaTime = time.eidAlAdhaTime,
-                                        eidAlAdhaDate = time.eidAlAdhaDate,
-                                        eidAlFitrHijri = time.eidAlFitrHijri,
-                                        eidAlFitrTime = time.eidAlFitrTime,
-                                        eidAlFitrDate = time.eidAlFitrDate,
-                                    )
-                                )
-                            }
+                            )
                         }
                     }
                 }
@@ -118,19 +115,21 @@ class AwqatRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun fetchDailyContent() {
-        withContext(dispatcher) {
+    private suspend fun fetchDailyContent(): Boolean {
+        return withContext(dispatcher) {
             getData(remoteSource.fetchDailyContent())?.let {
                 localSource.insertDailyContent(it.data)
-            }
+                true
+            } ?: false
         }
     }
 
-    private suspend fun fetchCountries() {
-        withContext(dispatcher) {
+    private suspend fun fetchCountries(): Boolean {
+        return withContext(dispatcher) {
             getData(remoteSource.loadCountries())?.let {
                 localSource.insertLocations(toLocation(it.data, LocationType.COUNTRY))
-            }
+                true
+            } ?: false
         }
     }
 
@@ -138,19 +137,21 @@ class AwqatRepositoryImpl @Inject constructor(
         return locations.map { Location(id = it.id, code = it.code, name = it.name, type) }
     }
 
-    private suspend fun fetchStates() {
-        withContext(dispatcher) {
+    private suspend fun fetchStates(): Boolean {
+        return withContext(dispatcher) {
             getData(remoteSource.loadStates())?.let {
                 localSource.insertLocations(toLocation(it.data, LocationType.STATE))
-            }
+                true
+            } ?: false
         }
     }
 
-    private suspend fun fetchCities() {
-        withContext(dispatcher) {
+    private suspend fun fetchCities(): Boolean {
+        return withContext(dispatcher) {
             getData(remoteSource.loadCities())?.let {
                 localSource.insertLocations(toLocation(it.data, LocationType.CITY))
-            }
+                true
+            } ?: false
         }
     }
 }

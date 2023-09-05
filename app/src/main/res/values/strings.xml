@@ -79,4 +79,7 @@
     <string name="sure_ayet">%d. Ayet</string>
     <string name="sure_list_cuz">Cüz: %s</string>
     <string name="sure_list_yer">Yer: %s</string>
-</resources>
+
+    <string name="permission_title">Konum ve Bildirim Izini</string>
+    <string name="permission_content">1. Namaz vakitleri ve Kible yönünü belirlemek icin, suanki bulundugunuz ilin konumu gerekli.\n2. Namaz vakti Bildirimleri almak icin ayriyet den izin gerekli dir.</string>
+ </resources>

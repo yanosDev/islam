@@ -22,19 +22,25 @@ import de.yanos.islam.data.repositories.AwqatRepository
 import de.yanos.islam.data.repositories.QuranRepository
 import de.yanos.islam.service.DailyScheduleWorker
 import de.yanos.islam.util.AppSettings
-import de.yanos.islam.util.LatandLong
+import de.yanos.islam.util.getCurrentLocation
+import de.yanos.islam.util.hasLocationPermission
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.time.Duration
-import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.Timer
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.concurrent.timerTask
 
 
 @SuppressLint("StaticFieldLeak")
@@ -50,21 +56,60 @@ class MainViewModel @Inject constructor(
     private val workManager: WorkManager
 ) : ViewModel() {
     var isReady: Boolean = false
+    private val timer: Timer = Timer()
 
     init {
-        initDB()
-        initDailyWorker()
-        loadDailyAwqatList()
-        loadQuran()
+        timer.scheduleAtFixedRate(
+            timerTask()
+            {
+                viewModelScope.launch(Dispatchers.Main) {
+                    if (hasLocationPermission(context))
+                        getCurrentLocation(context = context) { lat, lon ->
+                            @Suppress("DEPRECATION")
+                            geocoder.getFromLocation(lat, lon, 1)?.firstOrNull()?.let { address ->
+                                (address.subAdminArea ?: address.adminArea)?.let { name ->
+                                    appSettings.lastLocation = name
+                                    loadLocationDependentData()
+                                }
+                            }
+                        }
+                    else loadLocationIndependentData()
+                }
+            }, 0, 60000
+        )
     }
 
-    private fun loadQuran() {
+    private fun loadLocationDependentData() {
         viewModelScope.launch {
+            Timber.e("MAIN: loadLocationDependentData")
+            appSettings.lastLocation.takeIf { it.isNotBlank() }?.let {
+                awqatRepository.fetchCityData(it)
+            }
+        }
+    }
+
+    private suspend fun loadLocationIndependentData() {
+        viewModelScope.launch {
+            if (!isReady) {
+                Timber.e("MAIN: loadLocationIndependentData")
+                val tasks = listOf(
+                    async { initDB() },
+                    async { initDailyWorker() },
+                    async { loadQuran() },
+                    async { loadDailyAwqatList() },
+                ).awaitAll()
+                isReady = tasks.all { it }
+            }
+        }
+    }
+
+    private suspend fun loadQuran(): Boolean {
+        return withContext(dispatcher) {
             quranRepository.fetchQuran()
         }
     }
 
-    private fun initDailyWorker() {
+    private suspend fun initDailyWorker(): Boolean {
         val now = LocalDateTime.now()
         val delay = when {
             now.hour < 1 -> Duration.ofHours(0L)
@@ -74,31 +119,17 @@ class MainViewModel @Inject constructor(
             .setInitialDelay(delay)
             .build()
         workManager.enqueueUniquePeriodicWork("daily", ExistingPeriodicWorkPolicy.UPDATE, periodicWorkRequest)
+        return true
     }
 
-    fun onCurrentLocationChanged(location: LatandLong) {
-        viewModelScope.launch {
-            @Suppress("DEPRECATION")
-            geocoder.getFromLocation(location.latitude, location.longitude, 1)?.firstOrNull()?.let { address ->
-                (address.subAdminArea ?: address.adminArea)?.let { name ->
-                    awqatRepository.fetchCityData(name)
-                    appSettings.lastLocation = name
-                }
-            }
+    private suspend fun loadDailyAwqatList(): Boolean {
+        return withContext(dispatcher) {
+            awqatRepository.fetchAwqatLocationIndependentData()
         }
     }
 
-    private fun loadDailyAwqatList() {
-        viewModelScope.launch(dispatcher) {
-            if (LocalDate.now().isAfter(LocalDate.ofEpochDay(appSettings.awqatLastFetch))) {
-                awqatRepository.fetchAwqatData()
-                appSettings.awqatLastFetch = LocalDate.now().toEpochDay()
-            }
-        }
-    }
-
-    private fun initDB() {
-        viewModelScope.launch(dispatcher) {
+    private suspend fun initDB(): Boolean {
+        return withContext(dispatcher) {
             if (!appSettings.isDBInitialized) {
                 TopicResource.values().forEach { topic ->
                     topic.raw?.let { raw ->
@@ -151,7 +182,7 @@ class MainViewModel @Inject constructor(
                 appSettings.isDBInitialized = true
             }
             delay(1200L)
-            isReady = true
+            true
         }
     }
 

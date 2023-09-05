@@ -13,9 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -26,6 +26,7 @@ import androidx.navigation.navDeepLink
 import dagger.hilt.android.AndroidEntryPoint
 import de.yanos.core.ui.theme.AppTheme
 import de.yanos.core.ui.view.DynamicNavigationScreen
+import de.yanos.islam.ui.permissions.PermissionsScreen
 import de.yanos.islam.ui.prayer.PrayerScreen
 import de.yanos.islam.ui.settings.SettingsScreen
 import de.yanos.islam.util.AppSettings
@@ -33,11 +34,13 @@ import de.yanos.islam.util.KnowledgeNavigation
 import de.yanos.islam.util.MainNavigation
 import de.yanos.islam.util.NavigationAction
 import de.yanos.islam.util.PatternedBackgroung
-import de.yanos.islam.util.Permission
+import de.yanos.islam.util.Permissions
 import de.yanos.islam.util.QuranNavigation
+import de.yanos.islam.util.ToRootAfterPermission
 import de.yanos.islam.util.allKnowledge
 import de.yanos.islam.util.allQuran
-import de.yanos.islam.util.getUserLocation
+import de.yanos.islam.util.hasLocationPermission
+import de.yanos.islam.util.hasNotificationPermission
 import de.yanos.islam.util.typoByConfig
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -53,8 +56,10 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         setContent {
-            vm.onCurrentLocationChanged(getUserLocation(context = LocalContext.current))
-            Permission()
+            val startRoute = when {
+                !hasNotificationPermission(this) || !hasLocationPermission(this) -> Permissions.route
+                else -> MainNavigation.all[1].route
+            }
             AppTheme(activity = this, typography = typoByConfig(appSettings)) { modifier, config ->
                 navController = rememberNavController()
                 DynamicNavigationScreen(
@@ -66,7 +71,7 @@ class MainActivity : ComponentActivity() {
                     //NavHost Here
                     IslamNavHost(
                         modifier = contentModifier,
-                        startRoute = MainNavigation.all[1].route,
+                        startRoute = startRoute,
                         navController = navController!!
                     )
                 }
@@ -100,10 +105,12 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 private fun IslamNavHost(
     modifier: Modifier = Modifier,
     startRoute: String,
+    vm: MainViewModel = hiltViewModel(),
     navController: NavHostController,
 ) {
     val scope = rememberCoroutineScope()
@@ -111,6 +118,12 @@ private fun IslamNavHost(
         scope.launch {
             when (path) {
                 NavigationAction.NavigateBack -> navController.popBackStack()
+                ToRootAfterPermission -> navController.navigate(MainNavigation.Knowledge.route) {
+                    popUpTo(MainNavigation.Knowledge.route) {
+                        inclusive = true
+                    }
+                }
+
                 else -> navController.navigate(path.route)
             }
         }
@@ -131,6 +144,11 @@ private fun IslamNavHost(
             }
             composable(route = MainNavigation.Settings.route) {
                 SettingsScreen()
+            }
+            composable(Permissions.route) {
+                PermissionsScreen {
+                    onNavigationChange(ToRootAfterPermission)
+                }
             }
         }
     }
