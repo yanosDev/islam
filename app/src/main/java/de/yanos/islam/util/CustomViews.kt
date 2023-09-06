@@ -9,6 +9,7 @@ import androidx.annotation.RawRes
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -87,7 +88,7 @@ fun IslamSwitch(
     content: @Composable () -> Unit,
 ) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-        TextButton(onClick = { onCheckChange(!isChecked) }, enabled = isEnabled) {
+        TextButton(modifier = Modifier.weight(1f), onClick = { onCheckChange(!isChecked) }, enabled = isEnabled) {
             content()
         }
         Switch(
@@ -166,7 +167,7 @@ fun BackGroundPattern(modifier: Modifier = Modifier) {
     val pattern = ImageBitmap.imageResource(R.drawable.pattern_2)
 
     Canvas(
-        modifier = modifier.alpha(0.1F)
+        modifier = modifier.alpha(if (isSystemInDarkTheme()) 0.1F else 0.2F)
     ) {
         val paint = Paint().asFrameworkPaint().apply {
             isAntiAlias = true

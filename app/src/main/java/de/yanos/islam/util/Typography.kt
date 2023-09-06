@@ -11,20 +11,35 @@ import androidx.compose.ui.unit.sp
 import de.yanos.islam.R
 
 fun typoByConfig(appSettings: AppSettings): Typography {
+    return typoByConfig(appSettings.fontSizeFactor, appSettings.fontStyle)
+}
+
+fun typoByConfig(factor: Int, style: Int): Typography {
     return typo(
-        sizeFactor = appSettings.fontSizeFactor,
-        family = FontFamily(Font(FontStyle.values()[appSettings.fontStyle].fontId, FontWeight.Normal))
+        sizeFactor = factor,
+        family = FontFamily(Font(FontStyle.values()[style].fontId, FontWeight.Normal))
     )
 }
 
-val quranFont =  FontFamily(Font(R.font.quran_al_qalam, FontWeight.Normal))
-enum class FontStyle(val textId: Int, val fontId: Int) {
+fun quranFont(style:Int) = FontFamily(Font(style, FontWeight.Normal))
+interface Style {
+    val textId: Int
+    val fontId: Int
+}
+
+enum class FontStyle(override val textId: Int, override val fontId: Int) : Style {
     Alogical(R.string.font_alogical, R.font.alogical),
     OpenSans(R.string.font_open_sans, R.font.open_sans),
     Roboto(R.string.font_roboto, R.font.roboto),
     Ubuntu(R.string.font_ubuntu, R.font.ubuntu),
     Montserrat(R.string.font_montserrat, R.font.mont),
-    AlQalam(R.string.font_qalam, R.font.quran_al_qalam)
+}
+
+enum class QuranFontStyle(override val textId: Int, override val fontId: Int) : Style {
+    AlQalam(R.string.font_qalam, R.font.quran_al_qalam),
+    Scheherazade(R.string.font_scheherazade, R.font.scheherazade),
+    Saleem(R.string.font_saleem, R.font.saleem),
+    Arabic(R.string.font_arabic, R.font.arabic),
 }
 
 fun typo(sizeFactor: Int, family: FontFamily): Typography {

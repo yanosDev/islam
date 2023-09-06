@@ -20,7 +20,17 @@ class SettingsViewModel @Inject constructor(
         fontStyle = style
         appSettings.fontStyle = style
     }
+    fun updateQuranFontSize(size: Int) {
+        quranFontSize = size
+        appSettings.quranSizeFactor = size
+    }
+    fun updateQuranFontStyle(style: Int) {
+        quranFontStyle = style
+        appSettings.quranStyle = style
+    }
 
     var fontSize by mutableStateOf(appSettings.fontSizeFactor)
     var fontStyle by mutableStateOf(appSettings.fontStyle)
+    var quranFontSize by mutableStateOf(appSettings.quranSizeFactor)
+    var quranFontStyle by mutableStateOf(appSettings.quranStyle)
 }

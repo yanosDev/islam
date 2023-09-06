@@ -25,7 +25,7 @@ import java.util.Locale
 val goldColorDark = Color(android.graphics.Color.parseColor("#FFD700"))
 val errorColorDark = Color(android.graphics.Color.parseColor("#FF0000"))
 val correctColorDark = Color(android.graphics.Color.parseColor("#00FF00"))
-val goldColorLight = goldColorDark.copy(alpha = 0.75f)
+val goldColorLight = Color(android.graphics.Color.parseColor("#EEBC1D"))
 val errorColorLight = errorColorDark.copy(alpha = 0.75f)
 val correctColorLight = correctColorDark.copy(alpha = 0.75f)
 
@@ -102,7 +102,12 @@ fun <T> localResponse(response: Response<T>): LoadState<T> {
             LoadState.Data(body)
         } ?: LoadState.Failure(Exception(response.errorBody().toString()))
     } else {
-        LoadState.Failure(Exception(response.errorBody().toString()), response.code())
+        try {
+            LoadState.Failure(Exception(response.errorBody().toString()), response.code())
+        } catch (e: Exception) {
+            Timber.e(e)
+            LoadState.Failure(e)
+        }
     }
 }
 
@@ -130,6 +135,29 @@ fun getAnnotatedString(query: String, name: String, highlightStyle: SpanStyle): 
                 startIndex = endIndex
             }
         }
+    return builder.toAnnotatedString()
+}
+
+@Composable
+fun alternatingColors(
+    primaryColor: Color = goldColor(),
+    secondaryColor: Color = MaterialTheme.colorScheme.primary.copy(alpha = 0.85f),
+    text: String,
+    delimiter: Regex = Regex(" ")
+): AnnotatedString {
+    //Find where searchQuery appears in courseName
+    val primaryStyle = SpanStyle(color = primaryColor)
+    val secondaryStyle = SpanStyle(color = secondaryColor)
+    val builder = AnnotatedString.Builder(text)
+    var startIndex = 0
+    text.split(delimiter).takeIf { it.isNotEmpty() }?.forEachIndexed { index, part ->
+        val newIndex = startIndex + part.length + 1
+        if (index % 2 == 0)
+            builder.addStyle(primaryStyle, startIndex, startIndex + part.length)
+        startIndex = newIndex
+    } ?: run {
+        builder.addStyle(primaryStyle, 0, text.length)
+    }
     return builder.toAnnotatedString()
 }
 
