@@ -13,13 +13,12 @@ import de.yanos.islam.util.AppSettings
 import de.yanos.islam.util.getData
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
 interface AwqatRepository {
-    suspend fun fetchAwqatLocationIndependentData(): Boolean
+    suspend fun fetchAwqatLocationIndependentData()
     suspend fun fetchCityData(locationName: String)
 }
 
@@ -30,18 +29,15 @@ class AwqatRepositoryImpl @Inject constructor(
     private val remoteSource: RemoteAwqatSource
 ) : AwqatRepository {
 
-    override suspend fun fetchAwqatLocationIndependentData(): Boolean {
+    override suspend fun fetchAwqatLocationIndependentData() {
         return withContext(dispatcher) {
             remoteSource.auth()
             if (appSettings.authToken.isNotBlank()) {
-                val results = listOf(
-                    async { fetchDailyContent() },
-                    async { fetchCountries() },
-                    async { fetchStates() },
-                    async { fetchCities() }
-                ).awaitAll()
+                async { fetchDailyContent() }
+                async { fetchCountries() }
+                async { fetchStates() }
+                async { fetchCities() }
             }
-            true
         }
     }
 

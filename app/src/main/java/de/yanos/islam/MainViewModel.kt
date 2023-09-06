@@ -26,9 +26,6 @@ import de.yanos.islam.util.getCurrentLocation
 import de.yanos.islam.util.hasLocationPermission
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -80,55 +77,36 @@ class MainViewModel @Inject constructor(
     }
 
     private fun loadLocationDependentData() {
-        viewModelScope.launch {
-            Timber.e("MAIN: loadLocationDependentData")
-            appSettings.lastLocation.takeIf { it.isNotBlank() }?.let {
-                awqatRepository.fetchCityData(it)
+        if (isReady)
+            viewModelScope.launch {
+                Timber.e("MAIN: loadLocationDependentData")
+                appSettings.lastLocation.takeIf { it.isNotBlank() }?.let {
+                    awqatRepository.fetchCityData(it)
+                }
             }
-        }
     }
 
     private suspend fun loadLocationIndependentData() {
         viewModelScope.launch {
             if (!isReady) {
-                Timber.e("MAIN: loadLocationIndependentData")
-                val tasks = mutableListOf(
-                    async {
-                        val result = initDailyWorker()
-                        Timber.e("MAIN: Worker Init")
-                        result
-                    },
-                    async {
-                        val result = loadDailyAwqatList()
-                        Timber.e("MAIN: Awqat Init")
-                        result
-                    },
-                ).apply {
-                    if (!appSettings.isDBInitialized) {
-                        add(async {
-                            val result = loadQuran()
-                            Timber.e("MAIN: Quran Init")
-                            result
-                        })
-                        add(async {
-                            val result = initDB()
-                            Timber.e("MAIN: DB Init")
-                            result
-                        })
-                    }
-                }.awaitAll()
-                isReady = tasks.all { it }
+                initDailyWorker()
+                loadDailyAwqatList()
+                isReady = if (!appSettings.isDBInitialized) {
+                    loadQuran()
+                    initDB()
+                    true
+                } else true
             }
         }
     }
 
-    private suspend fun loadQuran(): Boolean {
+    private suspend fun loadQuran() {
         return withContext(dispatcher) {
             quranRepository.fetchQuran()
         }
     }
 
-    private suspend fun initDailyWorker(): Boolean {
+    private fun initDailyWorker(): Boolean {
         val now = LocalDateTime.now()
         val delay = when {
             now.hour < 1 -> Duration.ofHours(0L)
@@ -141,14 +119,14 @@ class MainViewModel @Inject constructor(
         return true
     }
 
-    private suspend fun loadDailyAwqatList(): Boolean {
-        return withContext(dispatcher) {
+    private suspend fun loadDailyAwqatList() {
+        withContext(dispatcher) {
             awqatRepository.fetchAwqatLocationIndependentData()
         }
     }
 
-    private suspend fun initDB(): Boolean {
-        return withContext(dispatcher) {
+    private suspend fun initDB() {
+        withContext(dispatcher) {
             if (!appSettings.isDBInitialized) {
                 TopicResource.values().forEach { topic ->
                     topic.raw?.let { raw ->
@@ -200,8 +178,6 @@ class MainViewModel @Inject constructor(
 
                 appSettings.isDBInitialized = true
             }
-            delay(1200L)
-            true
         }
     }
 

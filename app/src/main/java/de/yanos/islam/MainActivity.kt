@@ -19,7 +19,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -66,11 +65,10 @@ class MainActivity : ComponentActivity() {
                     navController = rememberNavController()
                     DynamicNavigationScreen(
                         modifier = modifier.padding(top = 48.dp), // TODO: Check statusbar problem
-                        config = config,
+                        config = config.copy(),
                         destinations = MainNavigation.all,
                         navController = navController!!
                     ) { contentModifier ->
-                        //NavHost Here
                         IslamNavHost(
                             modifier = contentModifier,
                             startRoute = MainNavigation.all[1].route,
@@ -115,7 +113,6 @@ class MainActivity : ComponentActivity() {
 private fun IslamNavHost(
     modifier: Modifier = Modifier,
     startRoute: String,
-    vm: MainViewModel = hiltViewModel(),
     navController: NavHostController,
 ) {
     val scope = rememberCoroutineScope()

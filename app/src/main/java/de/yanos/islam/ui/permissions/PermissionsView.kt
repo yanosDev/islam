@@ -3,8 +3,11 @@ package de.yanos.islam.ui.permissions
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -37,19 +40,24 @@ fun PermissionsScreen(
     var showLocationPermission by remember { mutableStateOf(false) }
     var showNotificationPermission by remember { mutableStateOf(hasLocationPermission(context)) }
 
-    AnimatedVisibility(visible = !showLocationPermission && !showNotificationPermission) {
-        Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(modifier = Modifier.padding(16.dp), text = stringResource(id = R.string.permission_title), style = titleLarge())
-            Text(modifier = Modifier.padding(16.dp), text = stringResource(id = R.string.permission_content), style = titleSmall())
-            TextButton(onClick = { showLocationPermission = true }) {
-                Text(text = stringResource(id = R.string.permission_btn), style = bodyLarge(), color = goldColor())
-            }
+    Column(
+        modifier = Modifier
+            .background(color = MaterialTheme.colorScheme.background)
+            .fillMaxSize()
+            .padding(top = 48.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(modifier = Modifier.padding(16.dp), text = stringResource(id = R.string.permission_title), style = titleLarge(), color = goldColor())
+        Text(modifier = Modifier.padding(16.dp), text = stringResource(id = R.string.permission_content), style = titleSmall(), color = MaterialTheme.colorScheme.onBackground)
+        TextButton(onClick = { showLocationPermission = true }) {
+            Text(text = stringResource(id = R.string.permission_btn), style = bodyLarge(), color = goldColor())
         }
-    }
-    AnimatedVisibility(visible = showLocationPermission) {
-        LocationPermission(onPermissionGranted = { showNotificationPermission = true }, onPermissionDenied = onPermissionHandled)
-    }
-    AnimatedVisibility(visible = showNotificationPermission) {
-        NotificationPermission(onPermissionGranted = onPermissionHandled, onPermissionDenied = onPermissionHandled)
+
+        AnimatedVisibility(visible = showLocationPermission) {
+            LocationPermission(onPermissionGranted = { showNotificationPermission = true }, onPermissionDenied = onPermissionHandled)
+        }
+        AnimatedVisibility(visible = showNotificationPermission) {
+            NotificationPermission(onPermissionGranted = onPermissionHandled, onPermissionDenied = onPermissionHandled)
+        }
     }
 }
