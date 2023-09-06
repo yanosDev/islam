@@ -17,7 +17,7 @@ class QuranPartialViewModel @Inject constructor(
     private val dao: QuranDao,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    private val sureName = savedStateHandle.get<String>("name")!!
+    private val sureName = savedStateHandle.get<String>("name")!!.trim()
     var sure by mutableStateOf(
         SureData(
             sureName,
