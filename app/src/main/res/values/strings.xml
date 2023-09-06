@@ -82,4 +82,5 @@
 
     <string name="permission_title">Konum ve Bildirim Izini</string>
     <string name="permission_content">1. Namaz vakitleri ve Kible yönünü belirlemek icin, suanki bulundugunuz ilin konumu gerekli.\n2. Namaz vakti Bildirimleri almak icin ayriyet den izin gerekli dir.</string>
+    <string name="permission_btn">Izin Ver</string>
  </resources>

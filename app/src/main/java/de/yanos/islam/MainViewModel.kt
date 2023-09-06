@@ -73,7 +73,7 @@ class MainViewModel @Inject constructor(
                                 }
                             }
                         }
-                    else loadLocationIndependentData()
+                    loadLocationIndependentData()
                 }
             }, 0, 60000
         )
@@ -92,12 +92,31 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             if (!isReady) {
                 Timber.e("MAIN: loadLocationIndependentData")
-                val tasks = listOf(
-                    async { initDB() },
-                    async { initDailyWorker() },
-                    async { loadQuran() },
-                    async { loadDailyAwqatList() },
-                ).awaitAll()
+                val tasks = mutableListOf(
+                    async {
+                        val result = initDailyWorker()
+                        Timber.e("MAIN: Worker Init")
+                        result
+                    },
+                    async {
+                        val result = loadDailyAwqatList()
+                        Timber.e("MAIN: Awqat Init")
+                        result
+                    },
+                ).apply {
+                    if (!appSettings.isDBInitialized) {
+                        add(async {
+                            val result = loadQuran()
+                            Timber.e("MAIN: Quran Init")
+                            result
+                        })
+                        add(async {
+                            val result = initDB()
+                            Timber.e("MAIN: DB Init")
+                            result
+                        })
+                    }
+                }.awaitAll()
                 isReady = tasks.all { it }
             }
         }

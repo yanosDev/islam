@@ -18,6 +18,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -37,7 +38,7 @@ class DailyScheduleWorker @AssistedInject constructor(
 ) : CoroutineWorker(appContext, params) {
     override suspend fun doWork(): Result {
         return withContext(dispatcher) {
-            cancelAllAlarms()
+            //cancelAllAlarms()
             dao.loadCityCode(appSettings.lastLocation.uppercase())?.let { cityCode ->
                 val prayingTime = dao.loadCityTimes(cityCode).first {
                     val date = LocalDate.parse(it.gregorianDateShort, DateTimeFormatter.ofPattern("dd.MM.yyyy"))
@@ -54,7 +55,7 @@ class DailyScheduleWorker @AssistedInject constructor(
     private fun cancelAllAlarms() {
         listOf("fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha").forEach {
             try {
-                val updateServiceIntent = Intent(applicationContext, PrayerTimeAlarmReceiver::class.java)
+                val updateServiceIntent = Intent(applicationContext, PrayerAzanCancelReceiver::class.java)
                 val pendingUpdateIntent =
                     PendingIntent.getService(applicationContext, it.hashCode(), updateServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE)
                 alarmManager.cancel(pendingUpdateIntent)
@@ -80,15 +81,16 @@ class DailyScheduleWorker @AssistedInject constructor(
         val intent = Intent(applicationContext, PrayerTimeAlarmReceiver::class.java).apply {
             putExtra(PrayerTimeAlarmReceiver.ID, schedule.id)
         }
-        alarmManager.setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP,
-            time.atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L,
-            PendingIntent.getBroadcast(
-                applicationContext,
-                schedule.id.hashCode(),
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        if (time.isAfter(LocalDateTime.now()))
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                time.atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L,
+                PendingIntent.getBroadcast(
+                    applicationContext,
+                    schedule.id.hashCode(),
+                    intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
             )
-        )
     }
 }

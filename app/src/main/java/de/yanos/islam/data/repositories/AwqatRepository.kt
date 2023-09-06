@@ -40,9 +40,8 @@ class AwqatRepositoryImpl @Inject constructor(
                     async { fetchStates() },
                     async { fetchCities() }
                 ).awaitAll()
-                results.all { it }
             }
-            false
+            true
         }
     }
 

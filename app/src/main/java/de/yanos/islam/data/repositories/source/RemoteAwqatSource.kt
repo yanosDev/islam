@@ -61,7 +61,7 @@ class RemoteAwqatSourceImpl @Inject constructor(
                 localResponse(response)
             } catch (e: Exception) {
                 Timber.e(e)
-                LoadState.Failure(Exception("Error"))
+                LoadState.Failure(e)
             }
         }
     }

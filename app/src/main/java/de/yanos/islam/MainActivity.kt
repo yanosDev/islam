@@ -11,7 +11,11 @@ import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -34,7 +38,6 @@ import de.yanos.islam.util.KnowledgeNavigation
 import de.yanos.islam.util.MainNavigation
 import de.yanos.islam.util.NavigationAction
 import de.yanos.islam.util.PatternedBackgroung
-import de.yanos.islam.util.Permissions
 import de.yanos.islam.util.QuranNavigation
 import de.yanos.islam.util.ToRootAfterPermission
 import de.yanos.islam.util.allKnowledge
@@ -56,24 +59,26 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         setContent {
-            val startRoute = when {
-                !hasNotificationPermission(this) || !hasLocationPermission(this) -> Permissions.route
-                else -> MainNavigation.all[1].route
-            }
+            var permissionsHandled by rememberSaveable { mutableStateOf(hasNotificationPermission(this) && hasLocationPermission(this)) }
+
             AppTheme(activity = this, typography = typoByConfig(appSettings)) { modifier, config ->
-                navController = rememberNavController()
-                DynamicNavigationScreen(
-                    modifier = modifier.padding(top = 48.dp), // TODO: Check statusbar problem
-                    config = config,
-                    destinations = MainNavigation.all,
-                    navController = navController!!
-                ) { contentModifier ->
-                    //NavHost Here
-                    IslamNavHost(
-                        modifier = contentModifier,
-                        startRoute = startRoute,
+                if (permissionsHandled) {
+                    navController = rememberNavController()
+                    DynamicNavigationScreen(
+                        modifier = modifier.padding(top = 48.dp), // TODO: Check statusbar problem
+                        config = config,
+                        destinations = MainNavigation.all,
                         navController = navController!!
-                    )
+                    ) { contentModifier ->
+                        //NavHost Here
+                        IslamNavHost(
+                            modifier = contentModifier,
+                            startRoute = MainNavigation.all[1].route,
+                            navController = navController!!
+                        )
+                    }
+                } else PermissionsScreen {
+                    permissionsHandled = true
                 }
             }
         }
@@ -144,11 +149,6 @@ private fun IslamNavHost(
             }
             composable(route = MainNavigation.Settings.route) {
                 SettingsScreen()
-            }
-            composable(Permissions.route) {
-                PermissionsScreen {
-                    onNavigationChange(ToRootAfterPermission)
-                }
             }
         }
     }

@@ -102,7 +102,7 @@ fun <T> localResponse(response: Response<T>): LoadState<T> {
             LoadState.Data(body)
         } ?: LoadState.Failure(Exception(response.errorBody().toString()))
     } else {
-        LoadState.Failure(Exception(response.errorBody().toString()))
+        LoadState.Failure(Exception(response.errorBody().toString()), response.code())
     }
 }
 

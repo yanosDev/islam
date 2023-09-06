@@ -215,9 +215,9 @@ fun PermissionCompose(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            // permission granted
+            onPermissionGranted()
         } else {
-            // permission denied, but should I show a rationale?
+            onPermissionDenied()
         }
     }
 
@@ -227,7 +227,7 @@ fun PermissionCompose(
             permission
         ) == PackageManager.PERMISSION_GRANTED
     ) {
-        // permission granted
+        onPermissionGranted()
     } else {
         LaunchedEffect(key1 = true) {
             launcher.launch(permission)
