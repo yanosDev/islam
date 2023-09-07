@@ -87,8 +87,8 @@ fun IslamSwitch(
     onCheckChange: (Boolean) -> Unit,
     content: @Composable () -> Unit,
 ) {
-    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-        TextButton(modifier = Modifier.weight(1f), onClick = { onCheckChange(!isChecked) }, enabled = isEnabled) {
+    Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+        TextButton(onClick = { onCheckChange(!isChecked) }, enabled = isEnabled) {
             content()
         }
         Switch(

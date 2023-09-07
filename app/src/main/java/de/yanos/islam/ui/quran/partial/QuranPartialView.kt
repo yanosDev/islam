@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -69,27 +70,20 @@ fun QuranPartialScreen(
     var showSettings by remember { mutableStateOf(false) }
     if (vm.sure.originals.isNotEmpty()) {
         Column(modifier = modifier) {
-            SureHeader(
-                sureName = vm.sure.name,
-                hasPreviousSure = vm.previousSure != null,
-                hasNextSure = vm.nextSure != null,
-                onPreviousSure = { vm.loadSure(vm.previousSure!!) },
-                onNextSure = { vm.loadSure(vm.nextSure!!) })
-            AyetList(state = state, sure = vm.sure, quranFontStyle = vm.quranFontStyle)
             Column(
                 modifier = Modifier
-                    .background(color = MaterialTheme.colorScheme.surfaceVariant)
+                    .background(color = MaterialTheme.colorScheme.background)
                     .fillMaxWidth()
+                    .wrapContentHeight(),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                IconButton(onClick = { showSettings = !showSettings }) {
-                    Icon(
-                        modifier = Modifier
-                            .height(36.dp)
-                            .width(36.dp),
-                        imageVector = if (showSettings) Icons.Rounded.ArrowDownward else Icons.Rounded.ArrowUpward,
-                        contentDescription = "OpenSettings"
-                    )
-                }
+                SureHeader(
+                    modifier = Modifier.wrapContentHeight(),
+                    sureName = vm.sure.name,
+                    hasPreviousSure = vm.previousSure != null,
+                    hasNextSure = vm.nextSure != null,
+                    onPreviousSure = { vm.loadSure(vm.previousSure!!) },
+                    onNextSure = { vm.loadSure(vm.nextSure!!) })
                 AyetSettings(
                     showSettings = showSettings,
                     showTranslations = vm.sure.showTranslation,
@@ -104,7 +98,17 @@ fun QuranPartialScreen(
                         state.animateScrollToItem(position - 1)
                     }
                 }
+                IconButton(onClick = { showSettings = !showSettings }) {
+                    Icon(
+                        modifier = Modifier
+                            .height(24.dp)
+                            .width(24.dp),
+                        imageVector = if (showSettings) Icons.Rounded.ArrowUpward else Icons.Rounded.ArrowDownward,
+                        contentDescription = "OpenSettings"
+                    )
+                }
             }
+            AyetList(modifier = Modifier.weight(1f), state = state, sure = vm.sure, quranFontStyle = vm.quranFontStyle)
         }
     }
 }
@@ -125,18 +129,16 @@ private fun AyetSettings(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            horizontalAlignment = Alignment.End
         ) {
-            IslamSwitch(isChecked = showTranslations, onCheckChange = onChangeShowingTranslations) {
-                Text(textAlign = TextAlign.Start, text = stringResource(id = R.string.partial_show_translations))
+            IslamSwitch( isChecked = showTranslations, onCheckChange = onChangeShowingTranslations) {
+                Text(text = stringResource(id = R.string.partial_show_translations))
             }
             Spacer(modifier = Modifier.height(2.dp))
-            IslamSwitch(isChecked = showPronunciations, onCheckChange = onChangeShowingPronunciations) {
-                Text(textAlign = TextAlign.Start, text = stringResource(id = R.string.partial_show_pronunciations))
+            IslamSwitch( isChecked = showPronunciations, onCheckChange = onChangeShowingPronunciations) {
+                Text(text = stringResource(id = R.string.partial_show_pronunciations))
             }
             Spacer(modifier = Modifier.height(2.dp))
             AyetChooser(
-                modifier = Modifier.width(120.dp),
                 size = ayetCount,
                 current = currentPosition,
                 onAyetChoosen = onAyeChosen
@@ -147,14 +149,15 @@ private fun AyetSettings(
 
 @Composable
 fun SureHeader(
+    modifier: Modifier = Modifier,
     sureName: String,
     hasNextSure: Boolean,
     hasPreviousSure: Boolean,
     onNextSure: () -> Unit,
-    onPreviousSure: () -> Unit
+    onPreviousSure: () -> Unit,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -186,11 +189,12 @@ fun SureHeader(
 
 @Composable
 private fun AyetList(
+    modifier: Modifier = Modifier,
     state: LazyListState,
     sure: SureData,
     quranFontStyle: Int
 ) {
-    LazyColumn(state = state) {
+    LazyColumn(modifier = modifier, state = state) {
         items(count = sure.originals.size) { index: Int ->
             AyetItem(
                 index = index,
