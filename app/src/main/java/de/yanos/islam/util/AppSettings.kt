@@ -19,6 +19,7 @@ interface AppSettings {
     var lastLocation: String
     var showTranslations: Boolean
     var showPronunciations: Boolean
+    var sortByOrdinal: Int
 }
 
 class AppSettingsImpl @Inject constructor(@ApplicationContext context: Context) : AppSettings {
@@ -35,4 +36,5 @@ class AppSettingsImpl @Inject constructor(@ApplicationContext context: Context) 
     override var lastLocation: String by PreferenceItem<String>(context) { "" }
     override var showTranslations: Boolean by PreferenceItem<Boolean>(context) { false }
     override var showPronunciations: Boolean by PreferenceItem<Boolean>(context) { false }
+    override var sortByOrdinal: Int by PreferenceItem<Int>(context) { 0 }
 }

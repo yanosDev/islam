@@ -10,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.data.database.dao.QuranDao
 import de.yanos.islam.data.model.tanzil.SureDetail
+import de.yanos.islam.util.AppSettings
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -17,11 +18,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SureListViewModel @Inject constructor(
+    private val appSettings: AppSettings,
     @IODispatcher private val dispatcher: CoroutineDispatcher,
     private val quranDao: QuranDao,
 ) : ViewModel() {
     var sureList = mutableStateListOf<SureDetail>()
-    var sortBy by mutableStateOf(SureSorting.ORIGINAL)
+    private var sortBy by mutableStateOf(SureSorting.values()[appSettings.sortByOrdinal])
 
     init {
         viewModelScope.launch {
@@ -32,18 +34,21 @@ class SureListViewModel @Inject constructor(
     }
 
     private suspend fun recreateList() {
-        viewModelScope.launch(dispatcher) {
+        viewModelScope.launch {
             val currentList = sureList.toList()
             sureList.clear()
             sureList.addAll(
-                currentList.sortedBy {
-                    when (sortBy) {
-                        SureSorting.ORIGINAL -> it.kuransira
-                        SureSorting.DESCENDENCE -> it.inissira
-                        SureSorting.ALPHABETICAL -> it.alfabesira
-                    }
-                }
+                currentList.sortSure(sortBy)
             )
+        }
+    }
+}
+ fun List<SureDetail>.sortSure(sortBy: SureSorting): List<SureDetail> {
+    return this.sortedBy {
+        when (sortBy) {
+            SureSorting.ORIGINAL -> it.kuransira.toInt()
+            SureSorting.DESCENDENCE -> it.inissira.toInt()
+            SureSorting.ALPHABETICAL -> it.alfabesira.toInt()
         }
     }
 }

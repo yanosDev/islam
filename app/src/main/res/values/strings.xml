@@ -73,6 +73,7 @@
     <string name="font_saleem">Saleem</string>
     <string name="partial_show_translations">Ayetlerin Anlami</string>
     <string name="partial_show_pronunciations">Ayetlerin Okunusu</string>
+    <string name="partial_settings">Ayarlar</string>
 
     <string name="notification_alarm_title">Namaz Vakti</string>
     <string name="notification_alarm_content">%s icin Namaz Vakti</string>

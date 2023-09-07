@@ -2,6 +2,7 @@ package de.yanos.islam.ui.quran.partial
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,15 +11,22 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowDownward
+import androidx.compose.material.icons.rounded.ArrowUpward
+import androidx.compose.material.icons.rounded.ChevronLeft
+import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -58,63 +66,148 @@ fun QuranPartialScreen(
     val state = rememberLazyListState()
     var position by remember { mutableStateOf(0) }
     val scope = rememberCoroutineScope()
+    var showSettings by remember { mutableStateOf(false) }
     if (vm.sure.originals.isNotEmpty()) {
-        Column {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+        Column(modifier = modifier) {
+            SureHeader(
+                sureName = vm.sure.name,
+                hasPreviousSure = vm.previousSure != null,
+                hasNextSure = vm.nextSure != null,
+                onPreviousSure = { vm.loadSure(vm.previousSure!!) },
+                onNextSure = { vm.loadSure(vm.nextSure!!) })
+            AyetList(state = state, sure = vm.sure, quranFontStyle = vm.quranFontStyle)
+            Column(
+                modifier = Modifier
+                    .background(color = MaterialTheme.colorScheme.surfaceVariant)
+                    .fillMaxWidth()
             ) {
-                Text(
-                    modifier = Modifier.padding(12.dp), text = vm.sure.name, style = headlineLarge()
-                )
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight()
-                        .widthIn(min = 180.dp, max = 300.dp),
-                    horizontalAlignment = Alignment.End
-                ) {
-                    IslamSwitch(isChecked = vm.sure.showTranslation, onCheckChange = { vm.updateTranslationsVisibility(it) }) {
-                        Text(textAlign = TextAlign.Start, text = stringResource(id = R.string.partial_show_translations))
-                    }
-                    Spacer(modifier = Modifier.height(2.dp))
-                    IslamSwitch(isChecked = vm.sure.showPronunciation, onCheckChange = { vm.updatePronunciationsVisibility(it) }) {
-                        Text(textAlign = TextAlign.Start, text = stringResource(id = R.string.partial_show_pronunciations))
-                    }
-                    Spacer(modifier = Modifier.height(2.dp))
-                    AyetChooser(
-                        modifier = Modifier.width(120.dp),
-                        size = vm.sure.originals.size,
-                        current = position,
-                        onAyetChoosen = {
-                            position = it
-                            scope.launch {
-                                state.animateScrollToItem(position - 1)
-                            }
-                        }
+                IconButton(onClick = { showSettings = !showSettings }) {
+                    Icon(
+                        modifier = Modifier
+                            .height(36.dp)
+                            .width(36.dp),
+                        imageVector = if (showSettings) Icons.Rounded.ArrowDownward else Icons.Rounded.ArrowUpward,
+                        contentDescription = "OpenSettings"
                     )
                 }
-            }
-            LazyColumn(modifier = modifier, state = state) {
-                items(count = vm.sure.originals.size) { index: Int ->
-                    AyetItem(
-                        index = index,
-                        original = vm.sure.originals[index],
-                        translations = vm.sure.translations[index],
-                        pronunciations = vm.sure.pronunciations[index],
-                        showTranslations = vm.sure.showTranslation,
-                        showPronunciations = vm.sure.showPronunciation,
-                        quranFont = quranFont(vm.quranFontStyle)
-                    )
+                AyetSettings(
+                    showSettings = showSettings,
+                    showTranslations = vm.sure.showTranslation,
+                    showPronunciations = vm.sure.showPronunciation,
+                    onChangeShowingTranslations = { vm.updateTranslationsVisibility(it) },
+                    onChangeShowingPronunciations = { vm.updatePronunciationsVisibility(it) },
+                    ayetCount = vm.sure.originals.size,
+                    currentPosition = position
+                ) { newPosition: Int ->
+                    position = newPosition
+                    scope.launch {
+                        state.animateScrollToItem(position - 1)
+                    }
                 }
             }
         }
     }
 }
 
+@Composable
+private fun AyetSettings(
+    showSettings: Boolean,
+    showTranslations: Boolean,
+    showPronunciations: Boolean,
+    onChangeShowingTranslations: (Boolean) -> Unit,
+    onChangeShowingPronunciations: (Boolean) -> Unit,
+    ayetCount: Int,
+    currentPosition: Int,
+    onAyeChosen: (Int) -> Unit
+) {
+    AnimatedVisibility(visible = showSettings) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.End
+        ) {
+            IslamSwitch(isChecked = showTranslations, onCheckChange = onChangeShowingTranslations) {
+                Text(textAlign = TextAlign.Start, text = stringResource(id = R.string.partial_show_translations))
+            }
+            Spacer(modifier = Modifier.height(2.dp))
+            IslamSwitch(isChecked = showPronunciations, onCheckChange = onChangeShowingPronunciations) {
+                Text(textAlign = TextAlign.Start, text = stringResource(id = R.string.partial_show_pronunciations))
+            }
+            Spacer(modifier = Modifier.height(2.dp))
+            AyetChooser(
+                modifier = Modifier.width(120.dp),
+                size = ayetCount,
+                current = currentPosition,
+                onAyetChoosen = onAyeChosen
+            )
+        }
+    }
+}
+
+@Composable
+fun SureHeader(
+    sureName: String,
+    hasNextSure: Boolean,
+    hasPreviousSure: Boolean,
+    onNextSure: () -> Unit,
+    onPreviousSure: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(onClick = onPreviousSure, enabled = hasPreviousSure) {
+            Icon(
+                modifier = Modifier
+                    .height(36.dp)
+                    .width(36.dp),
+                imageVector = Icons.Rounded.ChevronLeft,
+                contentDescription = "Previous"
+            )
+        }
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(
+            modifier = Modifier.padding(12.dp), text = sureName, style = headlineLarge()
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        IconButton(onClick = onNextSure, enabled = hasNextSure) {
+            Icon(
+                modifier = Modifier
+                    .height(36.dp)
+                    .width(36.dp),
+                imageVector = Icons.Rounded.ChevronRight,
+                contentDescription = "Previous"
+            )
+        }
+    }
+}
+
+@Composable
+private fun AyetList(
+    state: LazyListState,
+    sure: SureData,
+    quranFontStyle: Int
+) {
+    LazyColumn(state = state) {
+        items(count = sure.originals.size) { index: Int ->
+            AyetItem(
+                index = index,
+                original = sure.originals[index],
+                translations = sure.translations[index],
+                pronunciations = sure.pronunciations[index],
+                showTranslations = sure.showTranslation,
+                showPronunciations = sure.showPronunciation,
+                quranFont = quranFont(quranFontStyle)
+            )
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AyetChooser(
+private fun AyetChooser(
     modifier: Modifier = Modifier,
     size: Int,
     current: Int,
@@ -155,7 +248,7 @@ fun AyetChooser(
 }
 
 @Composable
-fun AyetItem(
+private fun AyetItem(
     modifier: Modifier = Modifier,
     index: Int,
     original: String,
