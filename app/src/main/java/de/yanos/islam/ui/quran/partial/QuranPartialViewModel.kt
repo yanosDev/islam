@@ -56,8 +56,12 @@ class QuranPartialViewModel @Inject constructor(
                     pronunciations = ayetList.map { it.suretrans },
                     originals = ayetList.map { it.surear })
                 val sureList = withContext(dispatcher) { dao.sureList() }.sortSure(sortBy)
-                sureList.find { it.sureaditr.trim() == name.trim() }?.kuransira?.let { index ->
-                    val asInt = index.toInt() - 1
+                sureList.find { it.sureaditr.trim() == name.trim() }?.let { sure ->
+                    val asInt = when (sortBy) {
+                        SureSorting.ORIGINAL -> sure.kuransira
+                        SureSorting.ALPHABETICAL -> sure.alfabesira
+                        else -> sure.inissira
+                    }.toInt() - 1
                     if (asInt > 0) {
                         previousSure = sureList[asInt - 1].sureaditr.trim()
                     }

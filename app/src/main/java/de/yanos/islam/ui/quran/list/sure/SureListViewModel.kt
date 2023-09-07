@@ -1,5 +1,6 @@
 package de.yanos.islam.ui.quran.list.sure
 
+import androidx.annotation.StringRes
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -8,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.yanos.core.utils.IODispatcher
+import de.yanos.islam.R
 import de.yanos.islam.data.database.dao.QuranDao
 import de.yanos.islam.data.model.tanzil.SureDetail
 import de.yanos.islam.util.AppSettings
@@ -23,7 +25,7 @@ class SureListViewModel @Inject constructor(
     private val quranDao: QuranDao,
 ) : ViewModel() {
     var sureList = mutableStateListOf<SureDetail>()
-    private var sortBy by mutableStateOf(SureSorting.values()[appSettings.sortByOrdinal])
+    var sortBy by mutableStateOf(SureSorting.values()[appSettings.sortByOrdinal])
 
     init {
         viewModelScope.launch {
@@ -42,8 +44,17 @@ class SureListViewModel @Inject constructor(
             )
         }
     }
+
+    fun onSortChange(sorting: SureSorting) {
+        viewModelScope.launch {
+            appSettings.sortByOrdinal = sorting.ordinal
+            sortBy = sorting
+            recreateList()
+        }
+    }
 }
- fun List<SureDetail>.sortSure(sortBy: SureSorting): List<SureDetail> {
+
+fun List<SureDetail>.sortSure(sortBy: SureSorting): List<SureDetail> {
     return this.sortedBy {
         when (sortBy) {
             SureSorting.ORIGINAL -> it.kuransira.toInt()
@@ -53,6 +64,8 @@ class SureListViewModel @Inject constructor(
     }
 }
 
-enum class SureSorting {
-    ORIGINAL, DESCENDENCE, ALPHABETICAL
+enum class SureSorting(@StringRes val textId: Int) {
+    ORIGINAL(R.string.sure_sort_quran),
+    DESCENDENCE(R.string.sure_sort_descending),
+    ALPHABETICAL(R.string.sure_sort_alphabetical)
 }

@@ -49,8 +49,8 @@ import de.yanos.islam.util.IslamSwitch
 import de.yanos.islam.util.NavigationAction
 import de.yanos.islam.util.alternatingColors
 import de.yanos.islam.util.bodyMedium
-import de.yanos.islam.util.headlineLarge
 import de.yanos.islam.util.headlineMedium
+import de.yanos.islam.util.headlineSmall
 import de.yanos.islam.util.labelLarge
 import de.yanos.islam.util.labelSmall
 import de.yanos.islam.util.quranFont
@@ -172,7 +172,7 @@ fun SureHeader(
         }
         Spacer(modifier = Modifier.width(12.dp))
         Text(
-            modifier = Modifier.padding(12.dp), text = sureName, style = headlineLarge()
+            modifier = Modifier.padding(12.dp), text = sureName, style = headlineSmall()
         )
         Spacer(modifier = Modifier.width(12.dp))
         IconButton(onClick = onNextSure, enabled = hasNextSure) {
