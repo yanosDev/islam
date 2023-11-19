@@ -62,7 +62,7 @@ fun SettingsScreen(
             FontSettings(
                 currentSize = vm.quranFontSize,
                 onFontSizeChange = {
-                    vm.updateQuranFontSize(it)
+                    vm.updateQuranFontSize( it)
                     recreate = true
                 },
                 currentFontIndex = vm.quranFontStyle,

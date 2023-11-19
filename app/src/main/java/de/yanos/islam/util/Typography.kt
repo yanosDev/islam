@@ -17,11 +17,18 @@ fun typoByConfig(appSettings: AppSettings): Typography {
 fun typoByConfig(factor: Int, style: Int): Typography {
     return typo(
         sizeFactor = factor,
-        family = FontFamily(Font(FontStyle.values()[style].fontId, FontWeight.Normal))
+        family = FontFamily(Font(FontStyle.values()[style].fontId, FontWeight.Normal)),
     )
 }
 
-fun quranFont(style:Int) = FontFamily(Font(style, FontWeight.Normal))
+fun quranTypoByConfig(factor: Int, style: Int): Typography {
+    return typo(
+        sizeFactor = factor,
+        family = FontFamily(Font(QuranFontStyle.values()[style].fontId, FontWeight.Normal))
+    )
+}
+
+fun quranFont(style: Int) = FontFamily(Font(style, FontWeight.Normal))
 interface Style {
     val textId: Int
     val fontId: Int
@@ -48,7 +55,7 @@ fun typo(sizeFactor: Int, family: FontFamily): Typography {
             fontFamily = family,
             fontWeight = FontWeight.Bold,
             fontSize = (56 + sizeFactor).sp,
-            lineHeight = (64.0 + sizeFactor).sp,
+            lineHeight = (64.0 + 2 * sizeFactor).sp,
             letterSpacing = (-0.025).sp,
             shadow = Shadow(
                 offset = Offset(5f, 4f),
@@ -59,98 +66,98 @@ fun typo(sizeFactor: Int, family: FontFamily): Typography {
             fontFamily = family,
             fontWeight = FontWeight.Medium,
             fontSize = (44 + sizeFactor).sp,
-            lineHeight = (52.0 + sizeFactor).sp,
+            lineHeight = (52.0 + 2 * sizeFactor).sp,
             letterSpacing = (-0.025).sp,
         ),
         displaySmall = TextStyle(
             fontFamily = family,
             fontWeight = FontWeight.Normal,
             fontSize = (36 + sizeFactor).sp,
-            lineHeight = (44.0 + sizeFactor).sp,
+            lineHeight = (44.0 + 2 * sizeFactor).sp,
             letterSpacing = 0.0.sp,
         ),
         headlineLarge = TextStyle(
             fontFamily = family,
             fontWeight = FontWeight.Bold,
             fontSize = (32 + sizeFactor).sp,
-            lineHeight = (40.0 + sizeFactor).sp,
+            lineHeight = (40.0 + 2 * sizeFactor).sp,
             letterSpacing = 0.0.sp,
         ),
         headlineMedium = TextStyle(
             fontFamily = family,
             fontWeight = FontWeight.Medium,
             fontSize = (28 + sizeFactor).sp,
-            lineHeight = (36.0 + sizeFactor).sp,
+            lineHeight = (36.0 + 2 * sizeFactor).sp,
             letterSpacing = 0.0.sp,
         ),
         headlineSmall = TextStyle(
             fontFamily = family,
             fontWeight = FontWeight.Normal,
             fontSize = (24 + sizeFactor).sp,
-            lineHeight = (32.0 + sizeFactor).sp,
+            lineHeight = (32.0 + 2 * sizeFactor).sp,
             letterSpacing = 0.0.sp,
         ),
         titleLarge = TextStyle(
             fontFamily = family,
             fontWeight = FontWeight.Bold,
             fontSize = (24 + sizeFactor).sp,
-            lineHeight = (28.0 + sizeFactor).sp,
+            lineHeight = (28.0 + 2 * sizeFactor).sp,
             letterSpacing = 0.0.sp,
         ),
         titleMedium = TextStyle(
             fontFamily = family,
             fontWeight = FontWeight.Medium,
             fontSize = (18 + sizeFactor).sp,
-            lineHeight = (36.0 + sizeFactor).sp,
+            lineHeight = (36.0 + 2 * sizeFactor).sp,
             letterSpacing = 0.015.sp,
         ),
         titleSmall = TextStyle(
             fontFamily = family,
             fontWeight = FontWeight.Normal,
             fontSize = (14.0 + sizeFactor).sp,
-            lineHeight = (20.0 + sizeFactor).sp,
+            lineHeight = (20.0 + 2 * sizeFactor).sp,
             letterSpacing = 0.01.sp,
         ),
         bodyLarge = TextStyle(
             fontFamily = family,
             fontWeight = FontWeight.SemiBold,
             fontSize = (18 + sizeFactor).sp,
-            lineHeight = (26.0 + sizeFactor).sp,
+            lineHeight = (26.0 + 2 * sizeFactor).sp,
             letterSpacing = 0.05.sp,
         ),
         bodyMedium = TextStyle(
             fontFamily = family,
             fontWeight = FontWeight.Medium,
             fontSize = (16 + sizeFactor).sp,
-            lineHeight = (22.0 + sizeFactor).sp,
+            lineHeight = (22.0 + 2 * sizeFactor).sp,
             letterSpacing = 0.05.sp,
         ),
         bodySmall = TextStyle(
             fontFamily = family,
             fontWeight = FontWeight.Normal,
             fontSize = (14 + sizeFactor).sp,
-            lineHeight = (18.0 + sizeFactor).sp,
+            lineHeight = (18.0 + 2 * sizeFactor).sp,
             letterSpacing = 0.05.sp,
         ),
         labelLarge = TextStyle(
             fontFamily = family,
             fontWeight = FontWeight.SemiBold,
             fontSize = (16 + sizeFactor).sp,
-            lineHeight = (22.0 + sizeFactor).sp,
+            lineHeight = (22.0 + 2 * sizeFactor).sp,
             letterSpacing = 0.05.sp,
         ),
         labelMedium = TextStyle(
             fontFamily = family,
             fontWeight = FontWeight.Medium,
             fontSize = (16 + sizeFactor).sp,
-            lineHeight = (18.0 + sizeFactor).sp,
+            lineHeight = (18.0 + 2 * sizeFactor).sp,
             letterSpacing = 0.05.sp,
         ),
         labelSmall = TextStyle(
             fontFamily = family,
             fontWeight = FontWeight.Normal,
             fontSize = (13 + sizeFactor).sp,
-            lineHeight = (18.0 + sizeFactor).sp,
+            lineHeight = (18.0 + 2 * sizeFactor).sp,
             letterSpacing = 0.05.sp,
         ),
     )

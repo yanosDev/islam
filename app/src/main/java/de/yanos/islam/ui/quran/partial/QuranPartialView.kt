@@ -30,6 +30,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,7 +40,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -49,11 +49,10 @@ import de.yanos.islam.util.IslamSwitch
 import de.yanos.islam.util.NavigationAction
 import de.yanos.islam.util.alternatingColors
 import de.yanos.islam.util.bodyMedium
-import de.yanos.islam.util.headlineMedium
 import de.yanos.islam.util.headlineSmall
 import de.yanos.islam.util.labelLarge
 import de.yanos.islam.util.labelSmall
-import de.yanos.islam.util.quranFont
+import de.yanos.islam.util.quranTypoByConfig
 import kotlinx.coroutines.launch
 
 
@@ -69,6 +68,14 @@ fun QuranPartialScreen(
     val scope = rememberCoroutineScope()
     var showSettings by remember { mutableStateOf(false) }
     if (vm.sure.originals.isNotEmpty()) {
+
+        val onScrollTo = { newPosition: Int ->
+            position = newPosition - 1
+            scope.launch {
+                state.animateScrollToItem(position)
+            }
+            Unit
+        }
         Column(modifier = modifier) {
             Column(
                 modifier = Modifier
@@ -82,8 +89,14 @@ fun QuranPartialScreen(
                     sureName = vm.sure.name,
                     hasPreviousSure = vm.previousSure != null,
                     hasNextSure = vm.nextSure != null,
-                    onPreviousSure = { vm.loadSure(vm.previousSure!!) },
-                    onNextSure = { vm.loadSure(vm.nextSure!!) })
+                    onPreviousSure = {
+                        vm.loadSure(vm.previousSure!!)
+                        onScrollTo(1)
+                    },
+                    onNextSure = {
+                        vm.loadSure(vm.nextSure!!)
+                        onScrollTo(1)
+                    })
                 AyetSettings(
                     showSettings = showSettings,
                     showTranslations = vm.sure.showTranslation,
@@ -91,13 +104,9 @@ fun QuranPartialScreen(
                     onChangeShowingTranslations = { vm.updateTranslationsVisibility(it) },
                     onChangeShowingPronunciations = { vm.updatePronunciationsVisibility(it) },
                     ayetCount = vm.sure.originals.size,
-                    currentPosition = position
-                ) { newPosition: Int ->
-                    position = newPosition
-                    scope.launch {
-                        state.animateScrollToItem(position - 1)
-                    }
-                }
+                    currentPosition = position,
+                    onAyetChosen = onScrollTo
+                )
                 IconButton(onClick = { showSettings = !showSettings }) {
                     Icon(
                         modifier = Modifier
@@ -108,7 +117,7 @@ fun QuranPartialScreen(
                     )
                 }
             }
-            AyetList(modifier = Modifier.weight(1f), state = state, sure = vm.sure, quranFontStyle = vm.quranFontStyle)
+            AyetList(modifier = Modifier.weight(1f), state = state, sure = vm.sure, typo = quranTypoByConfig(vm.quranSizeFactor, vm.quranStyle))
         }
     }
 }
@@ -122,7 +131,7 @@ private fun AyetSettings(
     onChangeShowingPronunciations: (Boolean) -> Unit,
     ayetCount: Int,
     currentPosition: Int,
-    onAyeChosen: (Int) -> Unit
+    onAyetChosen: (Int) -> Unit
 ) {
     AnimatedVisibility(visible = showSettings) {
         Column(
@@ -130,18 +139,18 @@ private fun AyetSettings(
                 .fillMaxWidth()
                 .padding(16.dp),
         ) {
-            IslamSwitch( isChecked = showTranslations, onCheckChange = onChangeShowingTranslations) {
+            IslamSwitch(isChecked = showTranslations, onCheckChange = onChangeShowingTranslations) {
                 Text(text = stringResource(id = R.string.partial_show_translations))
             }
             Spacer(modifier = Modifier.height(2.dp))
-            IslamSwitch( isChecked = showPronunciations, onCheckChange = onChangeShowingPronunciations) {
+            IslamSwitch(isChecked = showPronunciations, onCheckChange = onChangeShowingPronunciations) {
                 Text(text = stringResource(id = R.string.partial_show_pronunciations))
             }
             Spacer(modifier = Modifier.height(2.dp))
             AyetChooser(
                 size = ayetCount,
                 current = currentPosition,
-                onAyetChoosen = onAyeChosen
+                onAyetChoosen = onAyetChosen
             )
         }
     }
@@ -192,7 +201,7 @@ private fun AyetList(
     modifier: Modifier = Modifier,
     state: LazyListState,
     sure: SureData,
-    quranFontStyle: Int
+    typo: Typography
 ) {
     LazyColumn(modifier = modifier, state = state) {
         items(count = sure.originals.size) { index: Int ->
@@ -203,7 +212,7 @@ private fun AyetList(
                 pronunciations = sure.pronunciations[index],
                 showTranslations = sure.showTranslation,
                 showPronunciations = sure.showPronunciation,
-                quranFont = quranFont(quranFontStyle)
+                typo = typo
             )
         }
     }
@@ -260,7 +269,7 @@ private fun AyetItem(
     pronunciations: String,
     showTranslations: Boolean,
     showPronunciations: Boolean,
-    quranFont: FontFamily
+    typo: Typography
 ) {
     Column(
         modifier = modifier
@@ -271,7 +280,12 @@ private fun AyetItem(
         IslamDivider()
         Row(horizontalArrangement = Arrangement.SpaceBetween) {
             Text(text = stringResource(id = R.string.sure_ayet, index + 1), style = labelLarge())
-            Text(modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.End, text = alternatingColors(text = original), style = headlineMedium().copy(fontFamily = quranFont))
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.End,
+                text = alternatingColors(text = original),
+                style = typo.headlineMedium
+            )
         }
         AnimatedVisibility(visible = showPronunciations) {
             Spacer(modifier = Modifier.height(6.dp))

@@ -39,7 +39,8 @@ class QuranPartialViewModel @Inject constructor(
             originals = emptyList()
         )
     )
-    val quranFontStyle get() = QuranFontStyle.values()[appSettings.quranStyle].fontId
+    val quranStyle get() = appSettings.quranStyle
+    val quranSizeFactor get() = appSettings.quranSizeFactor
     var previousSure by mutableStateOf<String?>(null)
     var nextSure by mutableStateOf<String?>(null)
 
