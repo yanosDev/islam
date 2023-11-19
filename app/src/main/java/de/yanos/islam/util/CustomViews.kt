@@ -1,5 +1,6 @@
 package de.yanos.islam.util
 
+import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -8,6 +9,7 @@ import androidx.annotation.RawRes
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -44,6 +46,7 @@ import androidx.core.graphics.BlendModeCompat
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.airbnb.lottie.compose.rememberLottieDynamicProperties
@@ -85,7 +88,7 @@ fun IslamSwitch(
     onCheckChange: (Boolean) -> Unit,
     content: @Composable () -> Unit,
 ) {
-    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+    Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
         TextButton(onClick = { onCheckChange(!isChecked) }, enabled = isEnabled) {
             content()
         }
@@ -135,14 +138,14 @@ fun Lottie(modifier: Modifier, @RawRes resId: Int, applyColor: Boolean = true) {
         LottieAnimation(
             modifier = modifier,
             composition = composition,
-            progress = { progress },
-            dynamicProperties = dynamicProperties
+            iterations = LottieConstants.IterateForever,
+            dynamicProperties = dynamicProperties,
         )
     else
         LottieAnimation(
             modifier = modifier,
             composition = composition,
-            progress = { progress },
+            iterations = LottieConstants.IterateForever
         )
 
 }
@@ -165,7 +168,7 @@ fun BackGroundPattern(modifier: Modifier = Modifier) {
     val pattern = ImageBitmap.imageResource(R.drawable.pattern_2)
 
     Canvas(
-        modifier = modifier.alpha(0.1F)
+        modifier = modifier.alpha(if (isSystemInDarkTheme()) 0.1F else 0.2F)
     ) {
         val paint = Paint().asFrameworkPaint().apply {
             isAntiAlias = true
@@ -181,27 +184,55 @@ fun BackGroundPattern(modifier: Modifier = Modifier) {
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
-fun Permission() {
+fun NotificationPermission(
+    onPermissionGranted: () -> Unit = {},
+    onPermissionDenied: () -> Unit = {}
+) {
+    PermissionCompose(
+        permission = Manifest.permission.POST_NOTIFICATIONS,
+        onPermissionGranted = onPermissionGranted,
+        onPermissionDenied = onPermissionDenied
+    )
+}
+
+@Composable
+fun LocationPermission(
+    onPermissionGranted: () -> Unit = {},
+    onPermissionDenied: () -> Unit = {}
+) {
+    PermissionCompose(
+        permission = Manifest.permission.ACCESS_FINE_LOCATION,
+        onPermissionGranted = onPermissionGranted,
+        onPermissionDenied = onPermissionDenied
+    )
+}
+
+@Composable
+fun PermissionCompose(
+    permission: String,
+    onPermissionGranted: () -> Unit = {},
+    onPermissionDenied: () -> Unit = {}
+) {
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            // permission granted
+            onPermissionGranted()
         } else {
-            // permission denied, but should I show a rationale?
+            onPermissionDenied()
         }
     }
 
     val context = LocalContext.current
     if (ContextCompat.checkSelfPermission(
             context,
-            android.Manifest.permission.POST_NOTIFICATIONS
+            permission
         ) == PackageManager.PERMISSION_GRANTED
     ) {
-        // permission granted
+        onPermissionGranted()
     } else {
         LaunchedEffect(key1 = true) {
-            launcher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            launcher.launch(permission)
         }
     }
 }

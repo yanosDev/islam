@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface QuranDao : BaseDao<SureDetail> {
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertSure(ayet: List<Ayet>)
 
@@ -19,4 +18,7 @@ interface QuranDao : BaseDao<SureDetail> {
 
     @Query("SELECT * FROM Ayet WHERE sureaditr = :sureName ORDER BY ayetNr")
     fun loadSure(sureName: String): Flow<List<Ayet>>
+
+    @Query("SELECT * FROM SureDetail ORDER BY alfabesira")
+    fun sureList(): List<SureDetail>
 }

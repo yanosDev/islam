@@ -1,11 +1,11 @@
 package de.yanos.islam.ui.settings
 
 import android.app.Activity
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
@@ -25,6 +25,7 @@ import de.yanos.islam.util.FontStyle
 import de.yanos.islam.util.IslamDivider
 import de.yanos.islam.util.IslamRadio
 import de.yanos.islam.util.Lottie
+import de.yanos.islam.util.QuranFontStyle
 import de.yanos.islam.util.labelMedium
 import de.yanos.islam.util.titleMedium
 
@@ -38,20 +39,40 @@ fun SettingsScreen(
         (LocalContext.current as? Activity)?.recreate()
         recreate = false
     }
-    Column(modifier = modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-        Lottie(modifier = Modifier.height(160.dp), resId = R.raw.lottie_config, applyColor = false)
-        FontSettings(
-            currentSize = vm.fontSize,
-            onFontSizeChange = {
-                vm.updateFontSize(it)
-                recreate = true
-            },
-            currentFontIndex = vm.fontStyle,
-            onFontStyleChange = {
-                vm.updateFontStyle(it)
-                recreate = true
-            }
-        )
+    LazyColumn(modifier = modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        item {
+            Lottie(modifier = Modifier.height(160.dp), resId = R.raw.lottie_config, applyColor = false)
+        }
+        item {
+            FontSettings(
+                currentSize = vm.fontSize,
+                onFontSizeChange = {
+                    vm.updateFontSize(it)
+                    recreate = true
+                },
+                currentFontIndex = vm.fontStyle,
+                onFontStyleChange = {
+                    vm.updateFontStyle(it)
+                    recreate = true
+                },
+                fonts = FontStyle.values().map { it.textId }
+            )
+        }
+        item {
+            FontSettings(
+                currentSize = vm.quranFontSize,
+                onFontSizeChange = {
+                    vm.updateQuranFontSize( it)
+                    recreate = true
+                },
+                currentFontIndex = vm.quranFontStyle,
+                onFontStyleChange = {
+                    vm.updateQuranFontStyle(it)
+                    recreate = true
+                },
+                fonts = QuranFontStyle.values().map { it.textId }
+            )
+        }
     }
 }
 
@@ -61,7 +82,8 @@ private fun FontSettings(
     currentSize: Int,
     onFontSizeChange: (Int) -> Unit,
     currentFontIndex: Int,
-    onFontStyleChange: (Int) -> Unit
+    onFontStyleChange: (Int) -> Unit,
+    fonts: List<Int>
 ) {
     ElevatedCard(modifier = modifier.padding(8.dp)) {
         Column(modifier = Modifier.padding(12.dp)) {
@@ -74,7 +96,7 @@ private fun FontSettings(
             Spacer(modifier = Modifier.padding(vertical = 4.dp))
             IslamDivider()
             Spacer(modifier = Modifier.padding(vertical = 4.dp))
-            FontStyleSetting(currentFontIndex = currentFontIndex, onFontStyleChange = onFontStyleChange)
+            FontStyleSetting(currentFontIndex = currentFontIndex, onFontStyleChange = onFontStyleChange, fonts = fonts)
             Spacer(modifier = Modifier.padding(vertical = 4.dp))
         }
     }
@@ -84,12 +106,13 @@ private fun FontSettings(
 private fun FontStyleSetting(
     modifier: Modifier = Modifier,
     currentFontIndex: Int,
-    onFontStyleChange: (Int) -> Unit
+    onFontStyleChange: (Int) -> Unit,
+    fonts: List<Int>
 ) {
     Column(modifier = modifier) {
         Text(text = stringResource(id = R.string.setting_font_style_title), style = labelMedium())
-        FontStyle.values().forEachIndexed { index, font ->
-            IslamRadio(isSelected = currentFontIndex == index, text = font.textId) { onFontStyleChange(index) }
+        fonts.forEachIndexed { index, font ->
+            IslamRadio(isSelected = currentFontIndex == index, text = font) { onFontStyleChange(index) }
         }
     }
 }

@@ -4,6 +4,7 @@ import de.yanos.islam.data.model.quran.Ayet
 import de.yanos.islam.data.repositories.source.LocalQuranSource
 import de.yanos.islam.data.repositories.source.RemoteQuranSource
 import de.yanos.islam.util.getData
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -19,8 +20,9 @@ class QuranRepositoryImpl @Inject constructor(
     override suspend fun fetchQuran() {
         getData(remote.loadQuranSummary())?.let { response ->
             local.saveQuranSummary(response.kuran)
-            response.links.forEach { (key, value) ->
+            response.links.forEach { (key, _) ->
                 getData(remote.loadSure(key))?.let { (sureaditr, sureList) ->
+                    Timber.e("Loaded $sureaditr")
                     local.saveSure(sureList.map { sure ->
                         Ayet(
                             id = "${key}_${sure.ayetID}",
@@ -35,7 +37,6 @@ class QuranRepositoryImpl @Inject constructor(
                     })
                 }
             }
-
         }
     }
 

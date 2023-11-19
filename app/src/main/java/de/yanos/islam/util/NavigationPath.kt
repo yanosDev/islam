@@ -46,6 +46,10 @@ sealed interface NavigationAction {
     }
 }
 
+object ToRootAfterPermission : NavigationAction {
+    override val route: String = KnowledgeNavigation.MainList.route
+}
+
 sealed class QuranNavigationAction(override val route: String) : NavigationAction {
     object NavigateToQuran : QuranNavigationAction(QuranNavigation.QuranClassic.route)
     object NavigateToQuranSearch : QuranNavigationAction(QuranNavigation.SearchThroughQuran.route)
@@ -62,6 +66,11 @@ sealed class KnowledgeNavigationAction(override val route: String) : NavigationA
     data class NavigateToTopicQuestions(val id: Int, val parentId: Int?) :
         KnowledgeNavigationAction(KnowledgeNavigation.QuestionList.route.replace("{id}", id.toString()).replace("{parentId}", (parentId?.toString() ?: "-1")))
 
+}
+
+object Permissions : NavigationPath {
+    override val route: String = "permissions/notification"
+    override val args: List<NamedNavArgument> = emptyList()
 }
 
 sealed class MainNavigation(override val route: String, override val args: List<NamedNavArgument> = listOf()) : NavigationPath {

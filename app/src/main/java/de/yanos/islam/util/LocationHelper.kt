@@ -1,20 +1,15 @@
 package de.yanos.islam.util
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.os.Looper
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -42,18 +37,15 @@ fun getUserLocation(context: Context): LatandLong {
     locationProvider = LocationServices.getFusedLocationProviderClient(context)
 
     var currentUserLocation by remember { mutableStateOf(LatandLong()) }
-    val requestPermissionLauncher =
-        rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.RequestPermission(),
-            onResult = { isGranted: Boolean ->
-                if (isGranted) {
-                    // Permission granted, update the location
-                    getCurrentLocation(context) { lat, long ->
-                        currentUserLocation = LatandLong(lat, long)
-                    }
-                }
-            })
-
+    var showLocationPermission by remember {
+        mutableStateOf(false)
+    }
+    if (showLocationPermission)
+        LocationPermission(onPermissionGranted = {
+            getCurrentLocation(context) { lat, long ->
+                currentUserLocation = LatandLong(lat, long)
+            }
+        }, {})
     DisposableEffect(key1 = locationProvider) {
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
@@ -92,7 +84,7 @@ fun getUserLocation(context: Context): LatandLong {
         if (hasLocationPermission(context)) {
             locationUpdate()
         } else {
-            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            showLocationPermission = true
         }
 
         onDispose {
@@ -102,30 +94,6 @@ fun getUserLocation(context: Context): LatandLong {
     //
     return currentUserLocation
 
-}
-
-private fun hasLocationPermission(context: Context): Boolean {
-    return ContextCompat.checkSelfPermission(
-        context,
-        Manifest.permission.ACCESS_FINE_LOCATION
-    ) == PackageManager.PERMISSION_GRANTED
-}
-
-@SuppressLint("MissingPermission")
-private fun getCurrentLocation(context: Context, callback: (Double, Double) -> Unit) {
-    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-    fusedLocationClient.lastLocation
-        .addOnSuccessListener { location ->
-            if (location != null) {
-                val lat = location.latitude
-                val long = location.longitude
-                callback(lat, long)
-            }
-        }
-        .addOnFailureListener { exception ->
-            // Handle location retrieval failure
-            exception.printStackTrace()
-        }
 }
 
 fun stopLocationUpdate() {

@@ -68,6 +68,12 @@
     <string name="font_ubuntu">Ubuntu</string>
     <string name="font_montserrat">Montserrat</string>
     <string name="font_qalam">Al Qalam</string>
+    <string name="font_scheherazade">Scheherazade</string>
+    <string name="font_arabic">Arabic</string>
+    <string name="font_saleem">Saleem</string>
+    <string name="partial_show_translations">Ayetlerin Anlami</string>
+    <string name="partial_show_pronunciations">Ayetlerin Okunusu</string>
+    <string name="partial_settings">Ayarlar</string>
 
     <string name="notification_alarm_title">Namaz Vakti</string>
     <string name="notification_alarm_content">%s icin Namaz Vakti</string>
@@ -77,4 +83,16 @@
     <string name="quran_sure_list">Kuran daki Sureler</string>
     <string name="quran_search">Herhangi bi Ayeti mi ariyorsunuz?</string>
     <string name="sure_ayet">%d. Ayet</string>
-</resources>
+    <string name="sure_list_cuz">Cüz: %s</string>
+    <string name="sure_list_yer">Yer: %s</string>
+    <string name="sure_list_header">Sureler</string>
+    <string name="sure_sort_quran">Kurandaki Sira</string>
+    <string name="sure_sort_alphabetical">Alfabe Sira</string>
+    <string name="sure_sort_descending">Inis Sira</string>
+
+    <string name="init_download">Uygulamayi kullanmak icin gerekli bilgiler indirilmesi gerek. Lütfen birazcik bekleyin:</string>
+    <string name="init_title">Konum ve Bildirim Izini</string>
+    <string name="init_permission">1. Namaz vakitleri ve Kible yönünü belirlemek icin, suanki bulundugunuz ilin konumu gerekli.\n2. Namaz vakti Bildirimleri almak icin ayriyet den izin gerekli dir.</string>
+    <string name="init_permission_location">Konum Izin Ver</string>
+    <string name="init_permission_notification">Bildirim Izin Ver</string>
+ </resources>
