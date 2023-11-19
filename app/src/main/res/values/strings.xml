@@ -90,7 +90,9 @@
     <string name="sure_sort_alphabetical">Alfabe Sira</string>
     <string name="sure_sort_descending">Inis Sira</string>
 
-    <string name="permission_title">Konum ve Bildirim Izini</string>
-    <string name="permission_content">1. Namaz vakitleri ve Kible yönünü belirlemek icin, suanki bulundugunuz ilin konumu gerekli.\n2. Namaz vakti Bildirimleri almak icin ayriyet den izin gerekli dir.</string>
-    <string name="permission_btn">Izin Ver</string>
+    <string name="init_download">Uygulamayi kullanmak icin gerekli bilgiler indirilmesi gerek. Lütfen birazcik bekleyin:</string>
+    <string name="init_title">Konum ve Bildirim Izini</string>
+    <string name="init_permission">1. Namaz vakitleri ve Kible yönünü belirlemek icin, suanki bulundugunuz ilin konumu gerekli.\n2. Namaz vakti Bildirimleri almak icin ayriyet den izin gerekli dir.</string>
+    <string name="init_permission_location">Konum Izin Ver</string>
+    <string name="init_permission_notification">Bildirim Izin Ver</string>
  </resources>

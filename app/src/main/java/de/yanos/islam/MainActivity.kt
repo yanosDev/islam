@@ -13,8 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -29,7 +29,7 @@ import androidx.navigation.navDeepLink
 import dagger.hilt.android.AndroidEntryPoint
 import de.yanos.core.ui.theme.AppTheme
 import de.yanos.core.ui.view.DynamicNavigationScreen
-import de.yanos.islam.ui.permissions.PermissionsScreen
+import de.yanos.islam.ui.permissions.InitScreen
 import de.yanos.islam.ui.prayer.PrayerScreen
 import de.yanos.islam.ui.settings.SettingsScreen
 import de.yanos.islam.util.AppSettings
@@ -58,10 +58,14 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         setContent {
-            var permissionsHandled by rememberSaveable { mutableStateOf(hasNotificationPermission(this) && hasLocationPermission(this)) }
-
+            var isInitDone by remember { mutableStateOf(false) }
+            val refreshInit = {
+                vm.permissionsHandled = hasNotificationPermission(this) && hasLocationPermission(this)
+                isInitDone = vm.permissionsHandled && vm.isReady
+            }
+            refreshInit()
             AppTheme(activity = this, typography = typoByConfig(appSettings)) { modifier, config ->
-                if (permissionsHandled) {
+                if (vm.permissionsHandled && vm.isReady) {
                     navController = rememberNavController()
                     DynamicNavigationScreen(
                         modifier = modifier.padding(top = 48.dp), // TODO: Check statusbar problem
@@ -75,8 +79,8 @@ class MainActivity : ComponentActivity() {
                             navController = navController!!
                         )
                     }
-                } else PermissionsScreen {
-                    permissionsHandled = true
+                } else InitScreen(downloadingResources = !vm.isReady) {
+                    refreshInit()
                 }
             }
         }
@@ -89,7 +93,7 @@ class MainActivity : ComponentActivity() {
             object : ViewTreeObserver.OnPreDrawListener {
                 override fun onPreDraw(): Boolean {
                     // Check whether the initial data is ready.
-                    return if (vm.isReady) {
+                    return if (vm.isReady || !vm.permissionsHandled) {
                         // The content is ready. Start drawing.
                         content.viewTreeObserver.removeOnPreDrawListener(this)
                         true

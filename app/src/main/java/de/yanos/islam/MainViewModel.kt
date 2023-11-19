@@ -4,6 +4,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Geocoder
 import androidx.annotation.RawRes
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -43,7 +46,7 @@ import kotlin.concurrent.timerTask
 @SuppressLint("StaticFieldLeak")
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val appSettings: AppSettings,
+    val appSettings: AppSettings,
     private val geocoder: Geocoder,
     private val awqatRepository: AwqatRepository,
     private val quranRepository: QuranRepository,
@@ -52,7 +55,8 @@ class MainViewModel @Inject constructor(
     @IODispatcher private val dispatcher: CoroutineDispatcher,
     private val workManager: WorkManager
 ) : ViewModel() {
-    var isReady: Boolean = false
+    var permissionsHandled: Boolean by mutableStateOf(true)
+    var isReady: Boolean by mutableStateOf(false)
     private val timer: Timer = Timer()
 
     init {
