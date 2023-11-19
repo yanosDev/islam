@@ -47,19 +47,19 @@ import de.yanos.islam.util.titleSmall
 fun InitScreen(
     modifier: Modifier = Modifier,
     downloadingResources: Boolean = true,
-    refreshPermission: () -> Unit
 ) {
     val activity = LocalContext.current as Activity
-    val hasLocationPermission by mutableStateOf(hasLocationPermission(activity))
+    var hasLocationPermission = false
+    var hasNotificationPermission = false
     var showLocationPermission by remember { mutableStateOf(false) }
-    val hasNotificationPermission by mutableStateOf(hasNotificationPermission(activity))
     var showNotificationPermission by remember { mutableStateOf(false) }
-
-    if (hasNotificationPermission && hasLocationPermission && !downloadingResources)
-        LaunchedEffect(key1 = true) {
-            refreshPermission()
-        }
-    InitContent(modifier,
+    val checkPermissions = {
+        hasLocationPermission = hasLocationPermission(activity)
+        hasNotificationPermission = hasNotificationPermission(activity)
+    }
+    checkPermissions()
+    InitContent(
+        modifier,
         hasLocationPermission,
         showLocationPermission,
         hasNotificationPermission,
@@ -69,7 +69,7 @@ fun InitScreen(
             showLocationPermission = true
         },
         { showNotificationPermission = true }
-    )
+    ) { checkPermissions() }
 }
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -83,6 +83,7 @@ fun InitContent(
     downloadingResources: Boolean,
     onShowLocationPermissionClick: (Boolean) -> Unit,
     onShowNotificationPermissionClick: (Boolean) -> Unit,
+    refreshPermission: () -> Unit,
 ) {
     val activity = LocalContext.current as Activity
     val intent = Intent(ACTION_APPLICATION_DETAILS_SETTINGS)
@@ -121,6 +122,7 @@ fun InitContent(
                 if (!activity.shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION))
                     activity.startActivity(intent)
                 onShowLocationPermissionClick(false)
+                refreshPermission()
             }
             )
         }
@@ -129,6 +131,7 @@ fun InitContent(
                 if (!activity.shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS))
                     activity.startActivity(intent)
                 onShowNotificationPermissionClick(false)
+                refreshPermission()
             }
             )
         }

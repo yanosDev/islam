@@ -47,23 +47,18 @@ import de.yanos.islam.util.typoByConfig
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val vm: MainViewModel by viewModels()
     @Inject lateinit var appSettings: AppSettings
     private var navController: NavHostController? = null
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         setContent {
-            var isInitDone by remember { mutableStateOf(false) }
-            val refreshInit = {
-                vm.permissionsHandled = hasNotificationPermission(this) && hasLocationPermission(this)
-                isInitDone = vm.permissionsHandled && vm.isReady
-            }
-            refreshInit()
             AppTheme(activity = this, typography = typoByConfig(appSettings)) { modifier, config ->
                 if (vm.permissionsHandled && vm.isReady) {
                     navController = rememberNavController()
@@ -79,12 +74,15 @@ class MainActivity : ComponentActivity() {
                             navController = navController!!
                         )
                     }
-                } else InitScreen(downloadingResources = !vm.isReady) {
-                    refreshInit()
-                }
+                } else InitScreen(downloadingResources = !vm.isReady)
             }
         }
         setUpSplash()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        vm.permissionsHandled =  hasNotificationPermission(this) && hasLocationPermission(this)
     }
 
     private fun setUpSplash() {
