@@ -12,7 +12,6 @@ import de.yanos.islam.data.database.dao.QuranDao
 import de.yanos.islam.ui.quran.list.sure.SureSorting
 import de.yanos.islam.ui.quran.list.sure.sortSure
 import de.yanos.islam.util.AppSettings
-import de.yanos.islam.util.QuranFontStyle
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -27,10 +26,10 @@ class QuranPartialViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private var sortBy by mutableStateOf(SureSorting.values()[appSettings.sortByOrdinal])
-    private val sureName = savedStateHandle.get<String>("name")!!.trim()
-    var sure by mutableStateOf(
-        SureData(
-            sureName,
+    private val id = savedStateHandle.get<Int>("id")!!
+    var surah by mutableStateOf(
+        SurahData(
+            id,
             "",
             showTranslation = appSettings.showTranslations,
             showPronunciation = appSettings.showPronunciations,
@@ -41,53 +40,48 @@ class QuranPartialViewModel @Inject constructor(
     )
     val quranStyle get() = appSettings.quranStyle
     val quranSizeFactor get() = appSettings.quranSizeFactor
-    var previousSure by mutableStateOf<String?>(null)
-    var nextSure by mutableStateOf<String?>(null)
+    var previousSurahId by mutableStateOf<Int?>(null)
+    var nextSurahId by mutableStateOf<Int?>(null)
 
     init {
-        loadSure(sureName)
+        loadSurah(id)
     }
 
-    fun loadSure(name: String) {
+    fun loadSurah(id: Int) {
         viewModelScope.launch {
-            dao.loadSure(name).distinctUntilChanged().collect { ayetList ->
-                sure = sure.copy(
-                    name = name,
-                    translations = ayetList.map { it.suretur },
-                    pronunciations = ayetList.map { it.suretrans },
-                    originals = ayetList.map { it.surear })
-                val sureList = withContext(dispatcher) { dao.sureList() }.sortSure(sortBy)
-                sureList.find { it.sureaditr.trim() == name.trim() }?.let { sure ->
-                    val asInt = when (sortBy) {
-                        SureSorting.ORIGINAL -> sure.kuransira
-                        SureSorting.ALPHABETICAL -> sure.alfabesira
-                        else -> sure.inissira
-                    }.toInt() - 1
-                    if (asInt > 0) {
-                        previousSure = sureList[asInt - 1].sureaditr.trim()
-                    }
-                    if (asInt < sureList.size - 1) {
-                        nextSure = sureList[asInt + 1].sureaditr.trim()
-                    }
+            dao.loadSurah(id).distinctUntilChanged().collect { ayahs ->
+                val surahs = withContext(dispatcher) { dao.sureList() }.sortSure(sortBy)
+                val currentIndex = surahs.indexOfFirst { it.id == id }
+                if (currentIndex > 0) {
+                    previousSurahId = surahs[currentIndex - 1].id
                 }
+                if (currentIndex < surahs.size - 1) {
+                    nextSurahId = surahs[currentIndex + 1].id
+                }
+                surah = surah.copy(
+                    id = id,
+                    name = surahs[currentIndex].engName,
+                    translations = ayahs.map { it.translationTr },
+                    pronunciations = ayahs.map { it.transliterationEn },
+                    originals = ayahs.map { it.text })
             }
         }
     }
 
     fun updateTranslationsVisibility(showTranslation: Boolean) {
-        sure = sure.copy(showTranslation = showTranslation)
+        surah = surah.copy(showTranslation = showTranslation)
         appSettings.showTranslations = showTranslation
     }
 
     fun updatePronunciationsVisibility(showPronunciation: Boolean) {
-        sure = sure.copy(showPronunciation = showPronunciation)
+        surah = surah.copy(showPronunciation = showPronunciation)
         appSettings.showPronunciations = showPronunciation
     }
 }
 
-data class SureData(
+data class SurahData(
+    val id: Int,
     val name: String,
-    val nameAr: String,
     val showTranslation: Boolean,
     val showPronunciation: Boolean,
     val translations: List<String>,

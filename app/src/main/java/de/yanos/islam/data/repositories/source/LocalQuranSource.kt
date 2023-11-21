@@ -2,30 +2,24 @@ package de.yanos.islam.data.repositories.source
 
 import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.data.database.dao.QuranDao
-import de.yanos.islam.data.model.quran.Ayet
-import de.yanos.islam.data.model.tanzil.SureDetail
+import de.yanos.islam.data.model.quran.Ayah
+import de.yanos.islam.data.model.quran.Surah
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface LocalQuranSource {
-    suspend fun saveQuranSummary(kuran: List<SureDetail>)
-    suspend fun saveSure(map: List<Ayet>)
+    suspend fun insertSure(sure: Surah, ayahs: List<Ayah>)
 }
 
 class LocalQuranSourceImpl @Inject constructor(
     @IODispatcher private val dispatcher: CoroutineDispatcher,
-    private val dao: QuranDao
+    private val dao: QuranDao,
 ) : LocalQuranSource {
-    override suspend fun saveQuranSummary(kuran: List<SureDetail>) {
+    override suspend fun insertSure(sure: Surah, ayahs: List<Ayah>) {
         withContext(dispatcher) {
-            dao.insert(kuran)
+            dao.insertSure(sure, ayahs)
         }
     }
 
-    override suspend fun saveSure(ayet: List<Ayet>) {
-        withContext(dispatcher) {
-            dao.insertSure(ayet)
-        }
-    }
 }

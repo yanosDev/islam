@@ -106,10 +106,15 @@ fun PrayerScheduler(
     onScheduleChange: (id: String, isEnabled: Boolean, relativeTime: Int) -> Unit
 ) {
     val pageCount = schedules.size
-    val pagerState = rememberPagerState(initialPage = 0)
+    val pagerState = rememberPagerState(
+        initialPage = 0,
+        initialPageOffsetFraction = 0f
+    ) {
+        pageCount
+    }
 
     Column(modifier = modifier) {
-        HorizontalPager(pageCount = pageCount, state = pagerState) {
+        HorizontalPager(state = pagerState) {
             OutlinedCard(
                 modifier = modifier
                     .fillMaxWidth()
@@ -242,9 +247,14 @@ private fun PrayingDaily(
         }
     }
     val pageCount = 3
-    val pagerState = rememberPagerState(initialPage = 0)
+    val pagerState = rememberPagerState(
+        initialPage = 0,
+        initialPageOffsetFraction = 0f
+    ) {
+        pageCount
+    }
     Column(modifier = Modifier.wrapContentHeight()) {
-        HorizontalPager(pageCount = pageCount, state = pagerState) {
+        HorizontalPager(state = pagerState) {
             when (it) {
                 0 -> dailyCard(stringResource(id = R.string.praying_daily_hadith), content.hadith, content.hadithSource)
                 1 -> dailyCard(stringResource(id = R.string.praying_daily_verse), content.verse, content.verseSource)
@@ -308,8 +318,12 @@ private fun PrayingTimes(
     index: Int
 ) {
     val pageCount = times.size
-    val pagerState = rememberPagerState(initialPage = index)
-    HorizontalPager(modifier = modifier, pageCount = pageCount, state = pagerState) {
+    val pagerState = rememberPagerState(
+        initialPage = index,
+    ) {
+        pageCount
+    }
+    HorizontalPager(modifier = modifier, state = pagerState) {
         val currentDay = times[it]
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(text = currentDay.day, style = titleSmall(), color = goldColor())

@@ -79,23 +79,23 @@ fun SureListScreen(
                 }
             }
         }
-        items(items = vm.sureList, key = { it.sureaditr }) { detail ->
+        items(items = vm.sureList, key = { it.id }) { detail ->
             ElevatedCard(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
-                    .clickable { onNavigationChange(QuranNavigationAction.NavigateToSure(detail.sureaditr)) }
+                    .clickable { onNavigationChange(QuranNavigationAction.NavigateToSure(detail.id)) }
                     .padding(vertical = 8.dp)
                     .fillMaxWidth()
             ) {
-                Text(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp), text = "${detail.sureaditr} - ${detail.sureadiar}", style = labelLarge())
+                Text(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp), text = "${detail.engName} - ${detail.name}", style = labelLarge())
                 IslamDivider()
                 Row(modifier = modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
-                    Text(text = stringResource(id = R.string.sure_list_cuz, detail.cuz), style = bodyMedium())
+                    Text(text = stringResource(id = R.string.sure_list_cuz, detail.juz), style = bodyMedium())
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = stringResource(id = R.string.sure_list_yer, detail.yer), style = bodyMedium())
+                    Text(text = stringResource(id = R.string.sure_list_yer, detail.revelation), style = bodyMedium())
                 }
                 IslamDivider()
-                Text(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp), text = detail.sureaciklama, style = bodySmall())
+                Text(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp), text = detail.meaning, style = bodySmall())
             }
         }
     }

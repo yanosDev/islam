@@ -14,8 +14,8 @@ interface LocationUseCase {
 }
 
 class LocationUseCaseImpl @Inject constructor(
-    @Accelerometer private val accelerometer: Sensor,
-    @Magnetometer private val magnetometer: Sensor,
+    @Accelerometer private val accelerometer: Sensor?,
+    @Magnetometer private val magnetometer: Sensor?,
     private val sensorManager: SensorManager,
 ) : LocationUseCase, SensorEventListener {
 

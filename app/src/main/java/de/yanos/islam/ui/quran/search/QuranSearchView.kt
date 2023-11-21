@@ -65,7 +65,7 @@ fun QuranSearchScreen(
                 padding(horizontal = 12.dp)
         },
     ) { values ->
-        val onClick = { name: String -> onNavigationChange(QuranNavigationAction.NavigateToSure(name)) }
+        val onClick = { id: Int -> onNavigationChange(QuranNavigationAction.NavigateToSure(id)) }
         Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             SearchBar(
                 query = vm.query,
@@ -98,28 +98,28 @@ fun QuranSearchScreen(
                             vm.search(query, false)
                         }
                     }
-                    items(items = vm.findings, key = { it.id }) {
+                    items(items = vm.findings, key = { it.id }) { ayahSearch ->
                         MatchingSure(
                             modifier = Modifier.animateItemPlacement(),
                             sureName = getAnnotatedString(
                                 vm.query,
-                                it.sureName,
+                                ayahSearch.sureName,
                                 SpanStyle(color = goldColor(), fontWeight = FontWeight.Bold)
                             ),
-                            ayetList = getAnnotatedString(vm.query, it.ayet, SpanStyle(color = goldColor(), fontWeight = FontWeight.Bold)),
-                            onClick = onClick
+                            ayetList = getAnnotatedString(vm.query, ayahSearch.ayet, SpanStyle(color = goldColor(), fontWeight = FontWeight.Bold)),
+                            onClick = { onClick(ayahSearch.id) }
                         )
                     }
                 }
 
             }
             LazyColumn {
-                items(items = vm.findings, key = { it.id }) {
+                items(items = vm.findings, key = { it.id }) { ayahSearch ->
                     MatchingSure(
                         modifier = Modifier.animateItemPlacement(),
-                        sureName = getAnnotatedString(vm.query, it.sureName, SpanStyle(color = goldColor(), fontWeight = FontWeight.Bold)),
-                        ayetList = getAnnotatedString(vm.query, it.ayet, SpanStyle(color = goldColor(), fontWeight = FontWeight.Bold)),
-                        onClick = onClick
+                        sureName = getAnnotatedString(vm.query, ayahSearch.sureName, SpanStyle(color = goldColor(), fontWeight = FontWeight.Bold)),
+                        ayetList = getAnnotatedString(vm.query, ayahSearch.ayet, SpanStyle(color = goldColor(), fontWeight = FontWeight.Bold)),
+                        onClick = { onClick(ayahSearch.id) }
                     )
                 }
             }
