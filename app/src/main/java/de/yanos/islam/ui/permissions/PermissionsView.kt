@@ -126,12 +126,18 @@ fun InitContent(
             }
             )
         }
-/*
-        Spacer(modifier = Modifier.height(72.dp))
-        Text(modifier = Modifier.padding(16.dp), text = stringResource(id = R.string.init_download), style = titleSmall(), color = MaterialTheme.colorScheme.onBackground)
-        Spacer(modifier = Modifier.height(32.dp))
-        if (downloadingResources)
-            Lottie(modifier = Modifier.height(160.dp), resId = R.raw.lottie_download, applyColor = false)
-        else Lottie(modifier = Modifier.height(160.dp), resId = R.raw.lottie_done, applyColor = false)*/
     }
+}
+
+@Composable
+fun DownloadingScreen(modifier: Modifier = Modifier, downloadingResources: Boolean) {
+    if (downloadingResources)
+        Column(modifier = modifier) {
+            Spacer(modifier = Modifier.height(72.dp))
+            Text(modifier = Modifier.padding(16.dp), text = stringResource(id = R.string.init_download), style = titleSmall(), color = MaterialTheme.colorScheme.onBackground)
+            Spacer(modifier = Modifier.height(32.dp))
+            if (downloadingResources)
+                Lottie(modifier = Modifier.height(160.dp), resId = R.raw.lottie_download, applyColor = false)
+            else Lottie(modifier = Modifier.height(160.dp), resId = R.raw.lottie_done, applyColor = false)
+        }
 }

@@ -1,6 +1,11 @@
+@file:OptIn(ExperimentalFoundationApi::class)
+
 package de.yanos.islam.ui.knowledge.topics.main
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -31,6 +36,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.R
 import de.yanos.islam.data.model.Topic
 import de.yanos.islam.data.model.TopicType
+import de.yanos.islam.ui.permissions.DownloadingScreen
 import de.yanos.islam.util.KnowledgeNavigationAction
 import de.yanos.islam.util.Lottie
 import de.yanos.islam.util.NavigationAction
@@ -44,38 +50,57 @@ fun MainTopicsScreen(
     vm: MainTopicViewModel = hiltViewModel(),
     onNavigationChange: (NavigationAction) -> Unit
 ) {
-    LazyColumn(modifier = modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-        item {
-            Lottie(modifier = modifier.height(200.dp), resId = R.raw.lottie_stars_moving)
-        }
-        item {
-            Text(text = stringResource(id = R.string.main_topic_title), style = headlineLarge())
-        }
-        item {
-            TopicButtons(modifier = Modifier.padding(top = 12.dp, bottom = 48.dp), topics = vm.list.collectAsState(initial = listOf()).value) { topic ->
-                onNavigationChange(
-                    if (topic.type == TopicType.GROUP)
-                        KnowledgeNavigationAction.NavigateToSubTopic(topic.id)
-                    else KnowledgeNavigationAction.NavigateToTopicQuestions(topic.id, null)
-                )
+    val topics = vm.list.collectAsState(initial = listOf()).value
+    Column(
+        modifier
+            .fillMaxSize()
+            .padding(bottom = 12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            item {
+                Lottie(modifier = modifier.height(200.dp), resId = R.raw.lottie_stars_moving)
+            }
+            item {
+                Text(text = stringResource(id = R.string.main_topic_title), style = headlineLarge())
+            }
+            item {
+                TopicButtons(
+                    modifier = Modifier
+                        .padding(top = 12.dp, bottom = 48.dp), topics = topics
+                ) { topic ->
+                    onNavigationChange(
+                        if (topic.type == TopicType.GROUP)
+                            KnowledgeNavigationAction.NavigateToSubTopic(topic.id)
+                        else KnowledgeNavigationAction.NavigateToTopicQuestions(topic.id, null)
+                    )
+                }
+            }
+            item {
+                AnimatedVisibility(visible = !vm.isDBInitialized) {
+                    DownloadingScreen(downloadingResources = !vm.isDBInitialized)
+                }
             }
         }
-        item {
-            Column {
-                OutlinedButton(onClick = { onNavigationChange(KnowledgeNavigationAction.NavigateToSearchQuestions) }) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(imageVector = Icons.Rounded.Search, contentDescription = "To Challenges")
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = stringResource(id = R.string.main_search_question), style = labelMedium())
-                    }
+        Column(modifier = Modifier, verticalArrangement = Arrangement.Bottom) {
+            OutlinedButton(onClick = { onNavigationChange(KnowledgeNavigationAction.NavigateToSearchQuestions) }) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(imageVector = Icons.Rounded.Search, contentDescription = "To Challenges")
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(text = stringResource(id = R.string.main_search_question), style = labelMedium())
                 }
-                Spacer(modifier = Modifier.height(8.dp))
-                TextButton(onClick = { onNavigationChange(KnowledgeNavigationAction.NavigateToChallengeCreation) }) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(imageVector = Icons.Rounded.QuestionAnswer, contentDescription = "To Challenges")
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = stringResource(id = R.string.main_to_new_challenge), style = labelMedium())
-                    }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            TextButton(onClick = { onNavigationChange(KnowledgeNavigationAction.NavigateToChallengeCreation) }) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(imageVector = Icons.Rounded.QuestionAnswer, contentDescription = "To Challenges")
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(text = stringResource(id = R.string.main_to_new_challenge), style = labelMedium())
                 }
             }
         }

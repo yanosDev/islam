@@ -2,6 +2,7 @@ package de.yanos.islam.ui.prayer
 
 import android.graphics.Bitmap
 import android.graphics.Matrix
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -54,6 +56,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.R
 import de.yanos.islam.data.model.Schedule
 import de.yanos.islam.data.model.awqat.AwqatDailyContent
+import de.yanos.islam.ui.permissions.DownloadingScreen
 import de.yanos.islam.util.IslamDivider
 import de.yanos.islam.util.IslamSwitch
 import de.yanos.islam.util.bodySmall
@@ -70,31 +73,34 @@ fun PrayerScreen(
     modifier: Modifier = Modifier,
     vm: PrayerViewModel = hiltViewModel()
 ) {
-    if (vm.currentState.times.isNotEmpty()) {
-        Column(modifier = modifier.verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally) {
-            PrayingHeader(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .wrapContentHeight(),
-                direction = vm.currentState.times.first().direction
-            )
-            PrayingTimes(
+    Column(modifier = modifier
+        .verticalScroll(rememberScrollState())
+        .fillMaxHeight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+        PrayingHeader(
+            modifier = Modifier
+                .padding(8.dp)
+                .wrapContentHeight(),
+            direction = vm.currentState.times.firstOrNull()?.direction ?: 0F
+        )
+        PrayingTimes(
+            modifier = Modifier.wrapContentHeight(),
+            times = vm.currentState.times,
+            index = vm.currentState.index
+        )
+        PrayerScheduler(
+            modifier = Modifier.wrapContentHeight(),
+            schedules = vm.schedules,
+            onScheduleChange = vm::changeSchedule
+        )
+        vm.currentState.dailyContent?.let {
+            PrayingDaily(
                 modifier = Modifier.wrapContentHeight(),
-                times = vm.currentState.times,
-                index = vm.currentState.index
+                content = it
             )
-            PrayerScheduler(
-                modifier = Modifier.wrapContentHeight(),
-                schedules = vm.schedules,
-                onScheduleChange = vm::changeSchedule
-            )
-            vm.currentState.dailyContent?.let {
-                PrayingDaily(
-                    modifier = Modifier.wrapContentHeight(),
-                    content = it
-                )
-            }
         }
+    }
+    AnimatedVisibility(visible = !vm.isDBInitialized) {
+        DownloadingScreen(downloadingResources = !vm.isDBInitialized)
     }
 }
 

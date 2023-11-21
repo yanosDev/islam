@@ -29,6 +29,8 @@ import de.yanos.islam.util.getCurrentLocation
 import de.yanos.islam.util.hasLocationPermission
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -59,7 +61,7 @@ class MainViewModel @Inject constructor(
     private var timer: Timer? = null
 
     fun startSchedule() {
-        timer = Timer()
+       /* timer = Timer()
         timer?.scheduleAtFixedRate(
             timerTask()
             {
@@ -77,11 +79,11 @@ class MainViewModel @Inject constructor(
                     loadLocationIndependentData()
                 }
             }, 0, 60000
-        )
+        )*/
     }
 
     fun cancelSchedule() {
-        timer?.cancel()
+//        timer?.cancel()
     }
 
     private fun loadLocationDependentData() {
@@ -99,9 +101,11 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             if (!isReady && !isLoading) {
                 isLoading = true
-                loadQuran()
-                initDailyWorker()
-                loadDailyAwqatList()
+                listOf(
+                    async { loadQuran() },
+                    async { initDailyWorker() },
+                    async { loadDailyAwqatList() }
+                ).awaitAll()
                 isReady = if (!appSettings.isDBInitialized) {
                     initDB()
                     true
