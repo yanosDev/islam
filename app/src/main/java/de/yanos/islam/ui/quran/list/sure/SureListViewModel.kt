@@ -11,7 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.R
 import de.yanos.islam.data.database.dao.QuranDao
-import de.yanos.islam.data.model.tanzil.SureDetail
+import de.yanos.islam.data.model.quran.Surah
 import de.yanos.islam.util.AppSettings
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -24,7 +24,7 @@ class SureListViewModel @Inject constructor(
     @IODispatcher private val dispatcher: CoroutineDispatcher,
     private val quranDao: QuranDao,
 ) : ViewModel() {
-    var sureList = mutableStateListOf<SureDetail>()
+    var sureList = mutableStateListOf<Surah>()
     var sortBy by mutableStateOf(SureSorting.values()[appSettings.sortByOrdinal])
 
     init {
@@ -54,18 +54,16 @@ class SureListViewModel @Inject constructor(
     }
 }
 
-fun List<SureDetail>.sortSure(sortBy: SureSorting): List<SureDetail> {
+fun List<Surah>.sortSure(sortBy: SureSorting): List<Surah> {
     return this.sortedBy {
         when (sortBy) {
-            SureSorting.ORIGINAL -> it.kuransira.toInt()
-            SureSorting.DESCENDENCE -> it.inissira.toInt()
-            SureSorting.ALPHABETICAL -> it.alfabesira.toInt()
+            SureSorting.ORIGINAL -> it.id
+            SureSorting.ALPHABETICAL -> it.name.toInt()
         }
     }
 }
 
 enum class SureSorting(@StringRes val textId: Int) {
     ORIGINAL(R.string.sure_sort_quran),
-    DESCENDENCE(R.string.sure_sort_descending),
     ALPHABETICAL(R.string.sure_sort_alphabetical)
 }

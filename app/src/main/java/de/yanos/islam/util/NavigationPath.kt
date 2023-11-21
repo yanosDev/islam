@@ -54,7 +54,7 @@ sealed class QuranNavigationAction(override val route: String) : NavigationActio
     object NavigateToQuran : QuranNavigationAction(QuranNavigation.QuranClassic.route)
     object NavigateToQuranSearch : QuranNavigationAction(QuranNavigation.SearchThroughQuran.route)
     object NavigateToSureList : QuranNavigationAction(QuranNavigation.SureList.route)
-    class NavigateToSure(val name: String) : QuranNavigationAction(QuranNavigation.QuranPartial.route.replace("{name}", name))
+    class NavigateToSure(val id: Int) : QuranNavigationAction(QuranNavigation.QuranPartial.route.replace("{id}", id.toString()))
 }
 
 sealed class KnowledgeNavigationAction(override val route: String) : NavigationAction {
@@ -126,7 +126,7 @@ sealed class QuranNavigation(override val route: String, override val args: List
         }
     }
 
-    object QuranPartial : QuranNavigation("quran/sure/{name}", args = listOf(navArgument("name") { type = NavType.StringType })) {
+    object QuranPartial : QuranNavigation("quran/sure/{id}", args = listOf(navArgument("id") { type = NavType.IntType })) {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
             QuranPartialScreen(onNavigationChange = onNavigationChange)

@@ -67,7 +67,7 @@ fun QuranPartialScreen(
     var position by remember { mutableStateOf(0) }
     val scope = rememberCoroutineScope()
     var showSettings by remember { mutableStateOf(false) }
-    if (vm.sure.originals.isNotEmpty()) {
+    if (vm.surah.originals.isNotEmpty()) {
 
         val onScrollTo = { newPosition: Int ->
             position = newPosition - 1
@@ -86,24 +86,24 @@ fun QuranPartialScreen(
             ) {
                 SureHeader(
                     modifier = Modifier.wrapContentHeight(),
-                    sureName = vm.sure.name,
-                    hasPreviousSure = vm.previousSure != null,
-                    hasNextSure = vm.nextSure != null,
+                    sureName = vm.surah.name,
+                    hasPreviousSure = vm.previousSurahId != null,
+                    hasNextSure = vm.nextSurahId != null,
                     onPreviousSure = {
-                        vm.loadSure(vm.previousSure!!)
+                        vm.loadSurah(vm.previousSurahId!!)
                         onScrollTo(1)
                     },
                     onNextSure = {
-                        vm.loadSure(vm.nextSure!!)
+                        vm.loadSurah(vm.nextSurahId!!)
                         onScrollTo(1)
                     })
                 AyetSettings(
                     showSettings = showSettings,
-                    showTranslations = vm.sure.showTranslation,
-                    showPronunciations = vm.sure.showPronunciation,
+                    showTranslations = vm.surah.showTranslation,
+                    showPronunciations = vm.surah.showPronunciation,
                     onChangeShowingTranslations = { vm.updateTranslationsVisibility(it) },
                     onChangeShowingPronunciations = { vm.updatePronunciationsVisibility(it) },
-                    ayetCount = vm.sure.originals.size,
+                    ayetCount = vm.surah.originals.size,
                     currentPosition = position,
                     onAyetChosen = onScrollTo
                 )
@@ -117,7 +117,7 @@ fun QuranPartialScreen(
                     )
                 }
             }
-            AyetList(modifier = Modifier.weight(1f), state = state, sure = vm.sure, typo = quranTypoByConfig(vm.quranSizeFactor, vm.quranStyle))
+            AyetList(modifier = Modifier.weight(1f), state = state, sure = vm.surah, typo = quranTypoByConfig(vm.quranSizeFactor, vm.quranStyle))
         }
     }
 }
@@ -200,7 +200,7 @@ fun SureHeader(
 private fun AyetList(
     modifier: Modifier = Modifier,
     state: LazyListState,
-    sure: SureData,
+    sure: SurahData,
     typo: Typography
 ) {
     LazyColumn(modifier = modifier, state = state) {

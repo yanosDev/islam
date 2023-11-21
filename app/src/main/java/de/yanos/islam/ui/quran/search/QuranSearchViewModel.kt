@@ -37,11 +37,11 @@ class QuranSearchViewModel @Inject constructor(
             if (this.query.isNotBlank()) {
                 viewModelScope.launch(dispatcher) {
                     findings.clear()
-                    val newFindings = quranDao.findMatches(query).groupBy { it.sureaditr }.map { (sureAdiTr, ayetList) ->
+                    val newFindings = quranDao.findMatches(query).groupBy { it.sureId }.map { (sureId, ayahs) ->
                         AyetSearch(
-                            id = sureAdiTr,
-                            sureName = sureAdiTr,
-                            ayet = ayetList.subList(0, minOf(4, ayetList.size)).joinToString("\n") { "${it.ayetNr}. \n${it.suretur}\n${it.suretrans}" },
+                            id = sureId,
+                            sureName = ayahs.firstOrNull()?.sureName ?: "",
+                            ayet = ayahs.subList(0, minOf(4, ayahs.size)).joinToString("\n") { "${it.id}. \n${it.translationTr}\n${it.transliterationEn}" },
                         )
                     }
                     findings.addAll(newFindings)
@@ -56,4 +56,4 @@ class QuranSearchViewModel @Inject constructor(
     }
 }
 
-data class AyetSearch(val id: String, val sureName: String, val ayet: String)
+data class AyetSearch(val id: Int, val sureName: String, val ayet: String)

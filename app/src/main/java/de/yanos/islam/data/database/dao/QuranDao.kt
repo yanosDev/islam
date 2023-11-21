@@ -4,21 +4,28 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import de.yanos.islam.data.model.quran.Ayet
-import de.yanos.islam.data.model.tanzil.SureDetail
+import androidx.room.Transaction
+import de.yanos.islam.data.model.quran.Ayah
+import de.yanos.islam.data.model.quran.Surah
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface QuranDao : BaseDao<SureDetail> {
+interface QuranDao : BaseDao<Ayah> {
+    @Query("SELECT * FROM Ayah WHERE (sureName LIKE '%' || :query || '%' OR translationTr LIKE '%' || :query || '%' OR transliterationEn LIKE '%' || :query || '%') ORDER BY sureId")
+    fun findMatches(query: String): List<Ayah>
+
+    @Query("SELECT * FROM Ayah WHERE sureId = :sureId ORDER BY id")
+    fun loadSurah(sureId: Int): Flow<List<Ayah>>
+
+    @Query("SELECT * FROM Surah ORDER BY id")
+    fun sureList(): List<Surah>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertSure(ayet: List<Ayet>)
+    suspend fun insertSure(surah: Surah)
 
-    @Query("SELECT * FROM Ayet WHERE (sureaditr LIKE '%' || :query || '%' OR suretur LIKE '%' || :query || '%' OR suretrans LIKE '%' || :query || '%') ORDER BY sureOrdinal, ayetNr")
-    fun findMatches(query: String): List<Ayet>
-
-    @Query("SELECT * FROM Ayet WHERE sureaditr = :sureName ORDER BY ayetNr")
-    fun loadSure(sureName: String): Flow<List<Ayet>>
-
-    @Query("SELECT * FROM SureDetail ORDER BY alfabesira")
-    fun sureList(): List<SureDetail>
+    @Transaction
+    suspend fun insertSure(surah: Surah, ayahs: List<Ayah>) {
+        insertSure(surah)
+        insert(ayahs)
+    }
 }

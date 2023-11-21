@@ -20,8 +20,8 @@ import de.yanos.islam.data.model.awqat.CityDetail
 import de.yanos.islam.data.model.awqat.CityEid
 import de.yanos.islam.data.model.awqat.Location
 import de.yanos.islam.data.model.awqat.PrayerTime
-import de.yanos.islam.data.model.quran.Ayet
-import de.yanos.islam.data.model.tanzil.SureDetail
+import de.yanos.islam.data.model.quran.Ayah
+import de.yanos.islam.data.model.quran.Surah
 
 interface IslamDatabase {
     fun topicDao(): TopicDao
@@ -46,8 +46,8 @@ interface IslamDatabase {
         Search::class,
         CityEid::class,
         Schedule::class,
-        SureDetail::class,
-        Ayet::class
+        Surah::class,
+        Ayah::class
     ],
     version = 1
 )
@@ -57,6 +57,5 @@ internal abstract class IslamDatabaseImpl : IslamDatabase, RoomDatabase() {
     abstract override fun quizFormDao(): ChallengeDao
     abstract override fun awqatDao(): AwqatDao
     abstract override fun searchDao(): SearchDao
-
     abstract override fun quranDao(): QuranDao
 }

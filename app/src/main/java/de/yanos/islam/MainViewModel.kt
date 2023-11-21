@@ -21,8 +21,8 @@ import de.yanos.islam.data.model.Schedule
 import de.yanos.islam.data.model.Topic
 import de.yanos.islam.data.model.TopicResource
 import de.yanos.islam.data.model.TopicType
-import de.yanos.islam.data.repositories.AwqatRepository
 import de.yanos.islam.data.repositories.QuranRepository
+import de.yanos.islam.data.repositories.AwqatRepository
 import de.yanos.islam.service.DailyScheduleWorker
 import de.yanos.islam.util.AppSettings
 import de.yanos.islam.util.getCurrentLocation
@@ -93,10 +93,10 @@ class MainViewModel @Inject constructor(
     private suspend fun loadLocationIndependentData() {
         viewModelScope.launch {
             if (!isReady) {
+                loadQuran()
                 initDailyWorker()
                 loadDailyAwqatList()
                 isReady = if (!appSettings.isDBInitialized) {
-                    loadQuran()
                     initDB()
                     true
                 } else true
