@@ -61,7 +61,7 @@ class MainViewModel @Inject constructor(
     private var timer: Timer? = null
 
     fun startSchedule() {
-       /* timer = Timer()
+        timer = Timer()
         timer?.scheduleAtFixedRate(
             timerTask()
             {
@@ -79,11 +79,11 @@ class MainViewModel @Inject constructor(
                     loadLocationIndependentData()
                 }
             }, 0, 60000
-        )*/
+        )
     }
 
     fun cancelSchedule() {
-//        timer?.cancel()
+        timer?.cancel()
     }
 
     private fun loadLocationDependentData() {
@@ -102,12 +102,14 @@ class MainViewModel @Inject constructor(
             if (!isReady && !isLoading) {
                 isLoading = true
                 listOf(
-                    async { loadQuran() },
                     async { initDailyWorker() },
                     async { loadDailyAwqatList() }
                 ).awaitAll()
                 isReady = if (!appSettings.isDBInitialized) {
-                    initDB()
+                    listOf(
+                        async { loadQuran() },
+                        async { initDB() }
+                    ).awaitAll()
                     true
                 } else true
             }
