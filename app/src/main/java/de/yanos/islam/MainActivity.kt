@@ -1,10 +1,11 @@
+@file:OptIn(ExperimentalPermissionsApi::class, ExperimentalPermissionsApi::class)
+
 package de.yanos.islam
 
+import android.Manifest
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.view.View
-import android.view.ViewTreeObserver
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -22,6 +23,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import dagger.hilt.android.AndroidEntryPoint
 import de.yanos.core.ui.theme.AppTheme
 import de.yanos.core.ui.view.DynamicNavigationScreen
@@ -37,9 +41,8 @@ import de.yanos.islam.util.QuranNavigation
 import de.yanos.islam.util.ToRootAfterPermission
 import de.yanos.islam.util.allKnowledge
 import de.yanos.islam.util.allQuran
-import de.yanos.islam.util.hasLocationPermission
-import de.yanos.islam.util.hasNotificationPermission
 import de.yanos.islam.util.typoByConfig
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -55,8 +58,11 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         setContent {
+            val locationPermissionState = rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION)
+            val notificationPermissionState = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
+
             AppTheme(activity = this, typography = typoByConfig(appSettings)) { modifier, config ->
-                if (vm.permissionsHandled && vm.isReady) {
+                if (locationPermissionState.status.isGranted && notificationPermissionState.status.isGranted) {
                     navController = rememberNavController()
                     DynamicNavigationScreen(
                         modifier = modifier.padding(top = 48.dp), // TODO: Check statusbar problem
@@ -66,38 +72,23 @@ class MainActivity : ComponentActivity() {
                     ) { contentModifier ->
                         IslamNavHost(
                             modifier = contentModifier,
-                            startRoute = MainNavigation.all[1].route,
+                            startRoute = MainNavigation.all[0].route,
                             navController = navController!!
                         )
                     }
-                } else InitScreen(downloadingResources = !vm.isReady)
+                } else InitScreen(modifier, locationPermissionState, notificationPermissionState)
             }
         }
-        setUpSplash()
     }
 
     override fun onResume() {
         super.onResume()
-        vm.permissionsHandled =  hasNotificationPermission(this) && hasLocationPermission(this)
+        vm.startSchedule()
     }
 
-    private fun setUpSplash() {
-        val content: View = findViewById(android.R.id.content)
-        content.viewTreeObserver.addOnPreDrawListener(
-            object : ViewTreeObserver.OnPreDrawListener {
-                override fun onPreDraw(): Boolean {
-                    // Check whether the initial data is ready.
-                    return if (vm.isReady || !vm.permissionsHandled) {
-                        // The content is ready. Start drawing.
-                        content.viewTreeObserver.removeOnPreDrawListener(this)
-                        true
-                    } else {
-                        // The content isn't ready. Suspend.
-                        false
-                    }
-                }
-            }
-        )
+    override fun onPause() {
+        vm.cancelSchedule()
+        super.onPause()
     }
 
     override fun onNewIntent(intent: Intent?) {

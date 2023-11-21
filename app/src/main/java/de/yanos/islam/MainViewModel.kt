@@ -21,8 +21,8 @@ import de.yanos.islam.data.model.Schedule
 import de.yanos.islam.data.model.Topic
 import de.yanos.islam.data.model.TopicResource
 import de.yanos.islam.data.model.TopicType
-import de.yanos.islam.data.repositories.QuranRepository
 import de.yanos.islam.data.repositories.AwqatRepository
+import de.yanos.islam.data.repositories.QuranRepository
 import de.yanos.islam.service.DailyScheduleWorker
 import de.yanos.islam.util.AppSettings
 import de.yanos.islam.util.getCurrentLocation
@@ -55,12 +55,12 @@ class MainViewModel @Inject constructor(
     @IODispatcher private val dispatcher: CoroutineDispatcher,
     private val workManager: WorkManager
 ) : ViewModel() {
-    var permissionsHandled: Boolean by mutableStateOf(true)
     var isReady: Boolean by mutableStateOf(false)
-    private val timer: Timer = Timer()
+    private var timer: Timer? = null
 
-    init {
-        timer.scheduleAtFixedRate(
+    fun startSchedule() {
+        timer = Timer()
+        timer?.scheduleAtFixedRate(
             timerTask()
             {
                 viewModelScope.launch(Dispatchers.Main) {
@@ -80,6 +80,10 @@ class MainViewModel @Inject constructor(
         )
     }
 
+    fun cancelSchedule() {
+        timer?.cancel()
+    }
+
     private fun loadLocationDependentData() {
         if (isReady)
             viewModelScope.launch {
@@ -90,9 +94,11 @@ class MainViewModel @Inject constructor(
             }
     }
 
+    private var isLoading = false
     private suspend fun loadLocationIndependentData() {
         viewModelScope.launch {
-            if (!isReady) {
+            if (!isReady && !isLoading) {
+                isLoading = true
                 loadQuran()
                 initDailyWorker()
                 loadDailyAwqatList()

@@ -20,25 +20,25 @@ class QuranRepositoryImpl @Inject constructor(
         val translation = remote.loadQuranTranslation()
         val transliteration = remote.loadQuranTransliteration()
         if (audio is LoadState.Data && translation is LoadState.Data && transliteration is LoadState.Data) {
-            audio.data.data.surahs.forEach { surah ->
-                val translationSurah = translation.data.data.surahs.find { it.number == surah.number }
-                val transliterationSurah = transliteration.data.data.surahs.find { it.number == surah.number }
-                val firstJuz = surah.ayahs.first().juz
-                val lastJuz = surah.ayahs.last().juz
-                val sure = Surah(
-                    id = surah.number,
-                    name = surah.name,
-                    engName = surah.englishName,
-                    ayahCount = surah.ayahs.count(),
-                    meaning = surah.englishNameTranslation,
-                    revelation = surah.revelationType,
+            audio.data.data.surahs.forEach { surahAudio ->
+                val translationSurah = translation.data.data.surahs.find { it.number == surahAudio.number }
+                val transliterationSurah = transliteration.data.data.surahs.find { it.number == surahAudio.number }
+                val firstJuz = surahAudio.ayahs.first().juz
+                val lastJuz = surahAudio.ayahs.last().juz
+                val surah = Surah(
+                    id = surahAudio.number,
+                    name = surahAudio.name,
+                    engName = surahAudio.englishName,
+                    ayahCount = surahAudio.ayahs.count(),
+                    meaning = surahAudio.englishNameTranslation,
+                    revelation = surahAudio.revelationType,
                     juz = if (firstJuz == lastJuz) firstJuz.toString() else "$firstJuz - $lastJuz"
                 )
-                val ayahs = surah.ayahs.mapIndexed { index, ayahAudio ->
+                val ayahs = surahAudio.ayahs.mapIndexed { index, ayahAudio ->
                     Ayah(
                         id = ayahAudio.number,
-                        sureId = surah.number,
-                        sureName = surah.englishName,
+                        sureId = surahAudio.number,
+                        sureName = surahAudio.englishName,
                         number = ayahAudio.number,
                         audio = ayahAudio.audio,
                         audioMore = ayahAudio.audioSecondary.firstOrNull(),
@@ -49,7 +49,7 @@ class QuranRepositoryImpl @Inject constructor(
                         page = ayahAudio.page
                     )
                 }
-                local.insertSure(sure, ayahs)
+                local.insertSure(surah, ayahs)
             }
         }
     }
