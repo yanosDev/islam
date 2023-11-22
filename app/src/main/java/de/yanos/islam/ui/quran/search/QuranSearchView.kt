@@ -98,7 +98,7 @@ fun QuranSearchScreen(
                             vm.search(query, false)
                         }
                     }
-                    items(items = vm.findings, key = { it.id }) { ayahSearch ->
+                    items(items = vm.findings, key = { it.id.toString() + it.sureName }) { ayahSearch ->
                         MatchingSure(
                             modifier = Modifier.animateItemPlacement(),
                             sureName = getAnnotatedString(
@@ -114,7 +114,7 @@ fun QuranSearchScreen(
 
             }
             LazyColumn {
-                items(items = vm.findings, key = { it.id }) { ayahSearch ->
+                items(items = vm.findings, key = { it.id.toString() + it.sureName }) { ayahSearch ->
                     MatchingSure(
                         modifier = Modifier.animateItemPlacement(),
                         sureName = getAnnotatedString(vm.query, ayahSearch.sureName, SpanStyle(color = goldColor(), fontWeight = FontWeight.Bold)),

@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalPermissionsApi::class)
+
 package de.yanos.islam.ui.permissions
 
 import android.Manifest
@@ -19,7 +21,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,14 +30,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionState
+import com.google.accompanist.permissions.isGranted
 import de.yanos.islam.R
 import de.yanos.islam.util.LocationPermission
 import de.yanos.islam.util.Lottie
 import de.yanos.islam.util.NotificationPermission
 import de.yanos.islam.util.bodyLarge
 import de.yanos.islam.util.goldColor
-import de.yanos.islam.util.hasLocationPermission
-import de.yanos.islam.util.hasNotificationPermission
 import de.yanos.islam.util.titleLarge
 import de.yanos.islam.util.titleSmall
 
@@ -46,30 +48,23 @@ import de.yanos.islam.util.titleSmall
 @Composable
 fun InitScreen(
     modifier: Modifier = Modifier,
-    downloadingResources: Boolean = true,
+    locationState: PermissionState,
+    notificationState: PermissionState
+
 ) {
-    val activity = LocalContext.current as Activity
-    var hasLocationPermission = false
-    var hasNotificationPermission = false
     var showLocationPermission by remember { mutableStateOf(false) }
     var showNotificationPermission by remember { mutableStateOf(false) }
-    val checkPermissions = {
-        hasLocationPermission = hasLocationPermission(activity)
-        hasNotificationPermission = hasNotificationPermission(activity)
-    }
-    checkPermissions()
     InitContent(
         modifier,
-        hasLocationPermission,
+        locationState.status.isGranted,
         showLocationPermission,
-        hasNotificationPermission,
+        notificationState.status.isGranted,
         showNotificationPermission,
-        downloadingResources,
         {
             showLocationPermission = true
         },
         { showNotificationPermission = true }
-    ) { checkPermissions() }
+    )
 }
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -80,10 +75,8 @@ fun InitContent(
     showLocationPermission: Boolean,
     hasNotificationPermission: Boolean,
     showNotificationPermission: Boolean,
-    downloadingResources: Boolean,
     onShowLocationPermissionClick: (Boolean) -> Unit,
     onShowNotificationPermissionClick: (Boolean) -> Unit,
-    refreshPermission: () -> Unit,
 ) {
     val activity = LocalContext.current as Activity
     val intent = Intent(ACTION_APPLICATION_DETAILS_SETTINGS)
@@ -122,7 +115,6 @@ fun InitContent(
                 if (!activity.shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION))
                     activity.startActivity(intent)
                 onShowLocationPermissionClick(false)
-                refreshPermission()
             }
             )
         }
@@ -131,16 +123,21 @@ fun InitContent(
                 if (!activity.shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS))
                     activity.startActivity(intent)
                 onShowNotificationPermissionClick(false)
-                refreshPermission()
             }
             )
         }
-
-        Spacer(modifier = Modifier.height(72.dp))
-        Text(modifier = Modifier.padding(16.dp), text = stringResource(id = R.string.init_download), style = titleSmall(), color = MaterialTheme.colorScheme.onBackground)
-        Spacer(modifier = Modifier.height(32.dp))
-        if (downloadingResources)
-            Lottie(modifier = Modifier.height(160.dp), resId = R.raw.lottie_download, applyColor = false)
-        else Lottie(modifier = Modifier.height(160.dp), resId = R.raw.lottie_done, applyColor = false)
     }
+}
+
+@Composable
+fun DownloadingScreen(modifier: Modifier = Modifier, downloadingResources: Boolean) {
+    if (downloadingResources)
+        Column(modifier = modifier) {
+            Spacer(modifier = Modifier.height(72.dp))
+            Text(modifier = Modifier.padding(16.dp), text = stringResource(id = R.string.init_download), style = titleSmall(), color = MaterialTheme.colorScheme.onBackground)
+            Spacer(modifier = Modifier.height(32.dp))
+            if (downloadingResources)
+                Lottie(modifier = Modifier.height(160.dp), resId = R.raw.lottie_download, applyColor = false)
+            else Lottie(modifier = Modifier.height(160.dp), resId = R.raw.lottie_done, applyColor = false)
+        }
 }

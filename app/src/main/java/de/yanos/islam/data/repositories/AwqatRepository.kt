@@ -13,6 +13,7 @@ import de.yanos.islam.util.AppSettings
 import de.yanos.islam.util.getData
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -33,10 +34,12 @@ class AwqatRepositoryImpl @Inject constructor(
         return withContext(dispatcher) {
             remoteSource.auth()
             if (appSettings.authToken.isNotBlank()) {
-                async { fetchDailyContent() }
-                async { fetchCountries() }
-                async { fetchStates() }
-                async { fetchCities() }
+                listOf(
+                    async { fetchDailyContent() },
+                    async { fetchCountries() },
+                    async { fetchStates() },
+                    async { fetchCities() },
+                ).awaitAll()
             }
         }
     }

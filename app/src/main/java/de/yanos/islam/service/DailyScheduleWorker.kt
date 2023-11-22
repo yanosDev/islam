@@ -1,5 +1,6 @@
 package de.yanos.islam.service
 
+import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
@@ -38,7 +39,7 @@ class DailyScheduleWorker @AssistedInject constructor(
 ) : CoroutineWorker(appContext, params) {
     override suspend fun doWork(): Result {
         return withContext(dispatcher) {
-            //cancelAllAlarms()
+            cancelAllAlarms()
             dao.loadCityCode(appSettings.lastLocation.uppercase())?.let { cityCode ->
                 val prayingTime = dao.loadCityTimes(cityCode).first {
                     val date = LocalDate.parse(it.gregorianDateShort, DateTimeFormatter.ofPattern("dd.MM.yyyy"))
@@ -65,6 +66,7 @@ class DailyScheduleWorker @AssistedInject constructor(
         }
     }
 
+    @SuppressLint("ScheduleExactAlarm")
     private fun scheduleTime(schedule: Schedule, prayingTime: PrayerTime) {
         val prayerTime = when (schedule.ordinal) {
             0 -> prayingTime.fajr
@@ -84,7 +86,7 @@ class DailyScheduleWorker @AssistedInject constructor(
         if (time.isAfter(LocalDateTime.now()))
             alarmManager.setExactAndAllowWhileIdle(
                 AlarmManager.RTC_WAKEUP,
-                time.atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L,
+                LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L +5000,
                 PendingIntent.getBroadcast(
                     applicationContext,
                     schedule.id.hashCode(),

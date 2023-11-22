@@ -1,8 +1,10 @@
 package de.yanos.islam
 
 import android.annotation.SuppressLint
+import android.app.NotificationManager
 import android.content.Context
 import android.location.Geocoder
+import android.media.MediaPlayer
 import androidx.annotation.RawRes
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,14 +23,17 @@ import de.yanos.islam.data.model.Schedule
 import de.yanos.islam.data.model.Topic
 import de.yanos.islam.data.model.TopicResource
 import de.yanos.islam.data.model.TopicType
-import de.yanos.islam.data.repositories.QuranRepository
 import de.yanos.islam.data.repositories.AwqatRepository
+import de.yanos.islam.data.repositories.QuranRepository
+import de.yanos.islam.di.AzanPlayer
 import de.yanos.islam.service.DailyScheduleWorker
 import de.yanos.islam.util.AppSettings
 import de.yanos.islam.util.getCurrentLocation
 import de.yanos.islam.util.hasLocationPermission
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -47,20 +52,22 @@ import kotlin.concurrent.timerTask
 @HiltViewModel
 class MainViewModel @Inject constructor(
     val appSettings: AppSettings,
-    private val geocoder: Geocoder,
     private val awqatRepository: AwqatRepository,
-    private val quranRepository: QuranRepository,
     @ApplicationContext private val context: Context,
     private val db: IslamDatabase,
     @IODispatcher private val dispatcher: CoroutineDispatcher,
+    private val geocoder: Geocoder,
+    private val quranRepository: QuranRepository,
+    @AzanPlayer private val mediaPlayer: MediaPlayer,
+    private val notificationManager: NotificationManager,
     private val workManager: WorkManager
 ) : ViewModel() {
-    var permissionsHandled: Boolean by mutableStateOf(true)
     var isReady: Boolean by mutableStateOf(false)
-    private val timer: Timer = Timer()
+    private var timer: Timer? = null
 
-    init {
-        timer.scheduleAtFixedRate(
+    fun startSchedule() {
+        timer = Timer()
+        timer?.scheduleAtFixedRate(
             timerTask()
             {
                 viewModelScope.launch(Dispatchers.Main) {
@@ -80,6 +87,18 @@ class MainViewModel @Inject constructor(
         )
     }
 
+    fun cancelSchedule() {
+        timer?.cancel()
+    }
+
+    fun cancelAllNotifications() {
+        notificationManager.cancelAll()
+        if (mediaPlayer.isPlaying) {
+            mediaPlayer.pause()
+            mediaPlayer.seekTo(0)
+        }
+    }
+
     private fun loadLocationDependentData() {
         if (isReady)
             viewModelScope.launch {
@@ -90,14 +109,20 @@ class MainViewModel @Inject constructor(
             }
     }
 
+    private var isLoading = false
     private suspend fun loadLocationIndependentData() {
         viewModelScope.launch {
-            if (!isReady) {
-                loadQuran()
-                initDailyWorker()
-                loadDailyAwqatList()
+            if (!isReady && !isLoading) {
+                isLoading = true
+                listOf(
+                    async { initDailyWorker() },
+                    async { loadDailyAwqatList() }
+                ).awaitAll()
                 isReady = if (!appSettings.isDBInitialized) {
-                    initDB()
+                    listOf(
+                        async { loadQuran() },
+                        async { initDB() }
+                    ).awaitAll()
                     true
                 } else true
             }
@@ -117,7 +142,7 @@ class MainViewModel @Inject constructor(
             else -> Duration.ofHours(24L - now.hour)
         }.plusMinutes(20)
         val periodicWorkRequest = PeriodicWorkRequestBuilder<DailyScheduleWorker>(24, TimeUnit.HOURS)
-            .setInitialDelay(delay)
+            .setInitialDelay(Duration.ofHours(0L))
             .build()
         workManager.enqueueUniquePeriodicWork("daily", ExistingPeriodicWorkPolicy.UPDATE, periodicWorkRequest)
         return true
