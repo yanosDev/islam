@@ -89,6 +89,7 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         vm.startSchedule()
+        vm.cancelAllNotifications()
     }
 
     override fun onPause() {

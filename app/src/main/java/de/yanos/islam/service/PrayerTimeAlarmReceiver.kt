@@ -14,7 +14,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.yanos.islam.R
 import de.yanos.islam.di.AzanPlayer
 import de.yanos.islam.util.Constants
-import timber.log.Timber
 import javax.inject.Inject
 
 

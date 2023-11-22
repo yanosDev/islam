@@ -1,8 +1,10 @@
 package de.yanos.islam
 
 import android.annotation.SuppressLint
+import android.app.NotificationManager
 import android.content.Context
 import android.location.Geocoder
+import android.media.MediaPlayer
 import androidx.annotation.RawRes
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +25,7 @@ import de.yanos.islam.data.model.TopicResource
 import de.yanos.islam.data.model.TopicType
 import de.yanos.islam.data.repositories.AwqatRepository
 import de.yanos.islam.data.repositories.QuranRepository
+import de.yanos.islam.di.AzanPlayer
 import de.yanos.islam.service.DailyScheduleWorker
 import de.yanos.islam.util.AppSettings
 import de.yanos.islam.util.getCurrentLocation
@@ -49,12 +52,14 @@ import kotlin.concurrent.timerTask
 @HiltViewModel
 class MainViewModel @Inject constructor(
     val appSettings: AppSettings,
-    private val geocoder: Geocoder,
     private val awqatRepository: AwqatRepository,
-    private val quranRepository: QuranRepository,
     @ApplicationContext private val context: Context,
     private val db: IslamDatabase,
     @IODispatcher private val dispatcher: CoroutineDispatcher,
+    private val geocoder: Geocoder,
+    private val quranRepository: QuranRepository,
+    @AzanPlayer private val mediaPlayer: MediaPlayer,
+    private val notificationManager: NotificationManager,
     private val workManager: WorkManager
 ) : ViewModel() {
     var isReady: Boolean by mutableStateOf(false)
@@ -84,6 +89,14 @@ class MainViewModel @Inject constructor(
 
     fun cancelSchedule() {
         timer?.cancel()
+    }
+
+    fun cancelAllNotifications() {
+        notificationManager.cancelAll()
+        if (mediaPlayer.isPlaying) {
+            mediaPlayer.pause()
+            mediaPlayer.seekTo(0)
+        }
     }
 
     private fun loadLocationDependentData() {
@@ -129,7 +142,7 @@ class MainViewModel @Inject constructor(
             else -> Duration.ofHours(24L - now.hour)
         }.plusMinutes(20)
         val periodicWorkRequest = PeriodicWorkRequestBuilder<DailyScheduleWorker>(24, TimeUnit.HOURS)
-            .setInitialDelay(delay)
+            .setInitialDelay(Duration.ofHours(0L))
             .build()
         workManager.enqueueUniquePeriodicWork("daily", ExistingPeriodicWorkPolicy.UPDATE, periodicWorkRequest)
         return true
