@@ -2,10 +2,10 @@ package de.yanos.islam.util
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Book
 import androidx.compose.material.icons.rounded.LockClock
+import androidx.compose.material.icons.rounded.MenuBook
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Settings
-import androidx.compose.material.icons.rounded.Topic
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -82,22 +82,22 @@ sealed class MainNavigation(override val route: String, override val args: List<
 
         val all = listOf(
             NavigationDestination.TopDestination(
-                route = Knowledge.route,
-                selectedIcon = Icons.Rounded.Topic,
-                unselectedIcon = Icons.Rounded.Topic,
-                iconTextId = R.string.tab_topic
-            ),
-            NavigationDestination.TopDestination(
-                route = Quran.route,
-                selectedIcon = Icons.Rounded.Book,
-                unselectedIcon = Icons.Rounded.Book,
-                iconTextId = R.string.tab_quran
-            ),
-            NavigationDestination.TopDestination(
                 route = Praying.route,
                 selectedIcon = Icons.Rounded.LockClock,
                 unselectedIcon = Icons.Rounded.LockClock,
                 iconTextId = R.string.tab_time
+            ),
+            NavigationDestination.TopDestination(
+                route = Knowledge.route,
+                selectedIcon = Icons.Rounded.Search,
+                unselectedIcon = Icons.Rounded.Search,
+                iconTextId = R.string.tab_topic
+            ),
+            NavigationDestination.TopDestination(
+                route = Quran.route,
+                selectedIcon = Icons.Rounded.MenuBook,
+                unselectedIcon = Icons.Rounded.MenuBook,
+                iconTextId = R.string.tab_quran
             ),
             NavigationDestination.TopDestination(
                 route = Settings.route,
