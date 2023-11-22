@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalFoundationApi::class)
+@file:OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 
 package de.yanos.islam.ui.quran.classic
 
@@ -15,21 +15,32 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CutCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import de.yanos.islam.data.model.quran.Ayah
 import de.yanos.islam.data.model.quran.Page
+import de.yanos.islam.util.IslamDivider
 import de.yanos.islam.util.NavigationAction
 import de.yanos.islam.util.QuranText
+import de.yanos.islam.util.alternatingColors
 import de.yanos.islam.util.arabicNumber
 import de.yanos.islam.util.ayahWithColoredNumber
+import de.yanos.islam.util.bodyMedium
 import de.yanos.islam.util.headlineSmall
 import de.yanos.islam.util.labelLarge
 import de.yanos.islam.util.quranInnerColor
@@ -47,11 +58,22 @@ fun QuranClassicScreen(
         val pagerState = rememberPagerState {
             pageCount
         }
+        var selectedAyah: Ayah? by remember { mutableStateOf(null) }
+        val onAyahChange = { ayah: Ayah? -> selectedAyah = ayah }
         HorizontalPager(modifier = Modifier.fillMaxSize(), state = pagerState, reverseLayout = true) { pageNumber ->
             Column(modifier = modifier.padding(12.dp)) {
                 QuranHeader(modifier = Modifier.wrapContentHeight(), surahName = it.pages[pageNumber].pageSurahName, page = arabicNumber(it.pages[pageNumber].page))
-                QuranPage(modifier = Modifier, page = it.pages[pageNumber], style = quranTypoByConfig(vm.quranSizeFactor, vm.quranStyle).headlineMedium)
+                QuranPage(
+                    modifier = Modifier,
+                    page = it.pages[pageNumber],
+                    selectedAyah = selectedAyah,
+                    style = quranTypoByConfig(vm.quranSizeFactor, vm.quranStyle).headlineMedium,
+                    onAyahSelected = onAyahChange
+                )
             }
+        }
+        selectedAyah?.let { ayah ->
+            AyahPopOver(modifier = modifier, ayah = ayah, onAyahSelected = onAyahChange)
         }
     }
 }
@@ -65,7 +87,21 @@ private fun QuranHeader(modifier: Modifier, surahName: String, page: String) {
 }
 
 @Composable
-private fun QuranPage(modifier: Modifier, page: Page, style: TextStyle) {
+private fun AyahPopOver(modifier: Modifier, ayah: Ayah, onAyahSelected: (ayah: Ayah?) -> Unit) {
+    ModalBottomSheet(modifier = modifier, onDismissRequest = { onAyahSelected(null) }) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Text(text = alternatingColors(text = ayah.translationTr, delimiter = Regex("-|\\s")), style = bodyMedium())
+            IslamDivider()
+            Text(text = alternatingColors(text = ayah.transliterationEn, delimiter = Regex("-|\\s")), style = bodyMedium())
+            IslamDivider()
+            Text(text = "Audio")
+            IslamDivider()
+        }
+    }
+}
+
+@Composable
+private fun QuranPage(modifier: Modifier, page: Page, selectedAyah: Ayah?, style: TextStyle, onAyahSelected: (ayah: Ayah?) -> Unit) {
     Box(modifier = modifier.wrapContentHeight(), contentAlignment = Alignment.Center) {
         OutlinedCard(
             modifier = Modifier
@@ -100,18 +136,27 @@ private fun QuranPage(modifier: Modifier, page: Page, style: TextStyle) {
                                 .background(color = quranInnerColor.copy(alpha = 0.15f))
                         ) {
                             val scrollState = rememberScrollState()
+                            val ayahsOffsets = mutableMapOf<Int, Int>()
+                            val ayahs = page.ayahs.mapIndexed { index, ayah ->
+                                val ayahText = ayahWithColoredNumber(text = ayah.text, ayahNr = ayah.number, fontSize = style.fontSize, isSelected = ayah == selectedAyah)
+                                ayahsOffsets[ayah.id] = if (index == 0) ayahText.length else ayahText.length + (ayahsOffsets[ayah.id - 1] ?: 0)
+                                ayahText
+                            }
+                            val text = ayahs.reduceRight { first, second -> first.plus(second) }
                             QuranText {
-                                Text(
+                                ClickableText(
                                     modifier = Modifier
                                         .padding(horizontal = 16.dp, vertical = 2.dp)
                                         .verticalScroll(scrollState),
-                                    textAlign = TextAlign.Justify,
-                                    text = page.ayahs.map { ayah -> ayahWithColoredNumber(text = ayah.text, ayahNr = ayah.number, fontSize = style.fontSize) }
-                                        .reduceRight { first, second -> first.plus(second) },
-                                    style = style
+                                    text = text,
+                                    style = style.copy(textAlign = TextAlign.Justify),
+                                    onClick = { offset ->
+                                        ayahsOffsets.filter { offset < it.value }.toSortedMap().firstKey().let { id ->
+                                            page.ayahs.find { it.id == id }?.let(onAyahSelected)
+                                        }
+                                    }
                                 )
                             }
-
                         }
                     }
                 }

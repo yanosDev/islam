@@ -9,7 +9,9 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.unit.TextUnit
@@ -22,9 +24,8 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-val quranBorderColor = Color(android.graphics.Color.parseColor("#857953"))
+val greyColor = Color(android.graphics.Color.parseColor("#efefef"))
 val quranInnerColor = Color(android.graphics.Color.parseColor("#DED6CD"))
-val quranOuterColor = Color(android.graphics.Color.parseColor("#E9E2D7"))
 val goldColorDark = Color(android.graphics.Color.parseColor("#FFD700"))
 val errorColorDark = Color(android.graphics.Color.parseColor("#FF0000"))
 val correctColorDark = Color(android.graphics.Color.parseColor("#00FF00"))
@@ -169,18 +170,21 @@ fun ayahWithColoredNumber(
     primaryColor: Color = goldColor(),
     text: String,
     ayahNr: Int,
-    fontSize: TextUnit
+    fontSize: TextUnit,
+    isSelected: Boolean
 ): AnnotatedString {
     //Find where searchQuery appears in courseName
     val primaryStyle = SpanStyle(color = primaryColor, fontSize = fontSize.times(0.6))
-    val secondaryStyle = SpanStyle(color = MaterialTheme.colorScheme.onSurface)
+    val secondaryStyle = if (isSelected)
+        SpanStyle(
+            color = greyColor,
+            shadow = Shadow(offset = Offset(2F, 1F)),
+        )
+    else SpanStyle(color = MaterialTheme.colorScheme.onSurface)
     val ayahEnd = " \uFD3F" + arabicNumber(ayahNr) + "\uFD3E "
     val builder = AnnotatedString.Builder(text + ayahEnd)
-    var startIndex = 0
-    builder.addStyle(secondaryStyle, startIndex, startIndex + text.length)
-    startIndex += text.length
-    builder.addStyle(primaryStyle, startIndex, startIndex + ayahEnd.length)
-
+    builder.addStyle(secondaryStyle, 0, text.length)
+    builder.addStyle(primaryStyle, text.length, text.length + ayahEnd.length)
     return builder.toAnnotatedString()
 }
 

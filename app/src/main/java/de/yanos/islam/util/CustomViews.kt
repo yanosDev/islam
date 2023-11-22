@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
@@ -257,6 +258,8 @@ fun <T> ContentAfterLoading(
 @Composable
 fun QuranText(content: @Composable () -> Unit) {
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        content()
+        SelectionContainer {
+            content()
+        }
     }
 }
