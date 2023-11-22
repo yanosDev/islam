@@ -50,6 +50,7 @@ import de.yanos.islam.R
 import de.yanos.islam.util.IslamDivider
 import de.yanos.islam.util.IslamSwitch
 import de.yanos.islam.util.NavigationAction
+import de.yanos.islam.util.QuranText
 import de.yanos.islam.util.alternatingColors
 import de.yanos.islam.util.bodyMedium
 import de.yanos.islam.util.headlineSmall
@@ -282,12 +283,14 @@ private fun AyetItem(
         IslamDivider()
         Row(horizontalArrangement = Arrangement.SpaceBetween) {
             Text(text = stringResource(id = R.string.sure_ayet, index + 1), style = labelLarge())
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.End,
-                text = alternatingColors(text = original),
-                style = typo.headlineMedium
-            )
+            QuranText {
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Justify,
+                    text = alternatingColors(text = original),
+                    style = typo.headlineMedium
+                )
+            }
         }
         AnimatedVisibility(visible = showPronunciations) {
             Spacer(modifier = Modifier.height(6.dp))

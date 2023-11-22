@@ -23,9 +23,9 @@ fun typoByConfig(factor: Int, style: Int): Typography {
 
 fun quranTypoByConfig(factor: Int, style: Int): Typography {
     return typo(
-        sizeFactor = factor,
+        sizeFactor = if (factor > 0) 10 * factor else 3 * factor,
         family = FontFamily(Font(QuranFontStyle.values()[style].fontId, FontWeight.Normal)),
-        multiplier = if (factor > 0) 2 * factor else 14
+        multiplier = if (factor > 0) 20 * factor else 14
     )
 }
 

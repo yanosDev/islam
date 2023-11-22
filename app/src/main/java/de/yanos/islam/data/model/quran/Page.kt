@@ -1,4 +1,3 @@
 package de.yanos.islam.data.model.quran
 
-class Page {
-}
+data class Page(val page: Int, val ayahs: List<Ayah>)

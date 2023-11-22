@@ -11,6 +11,9 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface QuranDao : BaseDao<Ayah> {
+    @Query("SELECT * FROM Ayah ORDER BY id")
+    suspend fun ayahs(): List<Ayah>
+
     @Query("SELECT * FROM Ayah WHERE (sureName LIKE '%' || :query || '%' OR translationTr LIKE '%' || :query || '%' OR transliterationEn LIKE '%' || :query || '%') ORDER BY sureId")
     fun findMatches(query: String): List<Ayah>
 

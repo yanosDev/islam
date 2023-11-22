@@ -21,7 +21,9 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-
+val quranBorderColor = Color(android.graphics.Color.parseColor("#857953"))
+val quranInnerColor = Color(android.graphics.Color.parseColor("#DED6CD"))
+val quranOuterColor = Color(android.graphics.Color.parseColor("#E9E2D7"))
 val goldColorDark = Color(android.graphics.Color.parseColor("#FFD700"))
 val errorColorDark = Color(android.graphics.Color.parseColor("#FF0000"))
 val correctColorDark = Color(android.graphics.Color.parseColor("#00FF00"))
@@ -194,3 +196,18 @@ fun getCurrentLocation(context: Context, callback: (Double, Double) -> Unit) {
             exception.printStackTrace()
         }
 }
+
+fun arabicNumber(number: Int): String = number.toString().map { character ->
+    when (character.digitToInt()) {
+        0 -> "\u0660"
+        1 -> "\u0661"
+        2 -> "\u0662"
+        3 -> "\u0663"
+        4 -> "\u0664"
+        5 -> "\u0665"
+        6 -> "\u0666"
+        7 -> "\u0667"
+        8 -> "\u0668"
+        else -> "\u0669"
+    }
+}.joinToString("")

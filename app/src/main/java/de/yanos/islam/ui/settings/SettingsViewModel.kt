@@ -1,7 +1,7 @@
 package de.yanos.islam.ui.settings
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,7 +24,7 @@ class SettingsViewModel @Inject constructor(
 
     fun updateQuranFontSize(size: Int) {
         quranFontSize = size
-        appSettings.quranSizeFactor = if (size > 0) 10 * size else size
+        appSettings.quranSizeFactor = size
     }
 
     fun updateQuranFontStyle(style: Int) {
@@ -32,8 +32,8 @@ class SettingsViewModel @Inject constructor(
         appSettings.quranStyle = style
     }
 
-    var fontSize by mutableStateOf(appSettings.fontSizeFactor)
-    var fontStyle by mutableStateOf(appSettings.fontStyle)
-    var quranFontSize by mutableStateOf(appSettings.quranSizeFactor / 10)
-    var quranFontStyle by mutableStateOf(appSettings.quranStyle)
+    var fontSize by mutableIntStateOf(appSettings.fontSizeFactor)
+    var fontStyle by mutableIntStateOf(appSettings.fontStyle)
+    var quranFontSize by mutableIntStateOf(appSettings.quranSizeFactor)
+    var quranFontStyle by mutableIntStateOf(appSettings.quranStyle)
 }
