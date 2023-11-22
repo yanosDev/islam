@@ -5,13 +5,17 @@ import de.yanos.islam.data.model.quran.Surah
 import de.yanos.islam.data.repositories.source.LocalQuranSource
 import de.yanos.islam.data.repositories.source.RemoteQuranSource
 import de.yanos.islam.util.LoadState
+import de.yanos.islam.util.localFile
+import java.io.File
 import javax.inject.Inject
 
 interface QuranRepository {
     suspend fun fetchQuran()
+    suspend fun loadAudio(ayah: Ayah): File?
 }
 
 class QuranRepositoryImpl @Inject constructor(
+    private val filesDir: File,
     private val local: LocalQuranSource,
     private val remote: RemoteQuranSource
 ) : QuranRepository {
@@ -53,4 +57,23 @@ class QuranRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun loadAudio(ayah: Ayah): File? {
+        val audioFile = ayah.audio.localFile(filesDir)
+        val audioAlt = ayah.audioMore?.localFile(filesDir)
+        return if (audioFile.exists()) {
+            audioFile
+        } else {
+            val loadState = remote.downloadAudio(ayah.audio)
+            if (loadState is LoadState.Data)
+                loadState.data
+            else if (audioAlt != null) {
+                val altLoadState = remote.downloadAudio(ayah.audioMore)
+                if (altLoadState is LoadState.Data)
+                    audioAlt
+                else null
+            } else null
+        }
+    }
 }
+

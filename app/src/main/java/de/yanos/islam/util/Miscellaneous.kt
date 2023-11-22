@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -19,6 +20,7 @@ import androidx.core.content.ContextCompat
 import com.google.android.gms.location.LocationServices
 import retrofit2.Response
 import timber.log.Timber
+import java.io.File
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -236,3 +238,5 @@ fun arabicNumber(number: Int): String = number.toString().map { character ->
         else -> "\u0669"
     }
 }.joinToString("")
+
+fun String.localFile(dir: File) = File(dir, Uri.parse(this).path!!)

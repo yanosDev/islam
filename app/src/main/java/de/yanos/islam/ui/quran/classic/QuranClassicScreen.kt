@@ -7,8 +7,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.HorizontalPager
@@ -17,6 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedCard
@@ -73,7 +76,7 @@ fun QuranClassicScreen(
             }
         }
         selectedAyah?.let { ayah ->
-            AyahPopOver(modifier = modifier, ayah = ayah, onAyahSelected = onAyahChange)
+            AyahPopOver(modifier = modifier, ayah = ayah, onAyahSelected = onAyahChange, onAudioInteraction = vm::onAudioChange)
         }
     }
 }
@@ -87,15 +90,20 @@ private fun QuranHeader(modifier: Modifier, surahName: String, page: String) {
 }
 
 @Composable
-private fun AyahPopOver(modifier: Modifier, ayah: Ayah, onAyahSelected: (ayah: Ayah?) -> Unit) {
+private fun AyahPopOver(modifier: Modifier, ayah: Ayah, onAyahSelected: (ayah: Ayah?) -> Unit, onAudioInteraction: (OnAudioInteraction) -> Unit) {
     ModalBottomSheet(modifier = modifier, onDismissRequest = { onAyahSelected(null) }) {
         Column(modifier = Modifier.padding(12.dp)) {
             Text(text = alternatingColors(text = ayah.translationTr, delimiter = Regex("-|\\s")), style = bodyMedium())
+            Spacer(modifier = Modifier.height(4.dp))
             IslamDivider()
+            Spacer(modifier = Modifier.height(4.dp))
             Text(text = alternatingColors(text = ayah.transliterationEn, delimiter = Regex("-|\\s")), style = bodyMedium())
+            Spacer(modifier = Modifier.height(4.dp))
             IslamDivider()
-            Text(text = "Audio")
-            IslamDivider()
+            Spacer(modifier = Modifier.height(4.dp))
+            Button(onClick = { onAudioInteraction(DownloadAudio(ayah)) }) {
+                Text(text = "Audio")
+            }
         }
     }
 }

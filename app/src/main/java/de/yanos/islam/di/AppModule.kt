@@ -21,8 +21,8 @@ import de.yanos.core.utils.DebugInterceptor
 import de.yanos.core.utils.DefaultDispatcher
 import de.yanos.core.utils.IODispatcher
 import de.yanos.core.utils.MainDispatcher
-import de.yanos.islam.data.api.QuranApi
 import de.yanos.islam.data.api.AwqatApi
+import de.yanos.islam.data.api.QuranApi
 import de.yanos.islam.data.database.IslamDatabase
 import de.yanos.islam.data.database.IslamDatabaseImpl
 import kotlinx.coroutines.Dispatchers
@@ -172,6 +172,10 @@ internal class AppModule {
     @Singleton
     @DefaultDispatcher
     fun provideDefaultDispatcher() = Dispatchers.Default
+
+    @Provides
+    @Singleton
+    fun provideFilesDir(@ApplicationContext context: Context) = context.filesDir
 }
 
 @Qualifier
