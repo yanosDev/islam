@@ -1,12 +1,16 @@
 package de.yanos.islam.ui.quran.partial
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,7 +31,6 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.Typography
@@ -79,7 +82,6 @@ fun QuranPartialScreen(
         Column(modifier = modifier) {
             Column(
                 modifier = Modifier
-                    .background(color = MaterialTheme.colorScheme.background)
                     .fillMaxWidth()
                     .wrapContentHeight(),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -133,7 +135,7 @@ private fun AyetSettings(
     currentPosition: Int,
     onAyetChosen: (Int) -> Unit
 ) {
-    AnimatedVisibility(visible = showSettings) {
+    AnimatedVisibility(visible = showSettings, enter = expandVertically() + fadeIn(), exit = shrinkVertically() + fadeOut()) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -203,7 +205,7 @@ private fun AyetList(
     sure: SurahData,
     typo: Typography
 ) {
-    LazyColumn(modifier = modifier, state = state) {
+    LazyColumn(modifier = modifier.fillMaxHeight(1f), state = state) {
         items(count = sure.originals.size) { index: Int ->
             AyetItem(
                 index = index,

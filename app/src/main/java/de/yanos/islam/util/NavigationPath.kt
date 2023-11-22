@@ -65,7 +65,6 @@ sealed class KnowledgeNavigationAction(override val route: String) : NavigationA
     data class NavigateToSubTopic(val id: Int) : KnowledgeNavigationAction(KnowledgeNavigation.SubList.route.replace("{id}", id.toString()))
     data class NavigateToTopicQuestions(val id: Int, val parentId: Int?) :
         KnowledgeNavigationAction(KnowledgeNavigation.QuestionList.route.replace("{id}", id.toString()).replace("{parentId}", (parentId?.toString() ?: "-1")))
-
 }
 
 object Permissions : NavigationPath {
@@ -115,35 +114,35 @@ sealed class QuranNavigation(override val route: String, override val args: List
     object QuranMainList : QuranNavigation("quran/main") {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
-            QuranMainListScreen(onNavigationChange = onNavigationChange)
+            QuranMainListScreen(modifier = Modifier.fillMaxSize(), onNavigationChange = onNavigationChange)
         }
     }
 
     object SureList : QuranNavigation("quran/sure") {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
-            SureListScreen(onNavigationChange = onNavigationChange)
+            SureListScreen(modifier = Modifier.fillMaxSize(), onNavigationChange = onNavigationChange)
         }
     }
 
     object QuranPartial : QuranNavigation("quran/sure/{id}", args = listOf(navArgument("id") { type = NavType.IntType })) {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
-            QuranPartialScreen(onNavigationChange = onNavigationChange)
+            QuranPartialScreen(modifier = Modifier.fillMaxSize(), onNavigationChange = onNavigationChange)
         }
     }
 
     object QuranClassic : QuranNavigation("quran/book") {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
-            QuranClassicScreen(onNavigationChange = onNavigationChange)
+            QuranClassicScreen(modifier = Modifier.fillMaxSize(), onNavigationChange = onNavigationChange)
         }
     }
 
     object SearchThroughQuran : QuranNavigation("quran/search/") {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
-            QuranSearchScreen(onNavigationChange = onNavigationChange)
+            QuranSearchScreen(modifier = Modifier.fillMaxSize(), onNavigationChange = onNavigationChange)
         }
     }
 }
@@ -152,14 +151,14 @@ sealed class KnowledgeNavigation(override val route: String, override val args: 
     object MainList : KnowledgeNavigation("topics") {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
-            MainTopicsScreen(onNavigationChange = onNavigationChange)
+            MainTopicsScreen(modifier = Modifier.fillMaxSize(), onNavigationChange = onNavigationChange)
         }
     }
 
     object SubList : KnowledgeNavigation("topics/{id}", args = listOf(navArgument("id") { type = NavType.IntType })) {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
-            SubTopicsScreen(onNavigationChange = onNavigationChange)
+            SubTopicsScreen(modifier = Modifier.fillMaxSize(), onNavigationChange = onNavigationChange)
         }
     }
 
@@ -167,35 +166,35 @@ sealed class KnowledgeNavigation(override val route: String, override val args: 
         KnowledgeNavigation("topics/{parentId}/questions/{id}", args = listOf(navArgument("id") { type = NavType.IntType }, navArgument("parentId") { type = NavType.IntType })) {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
-            QuestionListScreen()
+            QuestionListScreen(modifier = Modifier.fillMaxSize())
         }
     }
 
     object Challenge : KnowledgeNavigation("topics/challenge") {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
-            ChallengeScreen(onNavigationChange = onNavigationChange)
+            ChallengeScreen(modifier = Modifier.fillMaxSize(), onNavigationChange = onNavigationChange)
         }
     }
 
     object ChallengeSession : KnowledgeNavigation("topics/challenge/{id}", args = listOf(navArgument("id") { type = NavType.IntType })) {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
-            ChallengeSessionScreen(onNavigationChange = onNavigationChange)
+            ChallengeSessionScreen(modifier = Modifier.fillMaxSize(), onNavigationChange = onNavigationChange)
         }
     }
 
     object ChallengeOpen : KnowledgeNavigation("topics/challenge/open/") {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
-            OpenChallengesScreen(onNavigationChange = onNavigationChange)
+            OpenChallengesScreen(modifier = Modifier.fillMaxSize(), onNavigationChange = onNavigationChange)
         }
     }
 
     object SearchQuestions : KnowledgeNavigation("topics/search/") {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
-            SearchQuestionsScreen(onNavigationChange = onNavigationChange)
+            SearchQuestionsScreen(modifier = Modifier.fillMaxSize(), onNavigationChange = onNavigationChange)
         }
     }
 

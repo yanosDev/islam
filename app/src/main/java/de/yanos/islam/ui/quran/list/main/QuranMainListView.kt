@@ -45,7 +45,7 @@ fun QuranMainListScreen(
 
         Column {
             ElevatedButton(
-                modifier = modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 4.dp),
                 shape = AbsoluteCutCornerShape(8.dp),
@@ -55,7 +55,7 @@ fun QuranMainListScreen(
                 Text(text = stringResource(id = R.string.quran_read_main), style = labelMedium(), color = goldColor())
             }
             ElevatedButton(
-                modifier = modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 2.dp),
                 shape = AbsoluteCutCornerShape(8.dp),
@@ -65,7 +65,7 @@ fun QuranMainListScreen(
                 Text(text = stringResource(id = R.string.quran_sure_list), style = labelMedium())
             }
             ElevatedButton(
-                modifier = modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 2.dp),
                 shape = AbsoluteCutCornerShape(8.dp),

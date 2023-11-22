@@ -10,9 +10,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -127,42 +128,74 @@ private fun IslamNavHost(
         NavHost(
             navController = navController,
             startDestination = startRoute,
-            enterTransition = { fadeIn(animationSpec = tween(200)) },
-            exitTransition = { fadeOut(animationSpec = tween(200)) },
-
-            ) {
+        ) {
             navKnowledge(onNavigationChange = onNavigationChange)
             navQuran(onNavigationChange = onNavigationChange)
             composable(
                 route = MainNavigation.Praying.route,
                 deepLinks = listOf(navDeepLink { uriPattern = "yanos://de.islam/praying" })
             ) {
-                PrayerScreen()
+                PrayerScreen(modifier = Modifier.fillMaxSize())
             }
-            composable(route = MainNavigation.Settings.route) {
-                SettingsScreen()
+            composable(
+                route = MainNavigation.Settings.route,
+            ) {
+                SettingsScreen(modifier = Modifier.fillMaxSize())
             }
         }
     }
 }
 
 fun NavGraphBuilder.navQuran(onNavigationChange: (NavigationAction) -> Unit) {
-    navigation(startDestination = QuranNavigation.QuranMainList.route, route = MainNavigation.Quran.route) {
-        allQuran.forEach { path ->
-            composable(route = path.route, arguments = path.args) {
-                path.View(onNavigationChange = onNavigationChange)
-            }
+    navigation(
+        startDestination = QuranNavigation.QuranMainList.route,
+        route = MainNavigation.Quran.route,
+    ) {
+        allQuran.forEachIndexed { index, path ->
+            if (index == 0)
+                composable(
+                    route = path.route, arguments = path.args,
+                    exitTransition = { fadeOut() }
+                ) {
+                    path.View(onNavigationChange = onNavigationChange)
+                }
+            else
+                composable(
+                    route = path.route, arguments = path.args,
+                    enterTransition = { slideInHorizontally(initialOffsetX = { it }) },
+                    exitTransition = { fadeOut() },
+                    popEnterTransition = { slideInHorizontally(initialOffsetX = { -it }) },
+                    popExitTransition = { slideOutHorizontally(targetOffsetX = { it }) },
+                ) {
+                    path.View(onNavigationChange = onNavigationChange)
+                }
         }
     }
 }
 
-
 fun NavGraphBuilder.navKnowledge(onNavigationChange: (NavigationAction) -> Unit) {
-    navigation(startDestination = KnowledgeNavigation.MainList.route, route = MainNavigation.Knowledge.route) {
-        allKnowledge.forEach { path ->
-            composable(route = path.route, arguments = path.args) {
-                path.View(onNavigationChange = onNavigationChange)
-            }
+    navigation(
+        startDestination = KnowledgeNavigation.MainList.route,
+        route = MainNavigation.Knowledge.route,
+    ) {
+        allKnowledge.forEachIndexed { index, path ->
+            if (index == 0)
+                composable(
+                    route = path.route, arguments = path.args,
+                    exitTransition = { fadeOut() }
+                ) {
+                    path.View(onNavigationChange = onNavigationChange)
+                }
+            else
+                composable(
+                    route = path.route, arguments = path.args,
+                    enterTransition = { slideInHorizontally(initialOffsetX = { it }) },
+                    exitTransition = { fadeOut() },
+                    popEnterTransition = { slideInHorizontally(initialOffsetX = { -it }) },
+                    popExitTransition = { slideOutHorizontally(targetOffsetX = { it }) },
+                ) {
+                    path.View(onNavigationChange = onNavigationChange)
+                }
         }
     }
 }
