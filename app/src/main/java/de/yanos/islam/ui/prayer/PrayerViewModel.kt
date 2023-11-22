@@ -19,6 +19,8 @@ import de.yanos.islam.data.model.Schedule
 import de.yanos.islam.data.model.awqat.AwqatDailyContent
 import de.yanos.islam.service.DailyScheduleWorker
 import de.yanos.islam.util.AppSettings
+import de.yanos.islam.util.IsLoading
+import de.yanos.islam.util.ScreenState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -44,9 +46,9 @@ class PrayerViewModel @Inject constructor(
     private var cityData: MutableList<CityData> = mutableListOf()
     private var dailyContent: AwqatDailyContent? = null
     private val timer: Timer = Timer()
-    private var currentIndex: Int = -1
+    private var currentIndex: Int = 0
     val isDBInitialized = appSettings.isDBInitialized
-    var currentState: PrayerScreenData by mutableStateOf(PrayerScreenData())
+    var currentState: ScreenState by mutableStateOf(IsLoading)
     var schedules = mutableStateListOf<Schedule>()
 
     init {
@@ -161,7 +163,7 @@ data class PrayerScreenData(
     val times: List<DayData> = listOf(),
     val index: Int = 0,
     val dailyContent: AwqatDailyContent? = null
-)
+) : ScreenState
 
 data class DayData(
     val day: String,

@@ -75,8 +75,8 @@ fun QuranMainListScreen(
                 Text(text = stringResource(id = R.string.quran_search), style = labelMedium())
             }
         }
-        AnimatedVisibility(visible = isEmpty) {
-            DownloadingScreen(downloadingResources = true)
+        AnimatedVisibility(visible = !vm.isDBInitialized && isEmpty) {
+            DownloadingScreen(downloadingResources = !vm.isDBInitialized)
         }
     }
 

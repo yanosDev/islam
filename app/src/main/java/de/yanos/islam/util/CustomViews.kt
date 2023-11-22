@@ -8,6 +8,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RawRes
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -158,7 +160,7 @@ fun PatternedBackgroung(
     Box(
         modifier = modifier.fillMaxSize()
     ) {
-        BackGroundPattern(modifier = Modifier.matchParentSize())
+//        BackGroundPattern(modifier = Modifier.matchParentSize())
         content()
     }
 }
@@ -234,5 +236,17 @@ fun PermissionCompose(
         LaunchedEffect(key1 = true) {
             launcher.launch(permission)
         }
+    }
+}
+
+@Composable
+fun <T> ContentAfterLoading(
+    state: ScreenState,
+    clazz: Class<T>,
+    content: @Composable (T) -> Unit
+) where T : ScreenState {
+    @Suppress("UNCHECKED_CAST")
+    AnimatedVisibility(visible = state::class.java == clazz, enter = fadeIn()) {
+        content(state as T)
     }
 }

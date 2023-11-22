@@ -82,7 +82,7 @@ fun MainTopicsScreen(
                 }
             }
             item {
-                AnimatedVisibility(visible = !vm.isDBInitialized) {
+                AnimatedVisibility(visible = !vm.isDBInitialized && topics.isEmpty()) {
                     DownloadingScreen(downloadingResources = !vm.isDBInitialized)
                 }
             }

@@ -57,6 +57,7 @@ import de.yanos.islam.R
 import de.yanos.islam.data.model.Schedule
 import de.yanos.islam.data.model.awqat.AwqatDailyContent
 import de.yanos.islam.ui.permissions.DownloadingScreen
+import de.yanos.islam.util.ContentAfterLoading
 import de.yanos.islam.util.IslamDivider
 import de.yanos.islam.util.IslamSwitch
 import de.yanos.islam.util.bodySmall
@@ -73,30 +74,35 @@ fun PrayerScreen(
     modifier: Modifier = Modifier,
     vm: PrayerViewModel = hiltViewModel()
 ) {
-    Column(modifier = modifier
-        .verticalScroll(rememberScrollState())
-        .fillMaxHeight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
-        PrayingHeader(
-            modifier = Modifier
-                .padding(8.dp)
-                .wrapContentHeight(),
-            direction = vm.currentState.times.firstOrNull()?.direction ?: 0F
-        )
-        PrayingTimes(
-            modifier = Modifier.wrapContentHeight(),
-            times = vm.currentState.times,
-            index = vm.currentState.index
-        )
-        PrayerScheduler(
-            modifier = Modifier.wrapContentHeight(),
-            schedules = vm.schedules,
-            onScheduleChange = vm::changeSchedule
-        )
-        vm.currentState.dailyContent?.let {
-            PrayingDaily(
-                modifier = Modifier.wrapContentHeight(),
-                content = it
+    ContentAfterLoading(state = vm.currentState, clazz = PrayerScreenData::class.java) { screenData ->
+        Column(
+            modifier = modifier
+                .verticalScroll(rememberScrollState())
+                .fillMaxHeight(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center
+        ) {
+            PrayingHeader(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .wrapContentHeight(),
+                direction = screenData.times.firstOrNull()?.direction ?: 0F
             )
+            PrayingTimes(
+                modifier = Modifier
+                    .wrapContentHeight(),
+                times = screenData.times,
+                index = screenData.index
+            )
+            PrayerScheduler(
+                modifier = Modifier.wrapContentHeight(),
+                schedules = vm.schedules,
+                onScheduleChange = vm::changeSchedule
+            )
+            screenData.dailyContent?.let {
+                PrayingDaily(
+                    modifier = Modifier.wrapContentHeight(),
+                    content = it
+                )
+            }
         }
     }
     AnimatedVisibility(visible = !vm.isDBInitialized) {
