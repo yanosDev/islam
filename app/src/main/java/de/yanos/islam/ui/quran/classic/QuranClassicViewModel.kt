@@ -1,5 +1,8 @@
+@file:OptIn(ExperimentalFoundationApi::class)
+
 package de.yanos.islam.ui.quran.classic
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -34,6 +37,10 @@ class QuranClassicViewModel @Inject constructor(
 
             state = QuranState(pages)
         }
+    }
+
+    fun updatePage(newPage: Int) {
+        state = (state as QuranState).copy(currentPage = newPage)
     }
 }
 

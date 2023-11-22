@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -27,6 +29,7 @@ import de.yanos.islam.data.model.quran.Page
 import de.yanos.islam.util.NavigationAction
 import de.yanos.islam.util.QuranText
 import de.yanos.islam.util.arabicNumber
+import de.yanos.islam.util.ayahWithColoredNumber
 import de.yanos.islam.util.headlineSmall
 import de.yanos.islam.util.labelLarge
 import de.yanos.islam.util.quranInnerColor
@@ -39,30 +42,23 @@ fun QuranClassicScreen(
     vm: QuranClassicViewModel = hiltViewModel(),
     onNavigationChange: (NavigationAction) -> Unit
 ) {
-    Column(modifier = modifier) {
-        (vm.state as? QuranState)?.let {
-            val currentPage = it.pages[it.currentPage]
-            QuranHeader(modifier = Modifier.padding(horizontal = 12.dp), surahName = currentPage.pageSurahName, page = arabicNumber(it.currentPage))
-            QuranPages(modifier = Modifier.padding(horizontal = 12.dp), pages = it.pages, style = quranTypoByConfig(vm.quranSizeFactor, vm.quranStyle).headlineMedium)
+    (vm.state as? QuranState)?.let {
+        val pageCount = it.pages.size
+        val pagerState = rememberPagerState {
+            pageCount
+        }
+        HorizontalPager(modifier = Modifier.fillMaxSize(), state = pagerState, reverseLayout = true) { pageNumber ->
+            Column(modifier = modifier.padding(12.dp)) {
+                QuranHeader(modifier = Modifier.wrapContentHeight(), surahName = it.pages[pageNumber].pageSurahName, page = arabicNumber(it.pages[pageNumber].page))
+                QuranPage(modifier = Modifier, page = it.pages[pageNumber], style = quranTypoByConfig(vm.quranSizeFactor, vm.quranStyle).headlineMedium)
+            }
         }
     }
 }
 
 @Composable
-fun QuranPages(modifier: Modifier, pages: List<Page>, style: TextStyle) {
-    val pageCount = pages.size
-    val pagerState = rememberPagerState {
-        pageCount
-    }
-
-    HorizontalPager(modifier = modifier, state = pagerState, reverseLayout = true) {
-        QuranPage(modifier = Modifier, page = pages[it], style = style)
-    }
-}
-
-@Composable
 private fun QuranHeader(modifier: Modifier, surahName: String, page: String) {
-    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+    Row(modifier = modifier.wrapContentHeight(), verticalAlignment = Alignment.CenterVertically) {
         Text(modifier = Modifier.weight(1f), textAlign = TextAlign.Center, text = surahName, style = headlineSmall())
         Text(text = arabicNumber(page.toInt()), style = labelLarge())
     }
@@ -70,33 +66,38 @@ private fun QuranHeader(modifier: Modifier, surahName: String, page: String) {
 
 @Composable
 private fun QuranPage(modifier: Modifier, page: Page, style: TextStyle) {
-    Box(modifier = modifier) {
+    Box(modifier = modifier.wrapContentHeight(), contentAlignment = Alignment.Center) {
         OutlinedCard(
-            modifier = modifier
-                .fillMaxSize(),
+            modifier = Modifier
+                .wrapContentHeight()
+                .fillMaxWidth(),
             shape = CutCornerShape(2.dp)
         ) {
             OutlinedCard(
                 modifier = Modifier
-                    .fillMaxSize(),
+                    .wrapContentHeight()
+                    .fillMaxWidth(),
                 shape = CutCornerShape(2.dp),
             ) {
                 OutlinedCard(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .wrapContentHeight()
+                        .fillMaxWidth()
                         .padding(8.dp),
                     shape = CutCornerShape(2.dp),
                 ) {
                     OutlinedCard(
                         modifier = Modifier
-                            .fillMaxSize()
+                            .wrapContentHeight()
+                            .fillMaxWidth()
                             .padding(8.dp),
                         shape = CutCornerShape(1.dp),
                     ) {
                         Box(
                             modifier = Modifier
+                                .wrapContentHeight()
+                                .fillMaxWidth()
                                 .background(color = quranInnerColor.copy(alpha = 0.15f))
-                                .fillMaxSize()
                         ) {
                             val scrollState = rememberScrollState()
                             QuranText {
@@ -105,7 +106,8 @@ private fun QuranPage(modifier: Modifier, page: Page, style: TextStyle) {
                                         .padding(horizontal = 16.dp, vertical = 2.dp)
                                         .verticalScroll(scrollState),
                                     textAlign = TextAlign.Justify,
-                                    text = page.ayahs.joinToString("") { ayah -> ayah.text + "\uFD3F" + arabicNumber(ayah.number) + "\uFD3E " }.replace("  ", " "),
+                                    text = page.ayahs.map { ayah -> ayahWithColoredNumber(text = ayah.text, ayahNr = ayah.number, fontSize = style.fontSize) }
+                                        .reduceRight { first, second -> first.plus(second) },
                                     style = style
                                 )
                             }

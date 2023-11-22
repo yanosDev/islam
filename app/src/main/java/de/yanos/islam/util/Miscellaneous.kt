@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.unit.TextUnit
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.LocationServices
 import retrofit2.Response
@@ -160,6 +161,26 @@ fun alternatingColors(
     } ?: run {
         builder.addStyle(primaryStyle, 0, text.length)
     }
+    return builder.toAnnotatedString()
+}
+
+@Composable
+fun ayahWithColoredNumber(
+    primaryColor: Color = goldColor(),
+    text: String,
+    ayahNr: Int,
+    fontSize: TextUnit
+): AnnotatedString {
+    //Find where searchQuery appears in courseName
+    val primaryStyle = SpanStyle(color = primaryColor, fontSize = fontSize.times(0.6))
+    val secondaryStyle = SpanStyle(color = MaterialTheme.colorScheme.onSurface)
+    val ayahEnd = " \uFD3F" + arabicNumber(ayahNr) + "\uFD3E "
+    val builder = AnnotatedString.Builder(text + ayahEnd)
+    var startIndex = 0
+    builder.addStyle(secondaryStyle, startIndex, startIndex + text.length)
+    startIndex += text.length
+    builder.addStyle(primaryStyle, startIndex, startIndex + ayahEnd.length)
+
     return builder.toAnnotatedString()
 }
 
