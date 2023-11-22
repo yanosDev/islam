@@ -142,7 +142,7 @@ class MainViewModel @Inject constructor(
             else -> Duration.ofHours(24L - now.hour)
         }.plusMinutes(20)
         val periodicWorkRequest = PeriodicWorkRequestBuilder<DailyScheduleWorker>(24, TimeUnit.HOURS)
-            .setInitialDelay(Duration.ofHours(0L))
+            .setInitialDelay(delay)
             .build()
         workManager.enqueueUniquePeriodicWork("daily", ExistingPeriodicWorkPolicy.UPDATE, periodicWorkRequest)
         return true

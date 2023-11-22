@@ -86,7 +86,7 @@ class DailyScheduleWorker @AssistedInject constructor(
         if (time.isAfter(LocalDateTime.now()))
             alarmManager.setExactAndAllowWhileIdle(
                 AlarmManager.RTC_WAKEUP,
-                LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L +5000,
+                time.atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L + 5000,
                 PendingIntent.getBroadcast(
                     applicationContext,
                     schedule.id.hashCode(),
