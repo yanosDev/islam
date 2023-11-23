@@ -83,5 +83,11 @@ dependencies {
     implementation(libs.lottie)
     implementation(libs.accompanist.permissions)
 
+    //Media
+    implementation(libs.androidx.media3.ui)
+    implementation(libs.androidx.media3.session)
+    implementation(libs.androidx.media3.exoplayer)
+
+    //Service
     implementation(libs.work)
 }

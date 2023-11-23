@@ -62,6 +62,7 @@ timber-version = "5.0.1"
 versionCatalog = "0.8.1"
 work = "2.8.1"
 yanos-lib = "0.1.40"
+media3 = "1.2.0"
 
 [libraries]
 accompanist-flowlayout = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "accompanist" }
@@ -168,6 +169,9 @@ secrets-gradlePlugin = { module = "com.google.android.libraries.mapsplatform.sec
 splash = { module = "androidx.core:core-splashscreen", version.ref = "splash" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber-version" }
 work = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
+androidx-media3-session = { group = "androidx.media3", name = "media3-session", version.ref = "media3" }
+androidx-media3-exoplayer = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "media3" }
+androidx-media3-ui = { group = "androidx.media3", name = "media3-ui", version.ref = "media3" }
 
 [plugins]
 android = { id = "com.android.application", version.ref = "androidGradlePlugin" }

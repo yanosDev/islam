@@ -49,7 +49,6 @@ import de.yanos.islam.util.typoByConfig
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -60,6 +59,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
+
         setContent {
             val locationPermissionState = rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION)
             val notificationPermissionState = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)

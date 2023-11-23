@@ -2,6 +2,7 @@
 
 package de.yanos.islam.ui.quran.classic
 
+import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,6 +33,7 @@ class QuranClassicViewModel @Inject constructor(
     val quranStyle get() = appSettings.quranStyle
     val quranSizeFactor get() = appSettings.quranSizeFactor
     var state: ScreenState by mutableStateOf(IsLoading)
+    var uri: Uri? = null
 
     init {
         viewModelScope.launch(dispatcher) {
@@ -45,7 +47,7 @@ class QuranClassicViewModel @Inject constructor(
     fun onAudioChange(onAudioInteraction: OnAudioInteraction) {
         viewModelScope.launch {
             when (onAudioInteraction) {
-                is DownloadAudio -> repository.loadAudio(onAudioInteraction.ayah)
+                is DownloadAudio -> repository.loadAudio(onAudioInteraction.ayah)?.let { uri = Uri.fromFile(it) }
             }
         }
     }

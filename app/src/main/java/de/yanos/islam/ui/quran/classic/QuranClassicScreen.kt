@@ -2,6 +2,9 @@
 
 package de.yanos.islam.ui.quran.classic
 
+import android.net.Uri
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.widget.FrameLayout
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -24,17 +27,30 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
+import androidx.media3.datasource.DataSource
+import androidx.media3.datasource.DefaultDataSource
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
+import androidx.media3.session.MediaSession
+import androidx.media3.ui.AspectRatioFrameLayout
+import androidx.media3.ui.PlayerView
 import de.yanos.islam.data.model.quran.Ayah
 import de.yanos.islam.data.model.quran.Page
 import de.yanos.islam.util.IslamDivider
@@ -44,8 +60,6 @@ import de.yanos.islam.util.alternatingColors
 import de.yanos.islam.util.arabicNumber
 import de.yanos.islam.util.ayahWithColoredNumber
 import de.yanos.islam.util.bodyMedium
-import de.yanos.islam.util.headlineSmall
-import de.yanos.islam.util.labelLarge
 import de.yanos.islam.util.quranInnerColor
 import de.yanos.islam.util.quranTypoByConfig
 
@@ -63,34 +77,35 @@ fun QuranClassicScreen(
         }
         var selectedAyah: Ayah? by remember { mutableStateOf(null) }
         val onAyahChange = { ayah: Ayah? -> selectedAyah = ayah }
+        val typo = quranTypoByConfig(vm.quranSizeFactor, vm.quranStyle)
         HorizontalPager(modifier = Modifier.fillMaxSize(), state = pagerState, reverseLayout = true) { pageNumber ->
             Column(modifier = modifier.padding(12.dp)) {
-                QuranHeader(modifier = Modifier.wrapContentHeight(), surahName = it.pages[pageNumber].pageSurahName, page = arabicNumber(it.pages[pageNumber].page))
+                QuranHeader(modifier = Modifier.wrapContentHeight(), surahName = it.pages[pageNumber].pageSurahName, page = arabicNumber(it.pages[pageNumber].page), typo = typo)
                 QuranPage(
                     modifier = Modifier,
                     page = it.pages[pageNumber],
                     selectedAyah = selectedAyah,
-                    style = quranTypoByConfig(vm.quranSizeFactor, vm.quranStyle).headlineMedium,
+                    style = typo.headlineMedium,
                     onAyahSelected = onAyahChange
                 )
             }
         }
         selectedAyah?.let { ayah ->
-            AyahPopOver(modifier = modifier, ayah = ayah, onAyahSelected = onAyahChange, onAudioInteraction = vm::onAudioChange)
+            AyahPopOver(modifier = modifier, ayah = ayah, uri = vm.uri, onAyahSelected = onAyahChange, onAudioInteraction = vm::onAudioChange)
         }
     }
 }
 
 @Composable
-private fun QuranHeader(modifier: Modifier, surahName: String, page: String) {
+private fun QuranHeader(modifier: Modifier, surahName: String, page: String, typo: Typography) {
     Row(modifier = modifier.wrapContentHeight(), verticalAlignment = Alignment.CenterVertically) {
-        Text(modifier = Modifier.weight(1f), textAlign = TextAlign.Center, text = surahName, style = headlineSmall())
-        Text(text = arabicNumber(page.toInt()), style = labelLarge())
+        Text(modifier = Modifier.weight(1f), textAlign = TextAlign.Center, text = surahName, style = typo.headlineSmall)
+        Text(text = arabicNumber(page.toInt()), style = typo.labelLarge)
     }
 }
 
 @Composable
-private fun AyahPopOver(modifier: Modifier, ayah: Ayah, onAyahSelected: (ayah: Ayah?) -> Unit, onAudioInteraction: (OnAudioInteraction) -> Unit) {
+private fun AyahPopOver(modifier: Modifier, ayah: Ayah, uri: Uri?, onAyahSelected: (ayah: Ayah?) -> Unit, onAudioInteraction: (OnAudioInteraction) -> Unit) {
     ModalBottomSheet(modifier = modifier, onDismissRequest = { onAyahSelected(null) }) {
         Column(modifier = Modifier.padding(12.dp)) {
             Text(text = alternatingColors(text = ayah.translationTr, delimiter = Regex("-|\\s")), style = bodyMedium())
@@ -101,9 +116,58 @@ private fun AyahPopOver(modifier: Modifier, ayah: Ayah, onAyahSelected: (ayah: A
             Spacer(modifier = Modifier.height(4.dp))
             IslamDivider()
             Spacer(modifier = Modifier.height(4.dp))
+
             Button(onClick = { onAudioInteraction(DownloadAudio(ayah)) }) {
                 Text(text = "Audio")
             }
+            uri?.let {
+                VideoPlayer(uri = it)
+            }
+        }
+    }
+}
+
+@Composable
+@androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+fun VideoPlayer(uri: Uri) {
+    val context = LocalContext.current
+
+    val exoPlayer = remember {
+        ExoPlayer.Builder(context)
+            .build()
+            .apply {
+                val defaultDataSourceFactory = DefaultDataSource.Factory(context)
+                val dataSourceFactory: DataSource.Factory = DefaultDataSource.Factory(
+                    context,
+                    defaultDataSourceFactory
+                )
+                val source = ProgressiveMediaSource.Factory(dataSourceFactory)
+                    .createMediaSource(MediaItem.fromUri(uri))
+
+                setMediaSource(source)
+                prepare()
+            }
+    }
+
+    exoPlayer.playWhenReady = true
+    exoPlayer.repeatMode = Player.REPEAT_MODE_ONE
+
+    val mediaSession = MediaSession.Builder(context, exoPlayer).build()
+
+    DisposableEffect(
+        AndroidView(factory = {
+            PlayerView(context).apply {
+                useController = true
+                resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+
+                player = exoPlayer
+                layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT)
+            }
+        })
+    ) {
+        onDispose {
+            exoPlayer.release()
+            mediaSession.release()
         }
     }
 }
