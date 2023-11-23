@@ -1,17 +1,21 @@
 package de.yanos.islam.data.repositories
 
 import de.yanos.islam.data.model.quran.Ayah
+import de.yanos.islam.data.model.quran.Page
 import de.yanos.islam.data.model.quran.Surah
 import de.yanos.islam.data.repositories.source.LocalQuranSource
 import de.yanos.islam.data.repositories.source.RemoteQuranSource
 import de.yanos.islam.util.LoadState
 import de.yanos.islam.util.localFile
+import kotlinx.coroutines.flow.Flow
 import java.io.File
 import javax.inject.Inject
 
 interface QuranRepository {
     suspend fun fetchQuran()
     suspend fun loadAudio(ayah: Ayah): File?
+    fun loadPages(): Flow<List<Page>>
+    suspend fun isWholeQuranFetched(): Boolean
 }
 
 class QuranRepositoryImpl @Inject constructor(
@@ -46,6 +50,7 @@ class QuranRepositoryImpl @Inject constructor(
                         number = ayahAudio.number,
                         audio = ayahAudio.audio,
                         audioMore = ayahAudio.audioSecondary.firstOrNull(),
+                        localAudio = null,
                         text = ayahAudio.text,
                         translationTr = translationSurah?.ayahs?.get(index)?.text ?: "",
                         transliterationEn = transliterationSurah?.ayahs?.get(index)?.text ?: "",
@@ -61,7 +66,7 @@ class QuranRepositoryImpl @Inject constructor(
     override suspend fun loadAudio(ayah: Ayah): File? {
         val audioFile = ayah.audio.localFile(filesDir)
         val audioAlt = ayah.audioMore?.localFile(filesDir)
-        return if (audioFile.exists()) {
+        val finalFile = if (audioFile.exists()) {
             audioFile
         } else {
             val loadState = remote.downloadAudio(ayah.audio)
@@ -74,6 +79,16 @@ class QuranRepositoryImpl @Inject constructor(
                 else null
             } else null
         }
+        local.saveLocalAudio(ayah.id, audioFile.absolutePath)
+        return finalFile
+    }
+
+    override fun loadPages(): Flow<List<Page>> {
+        return local.loadPages()
+    }
+
+    override suspend fun isWholeQuranFetched(): Boolean {
+        return local.isQuranLoaded()
     }
 }
 

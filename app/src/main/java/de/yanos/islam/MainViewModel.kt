@@ -116,11 +116,11 @@ class MainViewModel @Inject constructor(
                 isLoading = true
                 listOf(
                     async { initDailyWorker() },
-                    async { loadDailyAwqatList() }
+                    async { loadDailyAwqatList() },
+                    async { loadQuran() },
                 ).awaitAll()
                 isReady = if (!appSettings.isDBInitialized) {
                     listOf(
-                        async { loadQuran() },
                         async { initDB() }
                     ).awaitAll()
                     true
@@ -131,7 +131,8 @@ class MainViewModel @Inject constructor(
 
     private suspend fun loadQuran() {
         return withContext(dispatcher) {
-            quranRepository.fetchQuran()
+            if (!quranRepository.isWholeQuranFetched())
+                quranRepository.fetchQuran()
         }
     }
 
@@ -204,7 +205,6 @@ class MainViewModel @Inject constructor(
                         ),
                     )
                 )
-
                 appSettings.isDBInitialized = true
             }
         }

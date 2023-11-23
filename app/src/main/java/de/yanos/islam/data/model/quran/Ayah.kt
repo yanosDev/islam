@@ -11,6 +11,7 @@ data class Ayah(
     val number: Int,
     val audio: String,
     val audioMore: String?,
+    val localAudio: String?,
     val text: String,
     val translationTr: String,
     val transliterationEn: String,

@@ -11,7 +11,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.yanos.core.utils.IODispatcher
-import de.yanos.islam.data.database.dao.QuranDao
 import de.yanos.islam.data.model.quran.Ayah
 import de.yanos.islam.data.model.quran.Page
 import de.yanos.islam.data.repositories.QuranRepository
@@ -25,7 +24,6 @@ import javax.inject.Inject
 @HiltViewModel
 class QuranClassicViewModel @Inject constructor(
     private val appSettings: AppSettings,
-    private val dao: QuranDao,
     @IODispatcher private val dispatcher: CoroutineDispatcher,
     private val repository: QuranRepository,
 ) : ViewModel() {
@@ -36,11 +34,10 @@ class QuranClassicViewModel @Inject constructor(
     var uri: Uri? = null
 
     init {
-        viewModelScope.launch(dispatcher) {
-            val surahs = dao.sureList()
-            val pages = dao.ayahs().groupBy { it.page }.map { Page(it.key, surahs.find { surah -> surah.id == it.value.first().sureId }!!.name, it.value) }
-
-            state = QuranState(pages)
+        viewModelScope.launch {
+            repository.loadPages().collect {
+                state = QuranState(it)
+            }
         }
     }
 

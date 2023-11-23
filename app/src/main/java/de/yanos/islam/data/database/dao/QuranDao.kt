@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface QuranDao : BaseDao<Ayah> {
     @Query("SELECT * FROM Ayah ORDER BY id")
-    fun ayahs(): List<Ayah>
+    fun ayahs(): Flow<List<Ayah>>
 
     @Query("SELECT * FROM Ayah WHERE (sureName LIKE '%' || :query || '%' OR translationTr LIKE '%' || :query || '%' OR transliterationEn LIKE '%' || :query || '%') ORDER BY sureId")
     fun findMatches(query: String): List<Ayah>
@@ -20,8 +20,14 @@ interface QuranDao : BaseDao<Ayah> {
     @Query("SELECT * FROM Ayah WHERE sureId = :sureId ORDER BY id")
     fun loadSurah(sureId: Int): Flow<List<Ayah>>
 
+    @Query("SELECT * FROM Ayah WHERE id = :ayahId")
+    fun loadAyah(ayahId: Int): Flow<Ayah>
+
     @Query("SELECT * FROM Surah ORDER BY id")
     fun sureList(): List<Surah>
+
+    @Query("UPDATE Ayah SET localAudio = :localAudio WHERE id = :id")
+    fun updateLocalAudio(id: Int, localAudio: String)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSure(surah: Surah)
@@ -31,4 +37,7 @@ interface QuranDao : BaseDao<Ayah> {
         insertSure(surah)
         insert(ayahs)
     }
+
+    @Query("SELECT COUNT(*) FROM Ayah")
+    suspend fun ayahSize(): Int
 }
