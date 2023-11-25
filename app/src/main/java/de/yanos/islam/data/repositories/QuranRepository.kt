@@ -12,10 +12,15 @@ import java.io.File
 import javax.inject.Inject
 
 interface QuranRepository {
+    suspend fun isWholeQuranFetched(): Boolean
     suspend fun fetchQuran()
     suspend fun loadAudio(ayah: Ayah): File?
     fun loadPages(): Flow<List<Page>>
-    suspend fun isWholeQuranFetched(): Boolean
+    fun loadAyahs(): Flow<List<Ayah>>
+    suspend fun loadAyahById(ayahId: Int): Ayah?
+    suspend fun loadFirstAyahBySurahId(surahId: Int): Ayah?
+    suspend fun loadFirstAyahByPageId(pageId: Int): Ayah?
+    suspend fun loadFirstAyahByJuz(juz: Int): Ayah?
 }
 
 class QuranRepositoryImpl @Inject constructor(
@@ -85,6 +90,26 @@ class QuranRepositoryImpl @Inject constructor(
 
     override fun loadPages(): Flow<List<Page>> {
         return local.loadPages()
+    }
+
+    override fun loadAyahs(): Flow<List<Ayah>> {
+        return local.loadAyahs()
+    }
+
+    override suspend fun loadFirstAyahBySurahId(surahId: Int): Ayah? {
+        return local.loadFirstAyahBySurahId(surahId)
+    }
+
+    override suspend fun loadFirstAyahByPageId(pageId: Int): Ayah? {
+        return local.loadFirstAyahByPageId(pageId)
+    }
+
+    override suspend fun loadFirstAyahByJuz(juz: Int): Ayah? {
+        return local.loadFirstAyahByJuz(juz)
+    }
+
+    override suspend fun loadAyahById(ayahId: Int): Ayah? {
+        return local.loadAyahById(ayahId)
     }
 
     override suspend fun isWholeQuranFetched(): Boolean {

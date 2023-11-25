@@ -7,6 +7,14 @@ import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.location.Geocoder
 import android.media.MediaPlayer
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.common.util.Util
+import androidx.media3.database.StandaloneDatabaseProvider
+import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.datasource.cache.NoOpCacheEvictor
+import androidx.media3.datasource.cache.SimpleCache
+import androidx.media3.exoplayer.offline.DownloadManager
+import androidx.media3.exoplayer.offline.DownloadNotificationHelper
 import androidx.room.Room
 import androidx.work.WorkManager
 import com.squareup.moshi.Moshi
@@ -21,21 +29,26 @@ import de.yanos.core.utils.DebugInterceptor
 import de.yanos.core.utils.DefaultDispatcher
 import de.yanos.core.utils.IODispatcher
 import de.yanos.core.utils.MainDispatcher
+import de.yanos.islam.R
 import de.yanos.islam.data.api.AwqatApi
 import de.yanos.islam.data.api.QuranApi
 import de.yanos.islam.data.database.IslamDatabase
 import de.yanos.islam.data.database.IslamDatabaseImpl
+import de.yanos.islam.util.Constants
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.asExecutor
 import okhttp3.Interceptor
 import okhttp3.Interceptor.*
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import java.io.File
 import java.util.Locale
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
+@UnstableApi
 @Module
 @InstallIn(SingletonComponent::class)
 internal class AppModule {
@@ -157,6 +170,25 @@ internal class AppModule {
     @Provides
     @Singleton
     fun provideAccelerometer(sensorManager: SensorManager) = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+
+    @Provides
+    @Singleton
+    fun provideDownloadNotificationHelper(@ApplicationContext context: Context) = DownloadNotificationHelper(context, Constants.CHANNEL_ID_DOWNLOAD)
+
+    @Provides
+    @Singleton
+    fun provideDownloadManager(@ApplicationContext context: Context, cacheDir: File): DownloadManager {
+        val dataBase = StandaloneDatabaseProvider(context)
+        val downloadCache = SimpleCache(cacheDir, NoOpCacheEvictor(), dataBase)
+        val dataSource = DefaultHttpDataSource.Factory()
+            .setUserAgent(Util.getUserAgent(context, context.resources.getString(R.string.app_name)))
+            .setAllowCrossProtocolRedirects(true)
+            .setReadTimeoutMs(30 * 1000)
+            .setConnectTimeoutMs(30 * 1000)
+
+
+        return DownloadManager(context, dataBase, downloadCache, dataSource, Dispatchers.IO.asExecutor())
+    }
 
     @Provides
     @Singleton

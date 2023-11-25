@@ -19,13 +19,30 @@ class IslamApplication : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
         Timber.plant(Timber.DebugTree())
+
+        createAlarmChannel()
+        createDownloadChannel()
+        notificationManager.cancelAll()
+    }
+
+    private fun createDownloadChannel() {
+        val channel = NotificationChannel(
+            Constants.CHANNEL_ID_DOWNLOAD,
+            Constants.CHANNEL_NAME_DOWNLOAD,
+            NotificationManager.IMPORTANCE_HIGH
+        )
+
+        notificationManager.createNotificationChannel(channel)
+
+    }
+
+    private fun createAlarmChannel() {
         val channel = NotificationChannel(
             Constants.CHANNEL_ID_ALARM,
             Constants.CHANNEL_NAME_ALARM,
             NotificationManager.IMPORTANCE_HIGH
         )
         notificationManager.createNotificationChannel(channel)
-        notificationManager.cancelAll()
     }
 
     override fun getWorkManagerConfiguration(): Configuration {

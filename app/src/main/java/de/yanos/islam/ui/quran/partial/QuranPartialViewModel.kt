@@ -49,7 +49,7 @@ class QuranPartialViewModel @Inject constructor(
 
     fun loadSurah(id: Int) {
         viewModelScope.launch {
-            dao.loadSurah(id).distinctUntilChanged().collect { ayahs ->
+            dao.subsribeSurahAyahs(id).distinctUntilChanged().collect { ayahs ->
                 val surahs = withContext(dispatcher) { dao.sureList() }.sortSure(sortBy)
                 val currentIndex = surahs.indexOfFirst { it.id == id }
                 if (currentIndex > 0) {

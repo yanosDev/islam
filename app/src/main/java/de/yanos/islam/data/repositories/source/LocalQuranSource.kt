@@ -13,10 +13,17 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface LocalQuranSource {
+    suspend fun isQuranLoaded(): Boolean
     suspend fun insertSure(sure: Surah, ayahs: List<Ayah>)
     suspend fun saveLocalAudio(id: Int, localAudio: String)
+
+    suspend fun loadAyahById(ayahId: Int): Ayah?
+    suspend fun loadFirstAyahBySurahId(surahId: Int): Ayah?
+    suspend fun loadFirstAyahByPageId(pageId: Int): Ayah?
+    suspend fun loadFirstAyahByJuz(juz: Int): Ayah?
+
     fun loadPages(): Flow<List<Page>>
-    suspend fun isQuranLoaded(): Boolean
+    fun loadAyahs(): Flow<List<Ayah>>
 }
 
 class LocalQuranSourceImpl @Inject constructor(
@@ -35,14 +42,46 @@ class LocalQuranSourceImpl @Inject constructor(
         }
     }
 
+    override suspend fun loadAyahById(ayahId: Int): Ayah? {
+        return withContext(dispatcher) {
+            dao.loadAyah(ayahId)
+        }
+    }
+
+    override suspend fun loadFirstAyahBySurahId(surahId: Int): Ayah? {
+        return withContext(dispatcher) {
+            dao.loadFirstAyahBySurahId(surahId)
+        }
+    }
+
+    override suspend fun loadFirstAyahByPageId(pageId: Int): Ayah? {
+        return withContext(dispatcher) {
+            dao.loadFirstAyahByPageId(pageId)
+        }
+    }
+
+    override suspend fun loadFirstAyahByJuz(juz: Int): Ayah? {
+        return withContext(dispatcher) {
+            dao.loadFirstAyahByJuz(juz)
+        }
+    }
+
     override fun loadPages(): Flow<List<Page>> {
         return combine(flow {
             emit(withContext(dispatcher) {
                 dao.sureList()
             })
-        }, dao.ayahs()) { surahs, ayahs ->
-            ayahs.groupBy { it.page }.map { Page(it.key, surahs.find { surah -> surah.id == it.value.first().sureId }!!.name, it.value) }
+        }, dao.subscribeAyahs()) { surahs, ayahs ->
+            ayahs.groupBy { it.page }.map {
+                surahs.find { surah -> surah.id == it.value.first().sureId }?.let { surah ->
+                    Page(it.key, surah.name, surah.id, it.value)
+                }
+            }.filterNotNull()
         }
+    }
+
+    override fun loadAyahs(): Flow<List<Ayah>> {
+        return dao.subscribeAyahs()
     }
 
     override suspend fun isQuranLoaded(): Boolean {

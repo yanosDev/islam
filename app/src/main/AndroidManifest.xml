@@ -15,6 +15,7 @@
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 
     <application
         android:name=".IslamApplication"
@@ -49,13 +50,15 @@
         <receiver android:name=".service.PrayerAzanCancelReceiver" />
 
         <service
-            android:name=".service.PlaybackService"
-            android:exported="true"
-            android:foregroundServiceType="mediaPlayback">
+            android:name=".service.ExoDownloadService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync">
             <intent-filter>
-                <action android:name="androidx.media3.session.MediaSessionService" />
+                <action android:name="androidx.media3.exoplayer.downloadService.action.RESTART" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </service>
+
 
         <provider
             android:name="androidx.startup.InitializationProvider"

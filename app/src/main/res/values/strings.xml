@@ -95,4 +95,8 @@
     <string name="init_permission">1. Namaz vakitleri ve Kible yönünü belirlemek icin, suanki bulundugunuz ilin konumu gerekli.\n2. Namaz vakti Bildirimleri almak icin ayriyet den izin gerekli dir.</string>
     <string name="init_permission_location">Konum Izin Ver</string>
     <string name="init_permission_notification">Bildirim Izin Ver</string>
- </resources>
+
+
+    <string name="notification_channel_download_name">Ayet Audio</string>
+    <string name="notification_channel_download_description">Ayetlerin mp3 indiriliyor</string>
+</resources>

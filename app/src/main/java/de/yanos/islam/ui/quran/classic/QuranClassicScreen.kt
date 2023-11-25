@@ -4,6 +4,7 @@ package de.yanos.islam.ui.quran.classic
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,15 +21,15 @@ import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
@@ -37,7 +38,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.data.model.quran.Ayah
 import de.yanos.islam.data.model.quran.Page
-import de.yanos.islam.ui.quran.audio.AudioPlayerScreen
+import de.yanos.islam.ui.quran.audio.AudioEvents
+import de.yanos.islam.ui.quran.audio.AudioViewModel
+import de.yanos.islam.ui.quran.audio.AyahAudioPlayer
 import de.yanos.islam.util.IslamDivider
 import de.yanos.islam.util.NavigationAction
 import de.yanos.islam.util.QuranText
@@ -45,72 +48,130 @@ import de.yanos.islam.util.alternatingColors
 import de.yanos.islam.util.arabicNumber
 import de.yanos.islam.util.ayahWithColoredNumber
 import de.yanos.islam.util.bodyMedium
+import de.yanos.islam.util.labelMedium
 import de.yanos.islam.util.quranInnerColor
 import de.yanos.islam.util.quranTypoByConfig
+import kotlinx.coroutines.launch
 
 
 @Composable
 fun QuranClassicScreen(
     modifier: Modifier = Modifier,
-    vm: QuranClassicViewModel = hiltViewModel(),
+    quranViewModel: QuranClassicViewModel = hiltViewModel(),
+    audioViewModel: AudioViewModel = hiltViewModel(),
     onNavigationChange: (NavigationAction) -> Unit
 ) {
-    (vm.state as? QuranState)?.let {
-        val pageCount = it.pages.size
-        val pagerState = rememberPagerState {
-            pageCount
-        }
-        var selectedAyah: Ayah? by remember { mutableStateOf(null) }
-        val onAyahChange = { ayah: Ayah? -> selectedAyah = ayah }
-        val typo = quranTypoByConfig(vm.quranSizeFactor, vm.quranStyle)
-        HorizontalPager(modifier = Modifier.fillMaxSize(), state = pagerState, reverseLayout = true) { pageNumber ->
-            Column(modifier = modifier.padding(12.dp)) {
-                QuranHeader(modifier = Modifier.wrapContentHeight(), surahName = it.pages[pageNumber].pageSurahName, page = arabicNumber(it.pages[pageNumber].page), typo = typo)
-                QuranPage(
-                    modifier = Modifier,
-                    page = it.pages[pageNumber],
-                    selectedAyah = selectedAyah,
-                    style = typo.headlineMedium,
-                    onAyahSelected = onAyahChange
-                )
+    val typo = quranTypoByConfig(quranViewModel.quranSizeFactor, quranViewModel.quranStyle)
+
+    QuranContent(
+        modifier = modifier,
+        ayah = quranViewModel.currentAyah,
+        index = (quranViewModel.currentAyah?.page ?: 0) - 1,
+        pages = quranViewModel.pages,
+        onPageSelected = { page: Int -> quranViewModel.onSelectionChange(PageSelection(page)) },
+        onSurahSelected = { surahID: Int -> quranViewModel.onSelectionChange(SurahSelection(surahID)) },
+        onJuzSelected = { juz: Int -> quranViewModel.onSelectionChange(JuzSelection(juz)) },
+        onAyahSelected = { ayah: Ayah -> quranViewModel.onSelectionChange(AyahSelection(ayah.id)) },
+        typo = typo
+    )
+    quranViewModel.referenceAyah?.let {
+        AyahDetailBottomSheet(
+            modifier = modifier,
+            audioViewModel = audioViewModel,
+            referenceAyah = it,
+            currentAyah = quranViewModel.nowPlayingAyah,
+            typo = typo,
+            onAyahChange = { ayah: Ayah? ->
+                if (ayah == null)
+                    quranViewModel.clearAyahs()
+                else quranViewModel.nowPlayingAyah = ayah
             }
+        )
+    }
+}
+
+
+@Composable
+fun QuranContent(
+    modifier: Modifier,
+    ayah: Ayah?,
+    pages: List<Page>,
+    index: Int,
+    onSurahSelected: (Int) -> Unit,
+    onPageSelected: (Int) -> Unit,
+    onJuzSelected: (Int) -> Unit,
+    onAyahSelected: (ayah: Ayah) -> Unit,
+    typo: Typography
+) {
+    val pageCount = pages.size
+    val pagerState = rememberPagerState { pageCount }
+    val scope = rememberCoroutineScope()
+
+    if (index >= 0)
+        DisposableEffect(index) {
+            scope.launch {
+                pagerState.animateScrollToPage(index)
+            }
+            onDispose { }
         }
-        selectedAyah?.let { ayah ->
-            AyahPopOver(modifier = modifier, ayah = ayah, onAyahSelected = onAyahChange, onAyahChange = onAyahChange, typo = typo)
+
+    HorizontalPager(modifier = Modifier.fillMaxSize(), state = pagerState, reverseLayout = true) { pageNumber ->
+        Column(modifier = modifier.padding(12.dp)) {
+            QuranHeader(
+                modifier = Modifier.wrapContentHeight(),
+                page = pages[pageNumber],
+                onSurahSelected = onSurahSelected,
+                onJuzSelected = onJuzSelected,
+                onPageSelected = onPageSelected,
+                typo = typo,
+            )
+            QuranPage(
+                modifier = Modifier,
+                page = pages[pageNumber],
+                selectedAyah = ayah,
+                style = typo.headlineMedium,
+                onAyahSelected = onAyahSelected
+            )
         }
     }
 }
 
 @Composable
-private fun QuranHeader(modifier: Modifier, surahName: String, page: String, typo: Typography) {
+private fun QuranHeader(
+    modifier: Modifier, page: Page, typo: Typography,
+    onSurahSelected: (Int) -> Unit,
+    onPageSelected: (Int) -> Unit,
+    onJuzSelected: (Int) -> Unit,
+) {
     Row(modifier = modifier.wrapContentHeight(), verticalAlignment = Alignment.CenterVertically) {
-        Text(modifier = Modifier.weight(1f), textAlign = TextAlign.Center, text = surahName, style = typo.headlineSmall)
-        Text(text = page, style = typo.labelLarge)
-    }
-}
-
-@Composable
-private fun AyahPopOver(modifier: Modifier, ayah: Ayah, onAyahSelected: (ayah: Ayah?) -> Unit, onAyahChange: (Ayah) -> Unit, typo: Typography) {
-    ModalBottomSheet(modifier = modifier, onDismissRequest = { onAyahSelected(null) }) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Text(text = alternatingColors(text = ayah.text, delimiter = Regex("-|\\s")), style = typo.labelSmall)
-            Spacer(modifier = Modifier.height(4.dp))
-            IslamDivider()
-            Text(text = alternatingColors(text = ayah.translationTr, delimiter = Regex("-|\\s")), style = bodyMedium())
-            Spacer(modifier = Modifier.height(4.dp))
-            IslamDivider()
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text = alternatingColors(text = ayah.transliterationEn, delimiter = Regex("-|\\s")), style = bodyMedium())
-            Spacer(modifier = Modifier.height(4.dp))
-            IslamDivider()
-            Spacer(modifier = Modifier.height(4.dp))
-            AudioPlayerScreen(modifier = Modifier, surahId = null, ayahId = ayah.id)
+        TextButton(
+            onClick = { onJuzSelected(page.pageSurahId) },
+        ) {
+            Text(textAlign = TextAlign.Center, text = arabicNumber(page.ayahs.first().juz), style = typo.labelLarge)
+        }
+        TextButton(
+            onClick = { onSurahSelected(page.pageSurahId) },
+            modifier = Modifier
+                .weight(1f),
+        ) {
+            Text(textAlign = TextAlign.Center, text = page.pageSurahName, style = typo.headlineSmall)
+        }
+        TextButton(
+            onClick = { onPageSelected(page.pageSurahId) },
+        ) {
+            Text(textAlign = TextAlign.Center, text = arabicNumber(page.page), style = typo.labelLarge)
         }
     }
 }
 
 @Composable
-private fun QuranPage(modifier: Modifier, page: Page, selectedAyah: Ayah?, style: TextStyle, onAyahSelected: (ayah: Ayah?) -> Unit) {
+private fun QuranPage(
+    modifier: Modifier,
+    page: Page,
+    selectedAyah: Ayah?,
+    style: TextStyle,
+    onAyahSelected: (ayah: Ayah) -> Unit
+) {
     Box(modifier = modifier.wrapContentHeight(), contentAlignment = Alignment.Center) {
         OutlinedCard(
             modifier = Modifier
@@ -169,6 +230,72 @@ private fun QuranPage(modifier: Modifier, page: Page, selectedAyah: Ayah?, style
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun AyahDetailBottomSheet(
+    modifier: Modifier,
+    audioViewModel: AudioViewModel = hiltViewModel(),
+    referenceAyah: Ayah,
+    currentAyah: Ayah?,
+    onAyahChange: (Ayah?) -> Unit,
+    typo: Typography,
+) {
+    if (currentAyah == null)
+        audioViewModel.playAyah(referenceAyah, false)
+    val onEvent = { event: AudioEvents ->
+        audioViewModel.onAudioEvents(event)
+    }
+    val scope = rememberCoroutineScope()
+    DisposableEffect(audioViewModel.currentAyah) {
+        scope.launch {
+            onAyahChange(audioViewModel.currentAyah)
+        }
+        onDispose {
+
+        }
+    }
+    ModalBottomSheet(
+        modifier = modifier,
+        onDismissRequest = {
+            onEvent(AudioEvents.CloseAudio)
+        }) {
+        audioViewModel.currentAyah?.let { ayah: Ayah ->
+            Column(
+                modifier = Modifier
+                    .padding(12.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    //TODO: Replace with drop down
+                    Text(text = arabicNumber(ayah.juz), style = labelMedium())
+                    Text(text = arabicNumber(ayah.page), style = labelMedium())
+                }
+                AyahAudioPlayer(modifier = Modifier, title = ayah.sureName, subtitle = ayah.number.toString(), state = audioViewModel.playerState, onAyahChange = onEvent)
+                Spacer(modifier = Modifier.height(8.dp))
+                IslamDivider(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = alternatingColors(
+                        text = ayah.text,
+                        delimiter = Regex("-|\\s")
+                    ),
+                    style = typo.headlineMedium.copy(fontSize = typo.headlineLarge.fontSize.times(1.2)),
+                    textAlign = TextAlign.End
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                IslamDivider(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(text = alternatingColors(text = ayah.translationTr, delimiter = Regex("-|\\s")), style = bodyMedium())
+                Spacer(modifier = Modifier.height(8.dp))
+                IslamDivider(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = alternatingColors(text = ayah.transliterationEn, delimiter = Regex("-|\\s")), style = bodyMedium())
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
     }

@@ -6,7 +6,6 @@ import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
@@ -17,86 +16,77 @@ import androidx.lifecycle.viewmodel.compose.saveable
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.session.MediaSession
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import de.yanos.islam.data.database.dao.QuranDao
+import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.data.model.quran.Ayah
-import de.yanos.islam.util.IsLoading
-import de.yanos.islam.util.ScreenState
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import de.yanos.islam.data.repositories.QuranRepository
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
 class AudioViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
+    @IODispatcher private val dispatcher: CoroutineDispatcher,
     private val savedStateHandle: SavedStateHandle,
-    private val quranDao: QuranDao
+    private val repository: QuranRepository
 ) : ViewModel() {
-    private val ayahId: Int? = savedStateHandle["ayahId"]
-    private val surahId: Int? = savedStateHandle["sureId"]
+    private val exoPlayer = ExoPlayer.Builder(context).build()
+//    private val mediaSession = MediaSession.Builder(context, exoPlayer).build()
 
     var duration by savedStateHandle.saveable { mutableLongStateOf(0L) }
     var progress by savedStateHandle.saveable { mutableFloatStateOf(0F) }
     var progressString by savedStateHandle.saveable { mutableStateOf("00:00") }
-    var isPlaying by savedStateHandle.saveable { mutableStateOf(false) }
-    var currentPlaying by mutableStateOf<Ayah?>(null)
-    var ayahs = mutableStateListOf<Ayah>()
-
-    private val _uiState: MutableStateFlow<ScreenState> = MutableStateFlow(IsLoading)
-    val uiState: StateFlow<ScreenState> = _uiState
-    private val exoPlayer = ExoPlayer.Builder(context).build()
-    private val mediaSession = MediaSession.Builder(context, exoPlayer).build()
+    var currentAyah: Ayah? by mutableStateOf(null)
+    var playerState: PlayerState by mutableStateOf(PlayerState.Downloadable)
 
     init {
-        loadAudioData(surahId, ayahId)
+        /*exoPlayer.addListener(object : Player.Listener {
+            override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                super.onMediaItemTransition(mediaItem, reason)
+                val id = mediaItem?.mediaId?.toInt()
+                if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_SEEK || reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO)
+                    index = id - 1
+            }
+        })*/
     }
 
-    fun loadAudioData(surahId: Int?, ayahId: Int?) {
+
+    fun playAyah(ayah: Ayah, playAfterDownload: Boolean) {
         viewModelScope.launch {
-            surahId?.let {
-                quranDao.loadSurah(it).collect { ayahs ->
-                    this@AudioViewModel.ayahs.clear()
-                    this@AudioViewModel.ayahs.addAll(ayahs)
-
-                    setMediaItems()
-                }
-            } ?: ayahId?.let {
-                quranDao.loadAyah(it).collect { ayah ->
-                    this@AudioViewModel.ayahs.clear()
-                    this@AudioViewModel.ayahs.add(ayah)
-
-                    setMediaItems()
-                }
+            if (currentAyah != ayah) {
+                prepareAyah(ayah, playAfterDownload)
             }
         }
     }
 
-    private fun setMediaItems() {
-        exoPlayer.setMediaItems(
-            ayahs.map { ayah ->
-                MediaItem.Builder()
-                    .setUri(ayah.audio)
-                    .setMediaMetadata(
-                        MediaMetadata.Builder()
-                            .setAlbumTitle(ayah.sureName)
-                            .setDisplayTitle(ayah.sureName)
-                            .setSubtitle(ayah.id.toString())
-                            .build()
-                    )
-                    .build()
-            }
+    private fun prepareAyah(ayah: Ayah, playAfterDownload: Boolean) {
+        exoPlayer.setMediaItem(
+            MediaItem.Builder()
+                .setMediaId(ayah.id.toString())
+                .setUri(ayah.localAudio ?: ayah.audio)
+                .setMediaMetadata(
+                    MediaMetadata.Builder()
+                        .setAlbumTitle(ayah.sureName)
+                        .setDisplayTitle(ayah.sureName)
+                        .setSubtitle(ayah.id.toString())
+                        .build()
+                )
+                .build()
         )
         exoPlayer.prepare()
-        currentPlaying = ayahs.first()
+        currentAyah = ayah
+        playerState = if (ayah.localAudio == null) PlayerState.Downloadable else PlayerState.Paused
+        if (playAfterDownload)
+            onAudioEvents(if (ayah.localAudio == null) AudioEvents.StartDownload else AudioEvents.PlayAudio)
     }
 
-    private fun calculateProgressValue(currentProgress: Long) {
-        progress = if (currentProgress > 0) ((currentProgress.toFloat() / duration.toFloat()) * 100F) else 0F
-        progressString = formatDuration(currentProgress)
+    private fun calculateProgressValue(currentProgress: Float) {
+        progress = if (currentProgress > 0) ((currentProgress / duration.toFloat()) * 100F) else 0F
+        progressString = formatDuration(currentProgress.toLong())
     }
 
     private fun formatDuration(duration: Long): String {
@@ -106,21 +96,75 @@ class AudioViewModel @Inject constructor(
     }
 
     fun onAudioEvents(event: AudioEvents) {
-        when (event) {
-            AudioEvents.PlayPause -> if (exoPlayer.isPlaying) exoPlayer.pause() else exoPlayer.play()
-            AudioEvents.Backward -> exoPlayer.seekBack()
-            AudioEvents.Forward -> exoPlayer.seekForward()
-            AudioEvents.SeekToNext -> exoPlayer.seekToNext()
-            else -> {}
+        currentAyah?.let { ayah ->
+            Timber.e(event.javaClass.toString())
+            viewModelScope.launch {
+                when (event) {
+                    AudioEvents.StartDownload -> {
+                        playerState = PlayerState.Downloading
+                        repository.loadAudio(ayah)
+                        repository.loadAyahById(ayah.id)?.let { refreshedAyah ->
+                            prepareAyah(refreshedAyah, true)
+                        }
+                    }
+
+                    AudioEvents.PlayAudio -> {
+                        exoPlayer.play()
+                        playerState = PlayerState.Playing
+                    }
+
+                    AudioEvents.PauseAudio -> {
+                        exoPlayer.pause()
+                        playerState = PlayerState.Paused
+                    }
+
+                    is AudioEvents.UpdateProgress -> calculateProgressValue(event.newProgress)
+                    is AudioEvents.PlayPrevious -> {
+                        exoPlayer.pause()
+                        repository.loadAyahById(ayah.id - 1)?.let { refreshedAyah ->
+                            prepareAyah(refreshedAyah, playerState == PlayerState.Playing)
+                        }
+                    }
+
+                    is AudioEvents.PlayNext -> {
+                        exoPlayer.pause()
+                        repository.loadAyahById(ayah.id + 1)?.let { refreshedAyah ->
+                            prepareAyah(refreshedAyah, playerState == PlayerState.Playing)
+                        }
+                    }
+
+                    is AudioEvents.CloseAudio -> {
+                        exoPlayer.pause()
+                        currentAyah = null
+                        playerState = PlayerState.Downloadable
+                    }
+
+                    else -> {}
+                }
+            }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        exoPlayer.release()
+//        mediaSession.release()
     }
 }
 
-sealed class AudioEvents {
-    object PlayPause : AudioEvents()
-    object SeekToNext : AudioEvents()
-    object Backward : AudioEvents()
-    object Forward : AudioEvents()
-    data class UpdateProgress(val newProgress: Float) : AudioEvents()
-    data class SeekTo(val newProgress: Float) : AudioEvents()
+sealed interface AudioEvents {
+    object StartDownload : AudioEvents
+    object PlayAudio : AudioEvents
+    object PauseAudio : AudioEvents
+    object CloseAudio : AudioEvents
+    object PlayPrevious : AudioEvents
+    object PlayNext : AudioEvents
+    data class UpdateProgress(val newProgress: Float) : AudioEvents
+}
+
+sealed interface PlayerState {
+    object Downloadable : PlayerState
+    object Downloading : PlayerState
+    object Paused : PlayerState
+    object Playing : PlayerState
 }

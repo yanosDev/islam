@@ -13,11 +13,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Download
+import androidx.compose.material.icons.rounded.Downloading
 import androidx.compose.material.icons.rounded.MusicNote
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.SkipNext
-import androidx.compose.material3.BottomAppBar
+import androidx.compose.material.icons.rounded.SkipPrevious
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
@@ -33,81 +35,94 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.R
-import de.yanos.islam.data.model.quran.Ayah
 
 @Composable
-fun AudioPlayerScreen(
+fun AyahAudioPlayer(
     modifier: Modifier,
-    surahId: Int?,
-    ayahId: Int?,
+    title: String,
+    subtitle: String,
+    state: PlayerState,
+    onAyahChange: (event: AudioEvents) -> Unit,
     vm: AudioViewModel = hiltViewModel()
 ) {
-    vm.loadAudioData(surahId, ayahId)
-    vm.currentPlaying?.let { ayah ->
-        BottomBarPlayer(
-            modifier = modifier,
-            progress = vm.progress,
-            onProgress = { vm.onAudioEvents(AudioEvents.UpdateProgress(it)) },
-            ayah = ayah,
-            isAudioPlaying = vm.isPlaying,
-            onStart = { vm.onAudioEvents(AudioEvents.PlayPause) },
-            onNext = { vm.onAudioEvents(AudioEvents.SeekToNext) },
-        )
-    }
-
+    BottomBarPlayer(
+        modifier = modifier,
+        progress = vm.progress,
+        title = title,
+        subtitle = subtitle,
+        state = state,
+        onAyahChange = onAyahChange,
+    )
 }
 
 @Composable
 fun BottomBarPlayer(
     modifier: Modifier,
     progress: Float,
-    onProgress: (Float) -> Unit,
-    ayah: Ayah,
-    isAudioPlaying: Boolean,
-    onStart: () -> Unit,
-    onNext: () -> Unit,
+    title: String,
+    subtitle: String,
+    state: PlayerState,
+    onAyahChange: (event: AudioEvents) -> Unit
 ) {
-    BottomAppBar(modifier = modifier) {
-        Column(modifier = Modifier.padding(8.dp)) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                SurahInfo(modifier = Modifier, ayah = ayah)
-                MediaPlayerController(modifier = Modifier, isAudioPlaying = isAudioPlaying, onStart = onStart, onNext = onNext)
-                Slider(value = progress, onValueChange = { onProgress(it) }, valueRange = 0f..100f)
-            }
+//    BottomAppBar(modifier = modifier) {
+    Column(modifier = modifier.padding(8.dp)) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            SurahInfo(modifier = Modifier, title = title, subtitle = subtitle)
+            MediaPlayerController(
+                modifier = Modifier,
+                state = state,
+                onAyahChange = onAyahChange,
+            )
+            Slider(modifier = Modifier.weight(1f), value = progress, onValueChange = { onAyahChange(AudioEvents.UpdateProgress(it)) }, valueRange = 0f..100f)
         }
     }
+//    }
 }
 
 @Composable
 private fun MediaPlayerController(
     modifier: Modifier,
-    isAudioPlaying: Boolean,
-    onStart: () -> Unit,
-    onNext: () -> Unit
+    state: PlayerState,
+    onAyahChange: (event: AudioEvents) -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically, modifier = modifier
             .height(56.dp)
             .padding(4.dp)
     ) {
-        PlayerIconItem(modifier = Modifier, icon = if (isAudioPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow) {
-            onStart()
+        PlayerIconItem(icon = Icons.Rounded.SkipPrevious, modifier = Modifier) { onAyahChange(AudioEvents.PlayPrevious) }
+        Spacer(modifier = Modifier.size(8.dp))
+        PlayerIconItem(
+            modifier = Modifier, icon = when (state) {
+                PlayerState.Downloadable -> Icons.Rounded.Download
+                PlayerState.Paused -> Icons.Rounded.PlayArrow
+                PlayerState.Playing -> Icons.Rounded.Pause
+                else -> Icons.Rounded.Downloading
+            }
+        ) {
+            when (state) {
+                PlayerState.Downloadable -> AudioEvents.StartDownload
+                PlayerState.Paused -> AudioEvents.PlayAudio
+                PlayerState.Playing -> AudioEvents.PauseAudio
+                else -> null
+            }?.let(onAyahChange)
         }
         Spacer(modifier = Modifier.size(8.dp))
-        Icon(imageVector = Icons.Rounded.SkipNext, contentDescription = null, modifier = Modifier.clickable { onNext() })
+        PlayerIconItem(icon = Icons.Rounded.SkipNext, modifier = Modifier) { onAyahChange(AudioEvents.PlayNext) }
     }
 }
 
 @Composable
 private fun SurahInfo(
     modifier: Modifier,
-    ayah: Ayah,
+    title: String,
+    subtitle: String,
 ) {
     Row(
         modifier = modifier.padding(4.dp),
@@ -120,16 +135,16 @@ private fun SurahInfo(
         ) {
 
         }
-        Spacer(modifier = Modifier.size(4.dp))
+        Spacer(modifier = Modifier.size(8.dp))
         Column {
             Text(
-                text = ayah.sureName,
+                text = title,
                 style = MaterialTheme.typography.titleSmall,
                 modifier = Modifier.weight(1f),
                 maxLines = 1
             )
             Spacer(modifier = Modifier.size(4.dp))
-            Text(text = stringResource(id = R.string.sure_ayet, ayah.number), style = MaterialTheme.typography.bodySmall, maxLines = 1)
+            Text(text = stringResource(id = R.string.sure_ayet, subtitle.toInt()), style = MaterialTheme.typography.bodySmall, maxLines = 1)
         }
     }
 }

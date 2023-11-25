@@ -11,6 +11,6 @@ class QuranMainListViewModel @Inject constructor(
     private val appSettings: AppSettings,
     private val dao: QuranDao,
 ) : ViewModel() {
-    val lastSurah = dao.loadSurah(114)
+    val lastSurah = dao.subsribeSurahAyahs(114)
     val isDBInitialized = appSettings.isDBInitialized
 }
