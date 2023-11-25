@@ -73,7 +73,7 @@ class AudioViewModel @Inject constructor(
                 viewModelScope.launch {
                     calculateProgressValue()
                 }
-            }, 0, 100
+            }, 0, 50
         )
     }
 
@@ -117,6 +117,8 @@ class AudioViewModel @Inject constructor(
         duration = exoPlayer.duration
         progress = ((exoPlayer.currentPosition.toFloat() / exoPlayer.duration.toFloat()) * 100F)
         progressString = formatDuration(exoPlayer.currentPosition)
+        if (progress >= 100)
+            onAudioEvents(AudioEvents.PlayNext)
     }
 
     private fun formatDuration(duration: Long): String {
@@ -172,6 +174,9 @@ class AudioViewModel @Inject constructor(
                     is AudioEvents.CloseAudio -> {
                         stopTimer()
                         exoPlayer.pause()
+                        duration = 0
+                        progress = 0F
+                        progressString = "00:00"
                         currentAyah = null
                         playerState = PlayerState.Downloadable
                     }
