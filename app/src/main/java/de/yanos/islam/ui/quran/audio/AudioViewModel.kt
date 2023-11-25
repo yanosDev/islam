@@ -15,6 +15,7 @@ import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import androidx.lifecycle.viewmodel.compose.saveable
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -24,8 +25,10 @@ import de.yanos.islam.data.repositories.QuranRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.Timer
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.concurrent.timerTask
 
 @HiltViewModel
 class AudioViewModel @Inject constructor(
@@ -40,18 +43,43 @@ class AudioViewModel @Inject constructor(
     var duration by savedStateHandle.saveable { mutableLongStateOf(0L) }
     var progress by savedStateHandle.saveable { mutableFloatStateOf(0F) }
     var progressString by savedStateHandle.saveable { mutableStateOf("00:00") }
+
     var currentAyah: Ayah? by mutableStateOf(null)
     var playerState: PlayerState by mutableStateOf(PlayerState.Downloadable)
+    private var timer: Timer? = null
 
     init {
-        /*exoPlayer.addListener(object : Player.Listener {
+        exoPlayer.addListener(object : Player.Listener {
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                 super.onMediaItemTransition(mediaItem, reason)
                 val id = mediaItem?.mediaId?.toInt()
-                if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_SEEK || reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO)
-                    index = id - 1
             }
-        })*/
+
+            override fun onSeekBackIncrementChanged(seekBackIncrementMs: Long) {
+                super.onSeekBackIncrementChanged(seekBackIncrementMs)
+            }
+
+            override fun onSeekForwardIncrementChanged(seekForwardIncrementMs: Long) {
+                super.onSeekForwardIncrementChanged(seekForwardIncrementMs)
+            }
+        })
+    }
+
+    private fun startTimer() {
+        timer = Timer()
+        timer?.scheduleAtFixedRate(
+            timerTask()
+            {
+                viewModelScope.launch {
+                    calculateProgressValue()
+                }
+            }, 0, 100
+        )
+    }
+
+    private fun stopTimer() {
+        timer?.cancel()
+        timer = null
     }
 
 
@@ -78,15 +106,17 @@ class AudioViewModel @Inject constructor(
                 .build()
         )
         exoPlayer.prepare()
+        duration = exoPlayer.duration
         currentAyah = ayah
         playerState = if (ayah.localAudio == null) PlayerState.Downloadable else PlayerState.Paused
         if (playAfterDownload)
             onAudioEvents(if (ayah.localAudio == null) AudioEvents.StartDownload else AudioEvents.PlayAudio)
     }
 
-    private fun calculateProgressValue(currentProgress: Float) {
-        progress = if (currentProgress > 0) ((currentProgress / duration.toFloat()) * 100F) else 0F
-        progressString = formatDuration(currentProgress.toLong())
+    private suspend fun calculateProgressValue() {
+        duration = exoPlayer.duration
+        progress = ((exoPlayer.currentPosition.toFloat() / exoPlayer.duration.toFloat()) * 100F)
+        progressString = formatDuration(exoPlayer.currentPosition)
     }
 
     private fun formatDuration(duration: Long): String {
@@ -109,16 +139,22 @@ class AudioViewModel @Inject constructor(
                     }
 
                     AudioEvents.PlayAudio -> {
+                        startTimer()
                         exoPlayer.play()
                         playerState = PlayerState.Playing
                     }
 
                     AudioEvents.PauseAudio -> {
+                        stopTimer()
                         exoPlayer.pause()
                         playerState = PlayerState.Paused
                     }
 
-                    is AudioEvents.UpdateProgress -> calculateProgressValue(event.newProgress)
+                    is AudioEvents.UpdateProgress -> {
+                        exoPlayer.seekTo((event.newProgress / 100 * exoPlayer.duration).toLong())
+                        calculateProgressValue()
+                    }
+
                     is AudioEvents.PlayPrevious -> {
                         exoPlayer.pause()
                         repository.loadAyahById(ayah.id - 1)?.let { refreshedAyah ->
@@ -134,6 +170,7 @@ class AudioViewModel @Inject constructor(
                     }
 
                     is AudioEvents.CloseAudio -> {
+                        stopTimer()
                         exoPlayer.pause()
                         currentAyah = null
                         playerState = PlayerState.Downloadable
