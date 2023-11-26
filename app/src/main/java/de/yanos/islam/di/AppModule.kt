@@ -53,6 +53,7 @@ import de.yanos.islam.data.api.AwqatApi
 import de.yanos.islam.data.api.QuranApi
 import de.yanos.islam.data.database.IslamDatabase
 import de.yanos.islam.data.database.IslamDatabaseImpl
+import de.yanos.islam.data.repositories.QuranRepository
 import de.yanos.islam.service.ExoMediaSessionCallback
 import de.yanos.islam.service.ExoPlaybackService
 import de.yanos.islam.util.Constants
@@ -258,7 +259,8 @@ internal class AppModule {
         @ApplicationContext context: Context,
         @IODispatcher dispatcher: CoroutineDispatcher,
         exoPlayer: ExoPlayer,
-        mediaController: ListenableFuture<MediaController>
+        mediaController: ListenableFuture<MediaController>,
+        repository: QuranRepository
     ): MediaSession {
         val intent = Intent(context.applicationContext, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
@@ -280,7 +282,7 @@ internal class AppModule {
                 .build()
         return MediaSession.Builder(context, exoPlayer)
             .setCustomLayout(ImmutableList.of(previousAyahButton, nextAyahButton))
-            .setCallback(ExoMediaSessionCallback(mediaController, dispatcher))
+            .setCallback(ExoMediaSessionCallback(mediaController, dispatcher, repository))
             .setSessionActivity(pendingIntent)
             .setId(UUID.randomUUID().toString())
             .build()

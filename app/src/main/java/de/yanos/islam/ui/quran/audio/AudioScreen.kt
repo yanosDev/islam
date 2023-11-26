@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.MusicNote
@@ -29,16 +30,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.media3.common.MediaItem
+import de.yanos.islam.R
+import de.yanos.islam.data.model.quran.Ayah
 import de.yanos.islam.ui.quran.classic.AudioEvents
 import de.yanos.islam.ui.quran.classic.QuranClassicViewModel
 
 @Composable
 fun AyahAudioPlayer(
     modifier: Modifier,
-    item: MediaItem?,
+    item: Ayah?,
     isPlaying: Boolean,
     onAyahChange: (event: AudioEvents) -> Unit,
     vm: QuranClassicViewModel = hiltViewModel()
@@ -56,7 +59,7 @@ fun AyahAudioPlayer(
 fun BottomBarPlayer(
     modifier: Modifier,
     progress: Float,
-    item: MediaItem?,
+    item: Ayah?,
     isPlaying: Boolean,
     onAyahChange: (event: AudioEvents) -> Unit
 ) {
@@ -64,7 +67,7 @@ fun BottomBarPlayer(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
+                .wrapContentHeight(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -105,7 +108,7 @@ private fun MediaPlayerController(
 @Composable
 private fun SurahInfo(
     modifier: Modifier,
-    item: MediaItem?,
+    item: Ayah?,
 ) {
     Row(
         modifier = modifier.padding(4.dp),
@@ -121,13 +124,13 @@ private fun SurahInfo(
         Spacer(modifier = Modifier.size(8.dp))
         Column {
             Text(
-                text = item?.mediaMetadata?.title?.toString() ?: "",
+                text = item?.sureName ?: "",
                 style = MaterialTheme.typography.titleSmall,
                 modifier = Modifier.weight(1f),
                 maxLines = 1
             )
             Spacer(modifier = Modifier.size(4.dp))
-            Text(text = item?.mediaMetadata?.subtitle?.toString() ?: "", style = MaterialTheme.typography.bodySmall, maxLines = 1)
+            Text(text = stringResource(id = R.string.sure_ayet, item?.number ?: 0), style = MaterialTheme.typography.bodySmall, maxLines = 1)
         }
     }
 }

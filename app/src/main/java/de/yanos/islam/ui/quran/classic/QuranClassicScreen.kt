@@ -32,10 +32,12 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import de.yanos.islam.R
 import de.yanos.islam.data.model.quran.Ayah
 import de.yanos.islam.data.model.quran.Page
 import de.yanos.islam.ui.quran.audio.AyahAudioPlayer
@@ -134,7 +136,7 @@ private fun QuranHeader(
         TextButton(
             onClick = { onJuzSelected(page.pageSurahId) },
         ) {
-            Text(textAlign = TextAlign.Center, text = arabicNumber(page.ayahs.first().juz), style = typo.labelLarge)
+            Text(textAlign = TextAlign.Center, text = stringResource(id = R.string.sure_list_cuz, arabicNumber(page.ayahs.first().juz)), style = typo.labelLarge)
         }
         TextButton(
             onClick = { onSurahSelected(page.pageSurahId) },
@@ -146,7 +148,7 @@ private fun QuranHeader(
         TextButton(
             onClick = { onPageSelected(page.pageSurahId) },
         ) {
-            Text(textAlign = TextAlign.Center, text = arabicNumber(page.page), style = typo.labelLarge)
+            Text(textAlign = TextAlign.Center, text = stringResource(id = R.string.sure_list_page, arabicNumber(page.page)), style = typo.labelLarge)
         }
     }
 }
@@ -242,17 +244,26 @@ fun AyahDetailBottomSheet(
         ) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 //TODO: Replace with drop down
-                Text(text = quranViewModel.mediaItem?.mediaMetadata?.albumTitle?.toString() ?: "", style = labelMedium())
-                Text(text = quranViewModel.mediaItem?.mediaMetadata?.displayTitle?.toString() ?: "", style = labelMedium())
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = stringResource(id = R.string.sure_list_cuz, arabicNumber(quranViewModel.referenceAyah?.juz ?: 0)),
+                    style = labelMedium(),
+                )
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = stringResource(id = R.string.sure_list_page, arabicNumber(quranViewModel.referenceAyah?.page ?: 0)),
+                    style = labelMedium(),
+                    textAlign = TextAlign.End
+                )
             }
-            AyahAudioPlayer(modifier = Modifier, item = quranViewModel.mediaItem, isPlaying = quranViewModel.isPlaying, onAyahChange = onEvent)
+            AyahAudioPlayer(modifier = Modifier, item = quranViewModel.referenceAyah, isPlaying = quranViewModel.isPlaying, onAyahChange = onEvent)
             Spacer(modifier = Modifier.height(8.dp))
             IslamDivider(color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 text = alternatingColors(
-                    text = quranViewModel.mediaItem?.mediaMetadata?.description?.toString() ?: "",
+                    text = quranViewModel.referenceAyah?.text ?: "",
                     delimiter = Regex("-|\\s")
                 ),
                 style = typo.headlineMedium.copy(fontSize = typo.headlineLarge.fontSize.times(1.2)),
@@ -260,11 +271,11 @@ fun AyahDetailBottomSheet(
             )
             Spacer(modifier = Modifier.height(8.dp))
             IslamDivider(color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(text = alternatingColors(text = quranViewModel.mediaItem?.mediaMetadata?.albumArtist?.toString() ?: "", delimiter = Regex("-|\\s")), style = bodyMedium())
+            Text(text = alternatingColors(text = quranViewModel.referenceAyah?.transliterationEn ?: "", delimiter = Regex("-|\\s")), style = bodyMedium())
             Spacer(modifier = Modifier.height(8.dp))
             IslamDivider(color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = alternatingColors(text = quranViewModel.mediaItem?.mediaMetadata?.artist?.toString() ?: "", delimiter = Regex("-|\\s")), style = bodyMedium())
+            Text(text = alternatingColors(text = quranViewModel.referenceAyah?.translationTr ?: "", delimiter = Regex("-|\\s")), style = bodyMedium())
             Spacer(modifier = Modifier.height(8.dp))
         }
     }

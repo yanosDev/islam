@@ -12,6 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -43,7 +44,6 @@ class QuranClassicViewModel @Inject constructor(
     var progress by mutableFloatStateOf(0F)
     var progressString by mutableStateOf("00:00")
     var isPlaying by mutableStateOf(false)
-    var mediaItem: MediaItem? by mutableStateOf(null)
 
     private var timer: Timer? = null
     private var controller: MediaController? = null
@@ -59,6 +59,14 @@ class QuranClassicViewModel @Inject constructor(
     init {
         controllerFuture.addListener({
             controller = controllerFuture.get()
+            controller?.addListener(object : Player.Listener {
+                override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                    super.onMediaItemTransition(mediaItem, reason)
+                    viewModelScope.launch {
+                        refreshData()
+                    }
+                }
+            })
         }, dispatcher.asExecutor())
         viewModelScope.launch(dispatcher) {
             repository.loadPages().collect {
@@ -92,7 +100,6 @@ class QuranClassicViewModel @Inject constructor(
             progress = max(((it.currentPosition.toFloat() / it.duration.toFloat()) * 100F), 5F)
             progressString = formatDuration(it.currentPosition)
             isPlaying = it.isPlaying
-            mediaItem = it.currentMediaItem
         }
     }
 

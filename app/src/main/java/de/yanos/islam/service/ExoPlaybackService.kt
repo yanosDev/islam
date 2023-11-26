@@ -30,7 +30,6 @@ class ExoPlaybackService : MediaSessionService(), MediaSession.Callback {
         }
     }
 
-
     override fun onTaskRemoved(rootIntent: Intent?) {
         val player = mediaSession.player
         if (!player.playWhenReady || player.mediaItemCount == 0) {

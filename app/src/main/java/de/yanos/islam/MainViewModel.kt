@@ -1,7 +1,6 @@
 package de.yanos.islam
 
 import android.annotation.SuppressLint
-import android.app.NotificationManager
 import android.content.Context
 import android.location.Geocoder
 import android.media.MediaPlayer
@@ -32,7 +31,6 @@ import de.yanos.islam.data.repositories.QuranRepository
 import de.yanos.islam.di.AzanPlayer
 import de.yanos.islam.service.DailyScheduleWorker
 import de.yanos.islam.util.AppSettings
-import de.yanos.islam.util.arabicNumber
 import de.yanos.islam.util.getCurrentLocation
 import de.yanos.islam.util.hasLocationPermission
 import kotlinx.coroutines.CoroutineDispatcher
@@ -67,7 +65,6 @@ class MainViewModel @Inject constructor(
     private val geocoder: Geocoder,
     private val quranRepository: QuranRepository,
     @AzanPlayer private val mediaPlayer: MediaPlayer,
-    private val notificationManager: NotificationManager,
     private val workManager: WorkManager
 ) : ViewModel() {
     var isReady: Boolean by mutableStateOf(false)
@@ -85,24 +82,30 @@ class MainViewModel @Inject constructor(
                 delay(100)
             quranRepository.loadAyahs().collect { ayahs ->
                 controller?.let {
-                    val items = ayahs.map { ayah ->
-                        MediaItem.Builder()
-                            .setMediaId(ayah.id.toString())
-                            .setUri(ayah.audio)
-                            .setMediaMetadata(
-                                MediaMetadata.Builder()
-                                    .setDescription(ayah.text)
-                                    .setArtist(ayah.transliterationEn)
-                                    .setTitle(ayah.sureName)
-                                    .setAlbumArtist(ayah.translationTr)
-                                    .setSubtitle(context.getString(R.string.sure_ayet, ayah.number))
-                                    .setAlbumTitle(context.getString(R.string.sure_list_cuz, arabicNumber(ayah.juz)))
-                                    .setDisplayTitle(context.getString(R.string.sure_list_page, arabicNumber(ayah.page)))
-                                    .build()
-                            )
-                            .build()
+                    ayahs.groupBy { ayah -> ayah.page }.forEach { (_, value) ->
+                        it.addMediaItems(value.map { ayah ->
+                            MediaItem.Builder()
+                                .setMediaId(ayah.id.toString())
+                                .setUri(ayah.audio)
+                                .setMediaMetadata(
+                                    MediaMetadata.Builder()
+                                        .setTitle(
+                                            context.getString(R.string.sure_list_page, ayah.page.toString())
+                                                    + ", "
+                                                    + context.getString(R.string.sure_list_cuz, ayah.juz.toString())
+                                                    + ", "
+                                                    + context.getString(R.string.sure_ayet, ayah.number)
+                                        )
+                                        .setArtist(ayah.sureName)
+                                        .build()
+                                )
+                                .build()
+                        })
+
+                        delay(100)
                     }
-                    it.setMediaItems(items)
+
+
                     it.prepare()
                 }
             }
