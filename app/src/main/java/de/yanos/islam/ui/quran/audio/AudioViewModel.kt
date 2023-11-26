@@ -30,6 +30,7 @@ import java.util.Timer
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.concurrent.timerTask
+import kotlin.math.max
 
 @HiltViewModel
 class AudioViewModel @Inject constructor(
@@ -48,7 +49,7 @@ class AudioViewModel @Inject constructor(
     var playerState: PlayerState by mutableStateOf(PlayerState.Downloadable)
     private var timer: Timer? = null
 
-    var controller: MediaController? = null
+    private var controller: MediaController? = null
 
     init {
         controllerFuture.addListener({
@@ -90,6 +91,8 @@ class AudioViewModel @Inject constructor(
                     .setUri(ayah.audio)
                     .setMediaMetadata(
                         MediaMetadata.Builder()
+                            .setArtist(ayah.sureName)
+                            .setTitle(ayah.text)
                             .setAlbumTitle(ayah.sureName)
                             .setDisplayTitle(ayah.sureName)
                             .setSubtitle(ayah.id.toString())
@@ -109,9 +112,9 @@ class AudioViewModel @Inject constructor(
     private suspend fun calculateProgressValue() {
         controller?.let {
             duration = it.duration
-            progress = ((it.currentPosition.toFloat() / it.duration.toFloat()) * 100F)
+            progress = max(((it.currentPosition.toFloat() / it.duration.toFloat()) * 100F), 5F)
             progressString = formatDuration(it.currentPosition)
-            if (progress >= 100)
+            if (progress >= 98)
                 onAudioEvents(AudioEvents.PlayNext)
         }
     }

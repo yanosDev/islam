@@ -1,28 +1,56 @@
 package de.yanos.islam.service
 
+import android.content.Intent
+import android.os.Bundle
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
+import androidx.media3.session.SessionCommand
+import androidx.media3.session.SessionResult
+import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.AndroidEntryPoint
+import de.yanos.core.utils.IODispatcher
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import javax.inject.Inject
 
+@UnstableApi
 @AndroidEntryPoint
-class ExoPlaybackService : MediaSessionService() {
+class ExoPlaybackService : MediaSessionService(), MediaSession.Callback {
+    @Inject @IODispatcher lateinit var dispatcher: CoroutineDispatcher
     @Inject lateinit var mediaSession: MediaSession
 
-    /*// Remember to release the player and media session in onDestroy
+    private val job by lazy { Job() }
+    private val scope by lazy { CoroutineScope(dispatcher + job) }
+
+    override fun onCustomCommand(session: MediaSession, controller: MediaSession.ControllerInfo, customCommand: SessionCommand, args: Bundle): ListenableFuture<SessionResult> {
+        return when (customCommand.customAction) {
+            else -> super.onCustomCommand(session, controller, customCommand, args)
+        }
+    }
+
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        val player = mediaSession.player
+        if (!player.playWhenReady || player.mediaItemCount == 0) {
+            // Stop the service if not playing, continue playing in the background
+            // otherwise.
+            stopSelf()
+        }
+    }
+
     override fun onDestroy() {
-        mediaSession?.run {
+        mediaSession.run {
             player.release()
             release()
-            mediaSession = null
         }
         super.onDestroy()
-    }*/
-    override fun onCreate() {
-        super.onCreate()
+
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession {
         return mediaSession
     }
 }
+

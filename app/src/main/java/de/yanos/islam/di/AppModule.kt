@@ -10,6 +10,7 @@ import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.location.Geocoder
 import android.media.MediaPlayer
+import android.os.Bundle
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
 import androidx.media3.database.StandaloneDatabaseProvider
@@ -25,11 +26,14 @@ import androidx.media3.exoplayer.offline.DownloadManager
 import androidx.media3.exoplayer.offline.DownloadNotificationHelper
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.util.EventLogger
+import androidx.media3.session.CommandButton
 import androidx.media3.session.MediaController
 import androidx.media3.session.MediaSession
+import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionToken
 import androidx.room.Room
 import androidx.work.WorkManager
+import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.ListenableFuture
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -258,7 +262,22 @@ internal class AppModule {
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        return MediaSession.Builder(context, exoPlayer).setSessionActivity(pendingIntent).setId(UUID.randomUUID().toString()).build()
+        val previousAyahButton = CommandButton.Builder()
+            .setDisplayName("Önceki Ayet")
+            .setIconResId(android.R.drawable.ic_media_previous)
+            .setSessionCommand(SessionCommand(Constants.CHANNEL_COMMAND_PREVIOUS, Bundle()))
+            .build()
+        val nextAyahButton =
+            CommandButton.Builder()
+                .setDisplayName("Sonraki Ayet")
+                .setIconResId(android.R.drawable.ic_media_next)
+                .setSessionCommand(SessionCommand(Constants.CHANNEL_COMMAND_NEXT, Bundle()))
+                .build()
+        return MediaSession.Builder(context, exoPlayer)
+            .setCustomLayout(ImmutableList.of(previousAyahButton, nextAyahButton))
+            .setSessionActivity(pendingIntent)
+            .setId(UUID.randomUUID().toString())
+            .build()
     }
 
     @Provides
