@@ -53,8 +53,10 @@ import de.yanos.islam.data.api.AwqatApi
 import de.yanos.islam.data.api.QuranApi
 import de.yanos.islam.data.database.IslamDatabase
 import de.yanos.islam.data.database.IslamDatabaseImpl
+import de.yanos.islam.service.ExoMediaSessionCallback
 import de.yanos.islam.service.ExoPlaybackService
 import de.yanos.islam.util.Constants
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
 import okhttp3.Interceptor
@@ -253,7 +255,10 @@ internal class AppModule {
     @Provides
     @Singleton
     fun provideMediaSession(
-        @ApplicationContext context: Context, exoPlayer: ExoPlayer
+        @ApplicationContext context: Context,
+        @IODispatcher dispatcher: CoroutineDispatcher,
+        exoPlayer: ExoPlayer,
+        mediaController: ListenableFuture<MediaController>
     ): MediaSession {
         val intent = Intent(context.applicationContext, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
@@ -275,6 +280,7 @@ internal class AppModule {
                 .build()
         return MediaSession.Builder(context, exoPlayer)
             .setCustomLayout(ImmutableList.of(previousAyahButton, nextAyahButton))
+            .setCallback(ExoMediaSessionCallback(mediaController, dispatcher))
             .setSessionActivity(pendingIntent)
             .setId(UUID.randomUUID().toString())
             .build()
