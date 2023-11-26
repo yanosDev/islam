@@ -2,7 +2,10 @@ package de.yanos.islam.di
 
 import android.app.AlarmManager
 import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.location.Geocoder
@@ -10,13 +13,24 @@ import android.media.MediaPlayer
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
 import androidx.media3.database.StandaloneDatabaseProvider
+import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.datasource.HttpDataSource
+import androidx.media3.datasource.cache.Cache
+import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.NoOpCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.offline.DownloadManager
 import androidx.media3.exoplayer.offline.DownloadNotificationHelper
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.exoplayer.util.EventLogger
+import androidx.media3.session.MediaController
+import androidx.media3.session.MediaSession
+import androidx.media3.session.SessionToken
 import androidx.room.Room
 import androidx.work.WorkManager
+import com.google.common.util.concurrent.ListenableFuture
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -29,11 +43,13 @@ import de.yanos.core.utils.DebugInterceptor
 import de.yanos.core.utils.DefaultDispatcher
 import de.yanos.core.utils.IODispatcher
 import de.yanos.core.utils.MainDispatcher
+import de.yanos.islam.MainActivity
 import de.yanos.islam.R
 import de.yanos.islam.data.api.AwqatApi
 import de.yanos.islam.data.api.QuranApi
 import de.yanos.islam.data.database.IslamDatabase
 import de.yanos.islam.data.database.IslamDatabaseImpl
+import de.yanos.islam.service.ExoPlaybackService
 import de.yanos.islam.util.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
@@ -45,8 +61,10 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.io.File
 import java.util.Locale
+import java.util.UUID
 import javax.inject.Qualifier
 import javax.inject.Singleton
+
 
 @UnstableApi
 @Module
@@ -177,18 +195,80 @@ internal class AppModule {
 
     @Provides
     @Singleton
-    fun provideDownloadManager(@ApplicationContext context: Context, cacheDir: File): DownloadManager {
-        val dataBase = StandaloneDatabaseProvider(context)
-        val downloadCache = SimpleCache(cacheDir, NoOpCacheEvictor(), dataBase)
-        val dataSource = DefaultHttpDataSource.Factory()
-            .setUserAgent(Util.getUserAgent(context, context.resources.getString(R.string.app_name)))
-            .setAllowCrossProtocolRedirects(true)
-            .setReadTimeoutMs(30 * 1000)
-            .setConnectTimeoutMs(30 * 1000)
+    fun provideHttpDataSourceFactory(@ApplicationContext context: Context): HttpDataSource.Factory = DefaultHttpDataSource.Factory()
+        .setUserAgent(Util.getUserAgent(context, context.resources.getString(R.string.app_name)))
+        .setAllowCrossProtocolRedirects(true)
+        .setReadTimeoutMs(30 * 1000)
+        .setConnectTimeoutMs(30 * 1000)
 
+    @Provides
+    @Singleton
+    fun provideDownloadDatabase(@ApplicationContext context: Context): StandaloneDatabaseProvider = StandaloneDatabaseProvider(context)
 
-        return DownloadManager(context, dataBase, downloadCache, dataSource, Dispatchers.IO.asExecutor())
+    @Provides
+    @Singleton
+    fun provideCache(cacheDir: File, dataBase: StandaloneDatabaseProvider): Cache = SimpleCache(cacheDir, NoOpCacheEvictor(), dataBase)
+
+    @Provides
+    @Singleton
+    fun provideDownloadManager(
+        @ApplicationContext context: Context,
+        dataBase: StandaloneDatabaseProvider,
+        httpDataSourceFactory: HttpDataSource.Factory,
+        downloadCache: Cache
+    ): DownloadManager {
+        return DownloadManager(context, dataBase, downloadCache, httpDataSourceFactory, Dispatchers.IO.asExecutor())
     }
+
+    @Provides
+    @Singleton
+    fun provideDataSourceFactory(
+        cache: Cache,
+        httpDataSourceFactory: HttpDataSource.Factory,
+    ): DataSource.Factory = CacheDataSource.Factory()
+        .setCache(cache)
+        .setUpstreamDataSourceFactory(httpDataSourceFactory)
+        .setCacheWriteDataSinkFactory(null) // Disable writing.
+
+    @Provides
+    @Singleton
+    fun provideExoPlayer(
+        @ApplicationContext context: Context,
+        dataSourceFactory: DataSource.Factory
+    ): ExoPlayer {
+        val exoplayer = ExoPlayer.Builder(context)
+            .setMediaSourceFactory(
+                DefaultMediaSourceFactory(context)
+                    .setDataSourceFactory(dataSourceFactory)
+            )
+            .build()
+        exoplayer.addAnalyticsListener(EventLogger())
+        return exoplayer
+    }
+
+    @Provides
+    @Singleton
+    fun provideMediaSession(
+        @ApplicationContext context: Context, exoPlayer: ExoPlayer
+    ): MediaSession {
+        val intent = Intent(context.applicationContext, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        return MediaSession.Builder(context, exoPlayer).setSessionActivity(pendingIntent).setId(UUID.randomUUID().toString()).build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideSessionToken(@ApplicationContext context: Context): SessionToken = SessionToken(context, ComponentName(context, ExoPlaybackService::class.java))
+
+    @Provides
+    @Singleton
+    fun provideMediaController(@ApplicationContext context: Context, sessionToken: SessionToken): ListenableFuture<MediaController> =
+        MediaController.Builder(context, sessionToken).buildAsync()
 
     @Provides
     @Singleton

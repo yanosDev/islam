@@ -1,7 +1,6 @@
 package de.yanos.islam.service
 
 import android.app.Notification
-import android.content.Context
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadManager
@@ -10,7 +9,6 @@ import androidx.media3.exoplayer.offline.DownloadService
 import androidx.media3.exoplayer.scheduler.Requirements
 import androidx.media3.exoplayer.scheduler.Scheduler
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.qualifiers.ApplicationContext
 import de.yanos.islam.R
 import de.yanos.islam.util.Constants
 import timber.log.Timber
@@ -26,11 +24,8 @@ class ExoDownloadService @Inject constructor(
     R.string.notification_channel_download_name,
     R.string.notification_channel_download_description
 ) {
-
-    @ApplicationContext private lateinit var context: Context
-    private lateinit var notificationHelper: DownloadNotificationHelper
-    private lateinit var manager: DownloadManager
-
+    @Inject lateinit var notificationHelper: DownloadNotificationHelper
+    @Inject lateinit var manager: DownloadManager
 
     override fun getDownloadManager(): DownloadManager {
         //Set the maximum number of parallel downloads
@@ -63,6 +58,6 @@ class ExoDownloadService @Inject constructor(
 
 
     override fun getForegroundNotification(downloads: MutableList<Download>, notMetRequirements: Int): Notification {
-        return notificationHelper.buildProgressNotification(context, R.drawable.ic_launcher, null, getString(R.string.app_name), downloads, Requirements.NETWORK)
+        return notificationHelper.buildProgressNotification(applicationContext, R.drawable.ic_launcher, null, getString(R.string.app_name), downloads, Requirements.NETWORK)
     }
 }

@@ -1,10 +1,19 @@
+@file:UnstableApi
+
 package de.yanos.islam.data.repositories
 
+import android.content.Context
+import android.net.Uri
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.offline.DownloadRequest
+import androidx.media3.exoplayer.offline.DownloadService
+import dagger.hilt.android.qualifiers.ApplicationContext
 import de.yanos.islam.data.model.quran.Ayah
 import de.yanos.islam.data.model.quran.Page
 import de.yanos.islam.data.model.quran.Surah
 import de.yanos.islam.data.repositories.source.LocalQuranSource
 import de.yanos.islam.data.repositories.source.RemoteQuranSource
+import de.yanos.islam.service.ExoDownloadService
 import de.yanos.islam.util.LoadState
 import de.yanos.islam.util.localFile
 import kotlinx.coroutines.flow.Flow
@@ -21,9 +30,11 @@ interface QuranRepository {
     suspend fun loadFirstAyahBySurahId(surahId: Int): Ayah?
     suspend fun loadFirstAyahByPageId(pageId: Int): Ayah?
     suspend fun loadFirstAyahByJuz(juz: Int): Ayah?
+    suspend fun loadAudioAlt(ayah: Ayah)
 }
 
 class QuranRepositoryImpl @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val filesDir: File,
     private val local: LocalQuranSource,
     private val remote: RemoteQuranSource
@@ -106,6 +117,16 @@ class QuranRepositoryImpl @Inject constructor(
 
     override suspend fun loadFirstAyahByJuz(juz: Int): Ayah? {
         return local.loadFirstAyahByJuz(juz)
+    }
+
+    override suspend fun loadAudioAlt(ayah: Ayah) {
+        val downloadRequest: DownloadRequest = DownloadRequest.Builder(ayah.id.toString(), Uri.parse(ayah.audio)).build()
+        DownloadService.sendAddDownload(
+            context,
+            ExoDownloadService::class.java,
+            downloadRequest,
+            false
+        )
     }
 
     override suspend fun loadAyahById(ayahId: Int): Ayah? {
