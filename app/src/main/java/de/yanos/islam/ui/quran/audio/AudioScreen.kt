@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Download
-import androidx.compose.material.icons.rounded.Downloading
 import androidx.compose.material.icons.rounded.MusicNote
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
@@ -31,26 +29,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import de.yanos.islam.R
+import androidx.media3.common.MediaItem
+import de.yanos.islam.ui.quran.classic.AudioEvents
+import de.yanos.islam.ui.quran.classic.QuranClassicViewModel
 
 @Composable
 fun AyahAudioPlayer(
     modifier: Modifier,
-    title: String,
-    subtitle: String,
-    state: PlayerState,
+    item: MediaItem?,
+    isPlaying: Boolean,
     onAyahChange: (event: AudioEvents) -> Unit,
-    vm: AudioViewModel = hiltViewModel()
+    vm: QuranClassicViewModel = hiltViewModel()
 ) {
     BottomBarPlayer(
         modifier = modifier,
         progress = vm.progress,
-        title = title,
-        subtitle = subtitle,
-        state = state,
+        item = item,
+        isPlaying = isPlaying,
         onAyahChange = onAyahChange,
     )
 }
@@ -59,12 +56,10 @@ fun AyahAudioPlayer(
 fun BottomBarPlayer(
     modifier: Modifier,
     progress: Float,
-    title: String,
-    subtitle: String,
-    state: PlayerState,
+    item: MediaItem?,
+    isPlaying: Boolean,
     onAyahChange: (event: AudioEvents) -> Unit
 ) {
-//    BottomAppBar(modifier = modifier) {
     Column(modifier = modifier.padding(8.dp)) {
         Row(
             modifier = Modifier
@@ -73,22 +68,21 @@ fun BottomBarPlayer(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            SurahInfo(modifier = Modifier, title = title, subtitle = subtitle)
+            SurahInfo(modifier = Modifier, item = item)
             MediaPlayerController(
                 modifier = Modifier,
-                state = state,
+                isPlaying = isPlaying,
                 onAyahChange = onAyahChange,
             )
             Slider(modifier = Modifier.weight(1f), value = progress, onValueChange = { onAyahChange(AudioEvents.UpdateProgress(it)) }, valueRange = 0f..100f)
         }
     }
-//    }
 }
 
 @Composable
 private fun MediaPlayerController(
     modifier: Modifier,
-    state: PlayerState,
+    isPlaying: Boolean,
     onAyahChange: (event: AudioEvents) -> Unit
 ) {
     Row(
@@ -99,19 +93,9 @@ private fun MediaPlayerController(
         PlayerIconItem(icon = Icons.Rounded.SkipPrevious, modifier = Modifier) { onAyahChange(AudioEvents.PlayPrevious) }
         Spacer(modifier = Modifier.size(8.dp))
         PlayerIconItem(
-            modifier = Modifier, icon = when (state) {
-                PlayerState.Downloadable -> Icons.Rounded.Download
-                PlayerState.Paused -> Icons.Rounded.PlayArrow
-                PlayerState.Playing -> Icons.Rounded.Pause
-                else -> Icons.Rounded.Downloading
-            }
+            modifier = Modifier, icon = if (isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow
         ) {
-            when (state) {
-                PlayerState.Downloadable -> AudioEvents.StartDownload
-                PlayerState.Paused -> AudioEvents.PlayAudio
-                PlayerState.Playing -> AudioEvents.PauseAudio
-                else -> null
-            }?.let(onAyahChange)
+            if (isPlaying) onAyahChange(AudioEvents.PauseAudio) else onAyahChange(AudioEvents.PlayAudio)
         }
         Spacer(modifier = Modifier.size(8.dp))
         PlayerIconItem(icon = Icons.Rounded.SkipNext, modifier = Modifier) { onAyahChange(AudioEvents.PlayNext) }
@@ -121,8 +105,7 @@ private fun MediaPlayerController(
 @Composable
 private fun SurahInfo(
     modifier: Modifier,
-    title: String,
-    subtitle: String,
+    item: MediaItem?,
 ) {
     Row(
         modifier = modifier.padding(4.dp),
@@ -138,13 +121,13 @@ private fun SurahInfo(
         Spacer(modifier = Modifier.size(8.dp))
         Column {
             Text(
-                text = title,
+                text = item?.mediaMetadata?.title?.toString() ?: "",
                 style = MaterialTheme.typography.titleSmall,
                 modifier = Modifier.weight(1f),
                 maxLines = 1
             )
             Spacer(modifier = Modifier.size(4.dp))
-            Text(text = stringResource(id = R.string.sure_ayet, subtitle.toInt()), style = MaterialTheme.typography.bodySmall, maxLines = 1)
+            Text(text = item?.mediaMetadata?.subtitle?.toString() ?: "", style = MaterialTheme.typography.bodySmall, maxLines = 1)
         }
     }
 }

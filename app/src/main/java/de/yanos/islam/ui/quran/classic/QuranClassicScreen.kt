@@ -38,8 +38,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.data.model.quran.Ayah
 import de.yanos.islam.data.model.quran.Page
-import de.yanos.islam.ui.quran.audio.AudioEvents
-import de.yanos.islam.ui.quran.audio.AudioViewModel
 import de.yanos.islam.ui.quran.audio.AyahAudioPlayer
 import de.yanos.islam.util.IslamDivider
 import de.yanos.islam.util.NavigationAction
@@ -58,15 +56,13 @@ import kotlinx.coroutines.launch
 fun QuranClassicScreen(
     modifier: Modifier = Modifier,
     quranViewModel: QuranClassicViewModel = hiltViewModel(),
-    audioViewModel: AudioViewModel = hiltViewModel(),
     onNavigationChange: (NavigationAction) -> Unit
 ) {
     val typo = quranTypoByConfig(quranViewModel.quranSizeFactor, quranViewModel.quranStyle)
-
     QuranContent(
         modifier = modifier,
-        ayah = quranViewModel.currentAyah,
-        index = (quranViewModel.currentAyah?.page ?: 0) - 1,
+        ayah = quranViewModel.referenceAyah,
+        index = (quranViewModel.referenceAyah?.page ?: 0) - 1,
         pages = quranViewModel.pages,
         onPageSelected = { page: Int -> quranViewModel.onSelectionChange(PageSelection(page)) },
         onSurahSelected = { surahID: Int -> quranViewModel.onSelectionChange(SurahSelection(surahID)) },
@@ -74,20 +70,11 @@ fun QuranClassicScreen(
         onAyahSelected = { ayah: Ayah -> quranViewModel.onSelectionChange(AyahSelection(ayah.id)) },
         typo = typo
     )
-    quranViewModel.referenceAyah?.let {
+    if (quranViewModel.showDetailSheet)
         AyahDetailBottomSheet(
             modifier = modifier,
-            audioViewModel = audioViewModel,
-            referenceAyah = it,
-            currentAyah = quranViewModel.nowPlayingAyah,
-            typo = typo,
-            onAyahChange = { ayah: Ayah? ->
-                if (ayah == null)
-                    quranViewModel.clearAyahs()
-                else quranViewModel.nowPlayingAyah = ayah
-            }
+            typo = typo
         )
-    }
 }
 
 
@@ -224,7 +211,7 @@ private fun QuranPage(
                                         ayahsOffsets.filter { offset < it.value }.toSortedMap().firstKey().let { id ->
                                             page.ayahs.find { it.id == id }?.let(onAyahSelected)
                                         }
-                                    }
+                                    },
                                 )
                             }
                         }
@@ -235,68 +222,50 @@ private fun QuranPage(
     }
 }
 
-
 @Composable
 fun AyahDetailBottomSheet(
     modifier: Modifier,
-    audioViewModel: AudioViewModel = hiltViewModel(),
-    referenceAyah: Ayah,
-    currentAyah: Ayah?,
-    onAyahChange: (Ayah?) -> Unit,
+    quranViewModel: QuranClassicViewModel = hiltViewModel(),
     typo: Typography,
 ) {
-    if (currentAyah == null)
-        audioViewModel.playAyah(referenceAyah, false)
     val onEvent = { event: AudioEvents ->
-        audioViewModel.onAudioEvents(event)
-    }
-    val scope = rememberCoroutineScope()
-    DisposableEffect(audioViewModel.currentAyah) {
-        scope.launch {
-            onAyahChange(audioViewModel.currentAyah)
-        }
-        onDispose {
-
-        }
+        quranViewModel.onAudioEvents(event)
     }
     ModalBottomSheet(
         modifier = modifier,
-        onDismissRequest = {
-            onEvent(AudioEvents.CloseAudio)
-        }) {
-        audioViewModel.currentAyah?.let { ayah: Ayah ->
-            Column(
-                modifier = Modifier
-                    .padding(12.dp)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    //TODO: Replace with drop down
-                    Text(text = arabicNumber(ayah.juz), style = labelMedium())
-                    Text(text = arabicNumber(ayah.page), style = labelMedium())
-                }
-                AyahAudioPlayer(modifier = Modifier, title = ayah.sureName, subtitle = ayah.number.toString(), state = audioViewModel.playerState, onAyahChange = onEvent)
-                Spacer(modifier = Modifier.height(8.dp))
-                IslamDivider(color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = alternatingColors(
-                        text = ayah.text,
-                        delimiter = Regex("-|\\s")
-                    ),
-                    style = typo.headlineMedium.copy(fontSize = typo.headlineLarge.fontSize.times(1.2)),
-                    textAlign = TextAlign.End
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                IslamDivider(color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(text = alternatingColors(text = ayah.translationTr, delimiter = Regex("-|\\s")), style = bodyMedium())
-                Spacer(modifier = Modifier.height(8.dp))
-                IslamDivider(color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = alternatingColors(text = ayah.transliterationEn, delimiter = Regex("-|\\s")), style = bodyMedium())
-                Spacer(modifier = Modifier.height(8.dp))
+        onDismissRequest = { onEvent(AudioEvents.CloseAudio) }
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(12.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                //TODO: Replace with drop down
+                Text(text = quranViewModel.mediaItem?.mediaMetadata?.albumTitle?.toString() ?: "", style = labelMedium())
+                Text(text = quranViewModel.mediaItem?.mediaMetadata?.displayTitle?.toString() ?: "", style = labelMedium())
             }
+            AyahAudioPlayer(modifier = Modifier, item = quranViewModel.mediaItem, isPlaying = quranViewModel.isPlaying, onAyahChange = onEvent)
+            Spacer(modifier = Modifier.height(8.dp))
+            IslamDivider(color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = alternatingColors(
+                    text = quranViewModel.mediaItem?.mediaMetadata?.description?.toString() ?: "",
+                    delimiter = Regex("-|\\s")
+                ),
+                style = typo.headlineMedium.copy(fontSize = typo.headlineLarge.fontSize.times(1.2)),
+                textAlign = TextAlign.End
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            IslamDivider(color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(text = alternatingColors(text = quranViewModel.mediaItem?.mediaMetadata?.albumArtist?.toString() ?: "", delimiter = Regex("-|\\s")), style = bodyMedium())
+            Spacer(modifier = Modifier.height(8.dp))
+            IslamDivider(color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = alternatingColors(text = quranViewModel.mediaItem?.mediaMetadata?.artist?.toString() ?: "", delimiter = Regex("-|\\s")), style = bodyMedium())
+            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }

@@ -22,7 +22,6 @@ class IslamApplication : Application(), Configuration.Provider {
 
         createAlarmChannel()
         createDownloadChannel()
-        notificationManager.cancelAll()
     }
 
     private fun createDownloadChannel() {
