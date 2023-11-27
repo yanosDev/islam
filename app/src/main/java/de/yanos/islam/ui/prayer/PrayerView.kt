@@ -329,53 +329,55 @@ private fun PrayingTimes(
     times: List<DayData>,
     index: Int
 ) {
-    val pageCount = times.size
-    val pagerState = rememberPagerState(
-        initialPage = index,
-    ) {
-        pageCount
-    }
-    HorizontalPager(modifier = modifier, state = pagerState) {
-        val currentDay = times[it]
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = currentDay.day, style = titleSmall(), color = goldColor())
-            OutlinedCard(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
-                elevation = CardDefaults.elevatedCardElevation(),
-                border = BorderStroke(1.dp, goldColor()),
-            ) {
-                Column(modifier = Modifier.padding(horizontal = 12.dp)) {
-                    currentDay.times.forEach { time ->
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(4.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(textAlign = TextAlign.Start, text = stringResource(id = time.textId), style = labelSmall())
-                            time.remainingTime?.let {
+    if (index >= 0) {
+        val pageCount = times.size
+        val pagerState = rememberPagerState(
+            initialPage = index,
+        ) {
+            pageCount
+        }
+        HorizontalPager(modifier = modifier, state = pagerState) {
+            val currentDay = times[it]
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(text = currentDay.day, style = titleSmall(), color = goldColor())
+                OutlinedCard(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
+                    elevation = CardDefaults.elevatedCardElevation(),
+                    border = BorderStroke(1.dp, goldColor()),
+                ) {
+                    Column(modifier = Modifier.padding(horizontal = 12.dp)) {
+                        currentDay.times.forEach { time ->
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(4.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(textAlign = TextAlign.Start, text = stringResource(id = time.textId), style = labelSmall())
+                                time.remainingTime?.let {
+                                    Text(
+                                        modifier = Modifier
+                                            .padding(horizontal = 18.dp)
+                                            .weight(1f),
+                                        textAlign = TextAlign.End,
+                                        text = it,
+                                        style = bodySmall(),
+                                        color = goldColor()
+                                    )
+                                }
                                 Text(
-                                    modifier = Modifier
-                                        .padding(horizontal = 18.dp)
-                                        .weight(1f),
                                     textAlign = TextAlign.End,
-                                    text = it,
+                                    text = time.timeText,
                                     style = bodySmall(),
-                                    color = goldColor()
+                                    color = if (time.isCurrentTime) correctColor() else Color.Unspecified
                                 )
                             }
-                            Text(
-                                textAlign = TextAlign.End,
-                                text = time.timeText,
-                                style = bodySmall(),
-                                color = if (time.isCurrentTime) correctColor() else Color.Unspecified
-                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            IslamDivider()
                         }
-                        Spacer(modifier = Modifier.height(2.dp))
-                        IslamDivider()
                     }
                 }
             }

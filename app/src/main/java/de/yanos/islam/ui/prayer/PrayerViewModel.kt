@@ -46,22 +46,22 @@ class PrayerViewModel @Inject constructor(
     private var cityData: MutableList<CityData> = mutableListOf()
     private var dailyContent: AwqatDailyContent? = null
     private val timer: Timer = Timer()
-    private var currentIndex: Int = 0
+    private var currentIndex: Int = -1
     val isDBInitialized = appSettings.isDBInitialized
     var currentState: ScreenState by mutableStateOf(IsLoading)
     var schedules = mutableStateListOf<Schedule>()
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcher) {
             dao.schedules().distinctUntilChanged().collect {
-                schedules.clear()
-                schedules.addAll(it)
+                withContext(Dispatchers.Main) {
+                    schedules.clear()
+                    schedules.addAll(it)
+                }
             }
         }
-        viewModelScope.launch {
-            withContext(dispatcher) {
-                dailyContent = dao.dailyContent(LocalDateTime.now().dayOfYear)
-            }
+        viewModelScope.launch(dispatcher) {
+            dailyContent = dao.dailyContent(LocalDateTime.now().dayOfYear)
             dao.loadCityData().distinctUntilChanged().collect {
                 cityData.clear()
                 cityData.addAll(it)
@@ -71,61 +71,61 @@ class PrayerViewModel @Inject constructor(
         timer.scheduleAtFixedRate(
             timerTask()
             {
-                viewModelScope.launch(Dispatchers.Main) {
+                viewModelScope.launch(dispatcher) {
                     refreshData()
                 }
             }, 0, 1000
         )
     }
 
-    private fun refreshData() {
-        viewModelScope.launch {
-            cityData.map { data ->
-                val now = LocalTime.now()
-                val diff = -(data.qibla - data.degree).toFloat()
-                val abs = abs(diff)
-                val date = LocalDate.parse(data.gregorianDateShort, DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-                val isToday = date.dayOfYear == LocalDate.now().dayOfYear && date.year == LocalDate.now().year
-                var currentTimeFound = false
-                val time = { id: Int, textId: Int, textTime: String ->
-                    val formatter = DateTimeFormatter.ofPattern("HH:mm")
-                    val time = LocalTime.parse(textTime, formatter)
-                    var isCurrentTime = false
-                    if (now.isBefore(time) && isToday) {
-                        if (!currentTimeFound) {
-                            currentTimeFound = true
-                            isCurrentTime = true
-                        }
+    private suspend fun refreshData() {
+        cityData.toList().map { data ->
+            val now = LocalTime.now()
+            val diff = -(data.qibla - data.degree).toFloat()
+            val abs = abs(diff)
+            val date = LocalDate.parse(data.gregorianDateShort, DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+            val isToday = date.dayOfYear == LocalDate.now().dayOfYear && date.year == LocalDate.now().year
+            var currentTimeFound = false
+            val time = { id: Int, textId: Int, textTime: String ->
+                val formatter = DateTimeFormatter.ofPattern("HH:mm")
+                val time = LocalTime.parse(textTime, formatter)
+                var isCurrentTime = false
+                if (now.isBefore(time) && isToday) {
+                    if (!currentTimeFound) {
+                        currentTimeFound = true
+                        isCurrentTime = true
                     }
-                    PrayingTime(
-                        id = id,
-                        textId = textId,
-                        timeText = textTime,
-                        time = time,
-                        isCurrentTime = isCurrentTime,
-                        remainingTime = if (now.isBefore(time) && isToday) {
-                            val remaining = now.until(time, ChronoUnit.SECONDS)
-                            val hour = String.format("%02d", remaining.toInt() / 3600)
-                            val minute = String.format("%02d", (remaining.toInt() % 3600) / 60)
-                            val second = String.format("%02d", remaining.toInt() % 60)
-                            "${hour}:${minute}:${second}"
-                        } else null,
-                    )
                 }
-                DayData(
-                    day = "${data.hijriDateLong} - ${data.gregorianDateLong}",
-                    isToday = isToday,
-                    times = listOf(
-                        time(0, R.string.praying_imsak_title, data.fajr),
-                        time(1, R.string.praying_sunrise_title, data.sunrise),
-                        time(2, R.string.praying_lunch_title, data.dhuhr),
-                        time(3, R.string.praying_afternoon_title, data.asr),
-                        time(4, R.string.praying_evening_title, data.maghrib),
-                        time(5, R.string.praying_night_title, data.isha),
-                    ),
-                    direction = -(if (abs < 11) 0F else diff)
+                PrayingTime(
+                    id = id,
+                    textId = textId,
+                    timeText = textTime,
+                    time = time,
+                    isCurrentTime = isCurrentTime,
+                    remainingTime = if (now.isBefore(time) && isToday) {
+                        val remaining = now.until(time, ChronoUnit.SECONDS)
+                        val hour = String.format("%02d", remaining.toInt() / 3600)
+                        val minute = String.format("%02d", (remaining.toInt() % 3600) / 60)
+                        val second = String.format("%02d", remaining.toInt() % 60)
+                        "${hour}:${minute}:${second}"
+                    } else null,
                 )
-            }.let { days ->
+            }
+            DayData(
+                day = "${data.hijriDateLong} - ${data.gregorianDateLong}",
+                isToday = isToday,
+                times = listOf(
+                    time(0, R.string.praying_imsak_title, data.fajr),
+                    time(1, R.string.praying_sunrise_title, data.sunrise),
+                    time(2, R.string.praying_lunch_title, data.dhuhr),
+                    time(3, R.string.praying_afternoon_title, data.asr),
+                    time(4, R.string.praying_evening_title, data.maghrib),
+                    time(5, R.string.praying_night_title, data.isha),
+                ),
+                direction = -(if (abs < 11) 0F else diff)
+            )
+        }.let { days ->
+            withContext(Dispatchers.Main) {
                 currentIndex = if (currentIndex < 0) days.indexOfFirst { it.isToday } else currentIndex
                 currentState = PrayerScreenData(
                     times = days,

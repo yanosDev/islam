@@ -1,7 +1,6 @@
 package de.yanos.islam
 
 import android.annotation.SuppressLint
-import android.app.NotificationManager
 import android.content.Context
 import android.location.Geocoder
 import android.media.MediaPlayer
@@ -11,9 +10,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
+import androidx.media3.session.MediaController
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import de.yanos.core.utils.IODispatcher
@@ -32,8 +35,10 @@ import de.yanos.islam.util.getCurrentLocation
 import de.yanos.islam.util.hasLocationPermission
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -54,16 +59,58 @@ class MainViewModel @Inject constructor(
     val appSettings: AppSettings,
     private val awqatRepository: AwqatRepository,
     @ApplicationContext private val context: Context,
+    private val controllerFuture: ListenableFuture<MediaController>,
     private val db: IslamDatabase,
     @IODispatcher private val dispatcher: CoroutineDispatcher,
     private val geocoder: Geocoder,
     private val quranRepository: QuranRepository,
     @AzanPlayer private val mediaPlayer: MediaPlayer,
-    private val notificationManager: NotificationManager,
     private val workManager: WorkManager
 ) : ViewModel() {
     var isReady: Boolean by mutableStateOf(false)
     private var timer: Timer? = null
+    private var controller: MediaController? = null
+
+    init {
+        controllerFuture.addListener({
+            controller = controllerFuture.get()
+
+        }, dispatcher.asExecutor())
+
+        viewModelScope.launch {
+            while (controller == null)
+                delay(100)
+            quranRepository.loadAyahs().collect { ayahs ->
+                controller?.let {
+                    ayahs.groupBy { ayah -> ayah.page }.forEach { (_, value) ->
+                        it.addMediaItems(value.map { ayah ->
+                            MediaItem.Builder()
+                                .setMediaId(ayah.id.toString())
+                                .setUri(ayah.audio)
+                                .setMediaMetadata(
+                                    MediaMetadata.Builder()
+                                        .setTitle(
+                                            context.getString(R.string.sure_list_page, ayah.page.toString())
+                                                    + ", "
+                                                    + context.getString(R.string.sure_list_cuz, ayah.juz.toString())
+                                                    + ", "
+                                                    + context.getString(R.string.sure_ayet, ayah.number)
+                                        )
+                                        .setArtist(ayah.sureName)
+                                        .build()
+                                )
+                                .build()
+                        })
+
+                        delay(100)
+                    }
+
+
+                    it.prepare()
+                }
+            }
+        }
+    }
 
     fun startSchedule() {
         timer = Timer()
@@ -92,7 +139,6 @@ class MainViewModel @Inject constructor(
     }
 
     fun cancelAllNotifications() {
-        notificationManager.cancelAll()
         if (mediaPlayer.isPlaying) {
             mediaPlayer.pause()
             mediaPlayer.seekTo(0)
@@ -116,11 +162,11 @@ class MainViewModel @Inject constructor(
                 isLoading = true
                 listOf(
                     async { initDailyWorker() },
-                    async { loadDailyAwqatList() }
+                    async { loadDailyAwqatList() },
+                    async { loadQuran() },
                 ).awaitAll()
                 isReady = if (!appSettings.isDBInitialized) {
                     listOf(
-                        async { loadQuran() },
                         async { initDB() }
                     ).awaitAll()
                     true
@@ -131,7 +177,8 @@ class MainViewModel @Inject constructor(
 
     private suspend fun loadQuran() {
         return withContext(dispatcher) {
-            quranRepository.fetchQuran()
+            if (!quranRepository.isWholeQuranFetched())
+                quranRepository.fetchQuran()
         }
     }
 
@@ -204,7 +251,6 @@ class MainViewModel @Inject constructor(
                         ),
                     )
                 )
-
                 appSettings.isDBInitialized = true
             }
         }

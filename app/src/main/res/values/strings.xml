@@ -58,6 +58,7 @@
     <string name="praying_daily_verse">Günün Ayeti:</string>
     <string name="praying_daily_hadith">Günün Hadisi:</string>
     <string name="praying_daily_prayer">Günün Duasi:</string>
+    <string name="setting_audio_title">Tüm Sürelerin Ses Kayitlarini indirin %s</string>
     <string name="setting_font_title">Yazi ayarlari</string>
     <string name="setting_font_size_title">Yazi Boyutu</string>
     <string name="setting_font_style_title">Yazi türü</string>
@@ -82,8 +83,11 @@
     <string name="quran_read_main">Kuran i oku</string>
     <string name="quran_sure_list">Kuran daki Sureler</string>
     <string name="quran_search">Herhangi bi Ayeti mi ariyorsunuz?</string>
+    <string name="quran_audio">Ayetlerin Ses kayitlerini indir</string>
+    <string name="quran_video">Kuran i okumayi ögrenin</string>
     <string name="sure_ayet">%d. Ayet</string>
     <string name="sure_list_cuz">Cüz: %s</string>
+    <string name="sure_list_page">Sayfa: %s</string>
     <string name="sure_list_yer">Yer: %s</string>
     <string name="sure_list_header">Sureler</string>
     <string name="sure_sort_quran">Kurandaki Sira</string>
@@ -95,4 +99,11 @@
     <string name="init_permission">1. Namaz vakitleri ve Kible yönünü belirlemek icin, suanki bulundugunuz ilin konumu gerekli.\n2. Namaz vakti Bildirimleri almak icin ayriyet den izin gerekli dir.</string>
     <string name="init_permission_location">Konum Izin Ver</string>
     <string name="init_permission_notification">Bildirim Izin Ver</string>
- </resources>
+
+
+    <string name="notification_channel_download_name">Ayet Audio</string>
+    <string name="notification_channel_download_description">Ayetlerin mp3 indiriliyor</string>
+
+    <string name="download_list_title">Offline Kullanim icin Ayetleri önceden indiriniz</string>
+    <string name="download_list_all">Quranin tamamini indir</string>
+</resources>

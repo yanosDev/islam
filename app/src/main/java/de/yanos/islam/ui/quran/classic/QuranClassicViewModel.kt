@@ -2,60 +2,58 @@
 
 package de.yanos.islam.ui.quran.classic
 
-import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.viewModelScope
+import androidx.media3.session.MediaController
+import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.yanos.core.utils.IODispatcher
-import de.yanos.islam.data.database.dao.QuranDao
-import de.yanos.islam.data.model.quran.Ayah
 import de.yanos.islam.data.model.quran.Page
 import de.yanos.islam.data.repositories.QuranRepository
+import de.yanos.islam.ui.quran.classic.audio.AudioViewModel
 import de.yanos.islam.util.AppSettings
-import de.yanos.islam.util.IsLoading
-import de.yanos.islam.util.ScreenState
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class QuranClassicViewModel @Inject constructor(
     private val appSettings: AppSettings,
-    private val dao: QuranDao,
+    controllerFuture: ListenableFuture<MediaController>,
     @IODispatcher private val dispatcher: CoroutineDispatcher,
     private val repository: QuranRepository,
-) : ViewModel() {
-
+) : AudioViewModel(controllerFuture, repository, dispatcher) {
+    var pages = mutableStateListOf<Page>()
     val quranStyle get() = appSettings.quranStyle
     val quranSizeFactor get() = appSettings.quranSizeFactor
-    var state: ScreenState by mutableStateOf(IsLoading)
-    var uri: Uri? = null
+
 
     init {
         viewModelScope.launch(dispatcher) {
-            val surahs = dao.sureList()
-            val pages = dao.ayahs().groupBy { it.page }.map { Page(it.key, surahs.find { surah -> surah.id == it.value.first().sureId }!!.name, it.value) }
-
-            state = QuranState(pages)
-        }
-    }
-
-    fun onAudioChange(onAudioInteraction: OnAudioInteraction) {
-        viewModelScope.launch {
-            when (onAudioInteraction) {
-                is DownloadAudio -> repository.loadAudio(onAudioInteraction.ayah)?.let { uri = Uri.fromFile(it) }
+            repository.loadPages().collect {
+                withContext(Dispatchers.Main) {
+                    pages.clear()
+                    pages.addAll(it)
+                }
             }
         }
     }
 }
 
-data class QuranState(val pages: List<Page>, val currentPage: Int = 1) : ScreenState
+interface QuranSelection
+data class AyahSelection(val ayahId: Int) : QuranSelection
+data class SurahSelection(val surahId: Int) : QuranSelection
+data class PageSelection(val page: Int) : QuranSelection
+data class JuzSelection(val juz: Int) : QuranSelection
 
-
-interface OnAudioInteraction
-
-class DownloadAudio(val ayah: Ayah) : OnAudioInteraction
+sealed interface AudioEvents {
+    object PlayAudio : AudioEvents
+    object PauseAudio : AudioEvents
+    object CloseAudio : AudioEvents
+    object PlayPrevious : AudioEvents
+    object PlayNext : AudioEvents
+    data class UpdateProgress(val newProgress: Float) : AudioEvents
+}

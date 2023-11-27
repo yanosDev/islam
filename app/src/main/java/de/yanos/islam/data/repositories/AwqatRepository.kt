@@ -34,12 +34,14 @@ class AwqatRepositoryImpl @Inject constructor(
         return withContext(dispatcher) {
             remoteSource.auth()
             if (appSettings.authToken.isNotBlank()) {
-                listOf(
-                    async { fetchDailyContent() },
-                    async { fetchCountries() },
-                    async { fetchStates() },
-                    async { fetchCities() },
-                ).awaitAll()
+                if (!appSettings.isDBInitialized)
+                    listOf(
+                        async { fetchDailyContent() },
+                        async { fetchCountries() },
+                        async { fetchStates() },
+                        async { fetchCities() },
+                    ).awaitAll()
+                else fetchDailyContent()
             }
         }
     }

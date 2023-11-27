@@ -1,21 +1,39 @@
+@file:UnstableApi
+
 package de.yanos.islam.data.repositories
 
+import android.content.Context
+import android.net.Uri
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.offline.DownloadRequest
+import androidx.media3.exoplayer.offline.DownloadService
+import dagger.hilt.android.qualifiers.ApplicationContext
 import de.yanos.islam.data.model.quran.Ayah
+import de.yanos.islam.data.model.quran.Page
 import de.yanos.islam.data.model.quran.Surah
 import de.yanos.islam.data.repositories.source.LocalQuranSource
 import de.yanos.islam.data.repositories.source.RemoteQuranSource
+import de.yanos.islam.service.ExoDownloadService
 import de.yanos.islam.util.LoadState
-import de.yanos.islam.util.localFile
-import java.io.File
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 interface QuranRepository {
+    suspend fun isWholeQuranFetched(): Boolean
     suspend fun fetchQuran()
-    suspend fun loadAudio(ayah: Ayah): File?
+    fun loadPages(): Flow<List<Page>>
+    fun loadAyahs(): Flow<List<Ayah>>
+    suspend fun loadAyahById(ayahId: Int): Ayah?
+    suspend fun loadFirstAyahBySurahId(surahId: Int): Ayah?
+    suspend fun loadFirstAyahByPageId(pageId: Int): Ayah?
+    suspend fun loadFirstAyahByJuz(juz: Int): Ayah?
+    suspend fun loadAudioAlt(id: Int, uri: String)
+    fun subsribeSurahAyahs(id: Int): Flow<List<Ayah>>
+    suspend fun sureList(): List<Surah>
 }
 
 class QuranRepositoryImpl @Inject constructor(
-    private val filesDir: File,
+    @ApplicationContext private val context: Context,
     private val local: LocalQuranSource,
     private val remote: RemoteQuranSource
 ) : QuranRepository {
@@ -46,6 +64,7 @@ class QuranRepositoryImpl @Inject constructor(
                         number = ayahAudio.number,
                         audio = ayahAudio.audio,
                         audioMore = ayahAudio.audioSecondary.firstOrNull(),
+                        localAudio = null,
                         text = ayahAudio.text,
                         translationTr = translationSurah?.ayahs?.get(index)?.text ?: "",
                         transliterationEn = transliterationSurah?.ayahs?.get(index)?.text ?: "",
@@ -58,22 +77,50 @@ class QuranRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun loadAudio(ayah: Ayah): File? {
-        val audioFile = ayah.audio.localFile(filesDir)
-        val audioAlt = ayah.audioMore?.localFile(filesDir)
-        return if (audioFile.exists()) {
-            audioFile
-        } else {
-            val loadState = remote.downloadAudio(ayah.audio)
-            if (loadState is LoadState.Data)
-                loadState.data
-            else if (audioAlt != null) {
-                val altLoadState = remote.downloadAudio(ayah.audioMore)
-                if (altLoadState is LoadState.Data)
-                    audioAlt
-                else null
-            } else null
-        }
+    override fun loadPages(): Flow<List<Page>> {
+        return local.loadPages()
+    }
+
+    override fun loadAyahs(): Flow<List<Ayah>> {
+        return local.loadAyahs()
+    }
+
+    override suspend fun loadFirstAyahBySurahId(surahId: Int): Ayah? {
+        return local.loadFirstAyahBySurahId(surahId)
+    }
+
+    override suspend fun loadFirstAyahByPageId(pageId: Int): Ayah? {
+        return local.loadFirstAyahByPageId(pageId)
+    }
+
+    override suspend fun loadFirstAyahByJuz(juz: Int): Ayah? {
+        return local.loadFirstAyahByJuz(juz)
+    }
+
+    override suspend fun loadAudioAlt(id: Int, uri: String) {
+        val downloadRequest: DownloadRequest = DownloadRequest.Builder(id.toString(), Uri.parse(uri)).build()
+        DownloadService.sendAddDownload(
+            context,
+            ExoDownloadService::class.java,
+            downloadRequest,
+            false
+        )
+    }
+
+    override fun subsribeSurahAyahs(id: Int): Flow<List<Ayah>> {
+        return local.subsribeSurahAyahs(id)
+    }
+
+    override suspend fun sureList(): List<Surah> {
+        return local.sureList()
+    }
+
+    override suspend fun loadAyahById(ayahId: Int): Ayah? {
+        return local.loadAyahById(ayahId)
+    }
+
+    override suspend fun isWholeQuranFetched(): Boolean {
+        return local.isQuranLoaded()
     }
 }
 

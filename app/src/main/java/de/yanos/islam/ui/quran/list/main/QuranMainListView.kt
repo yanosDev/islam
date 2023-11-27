@@ -3,14 +3,22 @@ package de.yanos.islam.ui.quran.list.main
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.AbsoluteCutCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.LibraryBooks
+import androidx.compose.material.icons.rounded.MenuBook
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.VideoLibrary
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -52,7 +60,11 @@ fun QuranMainListScreen(
                 border = BorderStroke(1.dp, goldColor()),
                 onClick = { onNavigationChange(QuranNavigationAction.NavigateToQuran) },
             ) {
-                Text(text = stringResource(id = R.string.quran_read_main), style = labelMedium(), color = goldColor())
+                Row {
+                    Icon(imageVector = Icons.Rounded.MenuBook, contentDescription = "", tint = goldColor())
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(modifier = Modifier.weight(1f), text = stringResource(id = R.string.quran_read_main), style = labelMedium(), color = goldColor())
+                }
             }
             ElevatedButton(
                 modifier = Modifier
@@ -62,7 +74,11 @@ fun QuranMainListScreen(
                 border = BorderStroke(1.dp, goldColor()),
                 onClick = { onNavigationChange(QuranNavigationAction.NavigateToSureList) },
             ) {
-                Text(text = stringResource(id = R.string.quran_sure_list), style = labelMedium())
+                Row {
+                    Icon(imageVector = Icons.Rounded.LibraryBooks, contentDescription = "", tint = goldColor())
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(modifier = Modifier.weight(1f), text = stringResource(id = R.string.quran_sure_list), style = labelMedium())
+                }
             }
             ElevatedButton(
                 modifier = Modifier
@@ -72,7 +88,25 @@ fun QuranMainListScreen(
                 border = BorderStroke(1.dp, goldColor()),
                 onClick = { onNavigationChange(QuranNavigationAction.NavigateToQuranSearch) },
             ) {
-                Text(text = stringResource(id = R.string.quran_search), style = labelMedium())
+                Row {
+                    Icon(imageVector = Icons.Rounded.Search, contentDescription = "", tint = goldColor())
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(modifier = Modifier.weight(1f), text = stringResource(id = R.string.quran_search), style = labelMedium())
+                }
+            }
+            ElevatedButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 2.dp),
+                shape = AbsoluteCutCornerShape(8.dp),
+                border = BorderStroke(1.dp, goldColor()),
+                onClick = { onNavigationChange(QuranNavigationAction.NavigateToVideoLearnings) },
+            ) {
+                Row {
+                    Icon(imageVector = Icons.Rounded.VideoLibrary, contentDescription = "", tint = goldColor())
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(modifier = Modifier.weight(1f), text = stringResource(id = R.string.quran_video), style = labelMedium())
+                }
             }
         }
         AnimatedVisibility(visible = !vm.isDBInitialized && isEmpty) {

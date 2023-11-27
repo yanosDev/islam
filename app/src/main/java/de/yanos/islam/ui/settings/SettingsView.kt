@@ -1,12 +1,21 @@
 package de.yanos.islam.ui.settings
 
 import android.app.Activity
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Download
+import androidx.compose.material.icons.rounded.DownloadDone
+import androidx.compose.material.icons.rounded.Pause
+import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,6 +53,15 @@ fun SettingsScreen(
             Lottie(modifier = Modifier.height(160.dp), resId = R.raw.lottie_config, applyColor = false)
         }
         item {
+            AudioCard(
+                modifier = Modifier,
+                state = vm.audioDownloadState,
+                audioProgress = vm.audioStateString,
+                pauseDownload = { vm.pauseDownloadingAllAudio() },
+                resumeDownload = { vm.resumeDownloadingAllAudio() },
+                startDownload = { vm.queueDownloadAllAudio() })
+        }
+        item {
             FontSettings(
                 currentSize = vm.fontSize,
                 onFontSizeChange = {
@@ -62,7 +80,7 @@ fun SettingsScreen(
             FontSettings(
                 currentSize = vm.quranFontSize,
                 onFontSizeChange = {
-                    vm.updateQuranFontSize( it)
+                    vm.updateQuranFontSize(it)
                     recreate = true
                 },
                 currentFontIndex = vm.quranFontStyle,
@@ -72,6 +90,40 @@ fun SettingsScreen(
                 },
                 fonts = QuranFontStyle.values().map { it.textId }
             )
+        }
+    }
+}
+
+@Composable
+fun AudioCard(
+    modifier: Modifier,
+    state: AudioDownloadState,
+    audioProgress: String,
+    pauseDownload: () -> Unit,
+    resumeDownload: () -> Unit,
+    startDownload: () -> Unit,
+) {
+    ElevatedCard(modifier = modifier.padding(8.dp)) {
+        Row(modifier = Modifier.padding(12.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
+            Text(modifier = Modifier.weight(1f), text = stringResource(id = R.string.setting_audio_title, audioProgress), style = titleMedium())
+            Spacer(modifier = Modifier.padding(4.dp))
+            IconButton(onClick = {
+                when (state) {
+                    AudioDownloadState.IsDownloading -> pauseDownload()
+                    AudioDownloadState.IsIdle -> startDownload()
+                    AudioDownloadState.IsPaused -> resumeDownload()
+                    else -> {}
+                }
+            }) {
+                Icon(
+                    imageVector = when (state) {
+                        AudioDownloadState.IsDownloading -> Icons.Rounded.Pause
+                        AudioDownloadState.IsDownloaded -> Icons.Rounded.DownloadDone
+                        AudioDownloadState.IsPaused -> Icons.Rounded.PlayArrow
+                        else -> Icons.Rounded.Download
+                    }, contentDescription = ""
+                )
+            }
         }
     }
 }
