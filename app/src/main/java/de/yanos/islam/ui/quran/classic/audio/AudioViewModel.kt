@@ -30,15 +30,14 @@ open class AudioViewModel(
     private val repository: QuranRepository,
     dispatcher: CoroutineDispatcher
 ) : ViewModel() {
-
     var showDetailSheet by mutableStateOf(false)
     var referenceAyah by mutableStateOf<Ayah?>(null)
 
     var progress by mutableFloatStateOf(0F)
     var isPlaying by mutableStateOf(false)
 
-    var timer: Timer? = null
-    var controller: MediaController? = null
+    private var timer: Timer? = null
+    private var controller: MediaController? = null
 
     private val controllerListener = object : Player.Listener {
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
