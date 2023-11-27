@@ -4,11 +4,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.media3.session.MediaController
+import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.yanos.core.utils.IODispatcher
-import de.yanos.islam.data.database.dao.QuranDao
+import de.yanos.islam.data.model.quran.Ayah
+import de.yanos.islam.data.repositories.QuranRepository
+import de.yanos.islam.ui.quran.classic.audio.AudioViewModel
 import de.yanos.islam.ui.quran.list.sure.SureSorting
 import de.yanos.islam.ui.quran.list.sure.sortSure
 import de.yanos.islam.util.AppSettings
@@ -21,10 +24,11 @@ import javax.inject.Inject
 @HiltViewModel
 class QuranPartialViewModel @Inject constructor(
     private val appSettings: AppSettings,
-    private val dao: QuranDao,
+    controllerFuture: ListenableFuture<MediaController>,
+    private val quranRepository: QuranRepository,
     @IODispatcher private val dispatcher: CoroutineDispatcher,
-    private val savedStateHandle: SavedStateHandle
-) : ViewModel() {
+    savedStateHandle: SavedStateHandle
+) : AudioViewModel(controllerFuture, quranRepository, dispatcher) {
     private var sortBy by mutableStateOf(SureSorting.values()[appSettings.sortByOrdinal])
     private val id = savedStateHandle.get<Int>("id")!!
     var surah by mutableStateOf(
@@ -34,6 +38,7 @@ class QuranPartialViewModel @Inject constructor(
             showTranslation = appSettings.showTranslations,
             showPronunciation = appSettings.showPronunciations,
             translations = emptyList(),
+            ayahs = emptyList(),
             pronunciations = emptyList(),
             originals = emptyList()
         )
@@ -43,14 +48,15 @@ class QuranPartialViewModel @Inject constructor(
     var previousSurahId by mutableStateOf<Int?>(null)
     var nextSurahId by mutableStateOf<Int?>(null)
 
+
     init {
         loadSurah(id)
     }
 
     fun loadSurah(id: Int) {
         viewModelScope.launch {
-            dao.subsribeSurahAyahs(id).distinctUntilChanged().collect { ayahs ->
-                val surahs = withContext(dispatcher) { dao.sureList() }.sortSure(sortBy)
+            quranRepository.subsribeSurahAyahs(id).distinctUntilChanged().collect { ayahs ->
+                val surahs = withContext(dispatcher) { quranRepository.sureList() }.sortSure(sortBy)
                 val currentIndex = surahs.indexOfFirst { it.id == id }
                 if (currentIndex > 0) {
                     previousSurahId = surahs[currentIndex - 1].id
@@ -63,7 +69,9 @@ class QuranPartialViewModel @Inject constructor(
                     name = surahs[currentIndex].engName,
                     translations = ayahs.map { it.translationTr },
                     pronunciations = ayahs.map { it.transliterationEn },
-                    originals = ayahs.map { it.text })
+                    originals = ayahs.map { it.text },
+                    ayahs = ayahs
+                )
             }
         }
     }
@@ -84,6 +92,7 @@ data class SurahData(
     val name: String,
     val showTranslation: Boolean,
     val showPronunciation: Boolean,
+    val ayahs: List<Ayah>,
     val translations: List<String>,
     val pronunciations: List<String>,
     val originals: List<String>

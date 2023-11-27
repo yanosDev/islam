@@ -16,7 +16,6 @@ import de.yanos.islam.data.repositories.source.RemoteQuranSource
 import de.yanos.islam.service.ExoDownloadService
 import de.yanos.islam.util.LoadState
 import kotlinx.coroutines.flow.Flow
-import java.io.File
 import javax.inject.Inject
 
 interface QuranRepository {
@@ -29,11 +28,12 @@ interface QuranRepository {
     suspend fun loadFirstAyahByPageId(pageId: Int): Ayah?
     suspend fun loadFirstAyahByJuz(juz: Int): Ayah?
     suspend fun loadAudioAlt(id: Int, uri: String)
+    fun subsribeSurahAyahs(id: Int): Flow<List<Ayah>>
+    suspend fun sureList(): List<Surah>
 }
 
 class QuranRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val filesDir: File,
     private val local: LocalQuranSource,
     private val remote: RemoteQuranSource
 ) : QuranRepository {
@@ -105,6 +105,14 @@ class QuranRepositoryImpl @Inject constructor(
             downloadRequest,
             false
         )
+    }
+
+    override fun subsribeSurahAyahs(id: Int): Flow<List<Ayah>> {
+        return local.subsribeSurahAyahs(id)
+    }
+
+    override suspend fun sureList(): List<Surah> {
+        return local.sureList()
     }
 
     override suspend fun loadAyahById(ayahId: Int): Ayah? {

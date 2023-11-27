@@ -24,6 +24,8 @@ interface LocalQuranSource {
 
     fun loadPages(): Flow<List<Page>>
     fun loadAyahs(): Flow<List<Ayah>>
+    fun subsribeSurahAyahs(id: Int): Flow<List<Ayah>>
+    suspend fun sureList(): List<Surah>
 }
 
 class LocalQuranSourceImpl @Inject constructor(
@@ -82,6 +84,16 @@ class LocalQuranSourceImpl @Inject constructor(
 
     override fun loadAyahs(): Flow<List<Ayah>> {
         return dao.subscribeAyahs()
+    }
+
+    override fun subsribeSurahAyahs(id: Int): Flow<List<Ayah>> {
+        return dao.subsribeSurahAyahs(id)
+    }
+
+    override suspend fun sureList(): List<Surah> {
+        return withContext(dispatcher) {
+            dao.sureList()
+        }
     }
 
     override suspend fun isQuranLoaded(): Boolean {

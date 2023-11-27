@@ -5,7 +5,6 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +19,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowDownward
 import androidx.compose.material.icons.rounded.ArrowUpward
@@ -35,7 +35,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -47,6 +49,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.R
+import de.yanos.islam.data.model.quran.Ayah
+import de.yanos.islam.ui.quran.classic.AyahSelection
+import de.yanos.islam.ui.quran.classic.audio.AyahDetailBottomSheet
 import de.yanos.islam.util.IslamDivider
 import de.yanos.islam.util.IslamSwitch
 import de.yanos.islam.util.NavigationAction
@@ -60,7 +65,6 @@ import de.yanos.islam.util.quranTypoByConfig
 import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun QuranPartialScreen(
     modifier: Modifier = Modifier,
@@ -68,7 +72,7 @@ fun QuranPartialScreen(
     onNavigationChange: (NavigationAction) -> Unit = {}
 ) {
     val state = rememberLazyListState()
-    var position by remember { mutableStateOf(0) }
+    var position by remember { mutableIntStateOf(0) }
     val scope = rememberCoroutineScope()
     var showSettings by remember { mutableStateOf(false) }
     if (vm.surah.originals.isNotEmpty()) {
@@ -120,7 +124,28 @@ fun QuranPartialScreen(
                     )
                 }
             }
-            AyetList(modifier = Modifier.weight(1f), state = state, sure = vm.surah, typo = quranTypoByConfig(vm.quranSizeFactor, vm.quranStyle))
+            val typo = quranTypoByConfig(vm.quranSizeFactor, vm.quranStyle)
+            DisposableEffect(vm.referenceAyah) {
+                scope.launch {
+                    if (vm.referenceAyah != null && vm.referenceAyah?.sureId != vm.surah.id) {
+                        vm.loadSurah(vm.nextSurahId!!)
+                        onScrollTo(1)
+                    }
+                }
+                onDispose { }
+            }
+            AyetList(modifier = Modifier.weight(1f), state = state, sure = vm.surah, typo = typo, onAyahChanged = { vm.onSelectionChange(AyahSelection(it.id)) })
+            if (vm.showDetailSheet)
+                AyahDetailBottomSheet(
+                    modifier = modifier,
+                    typo = typo,
+                    progress = vm.progress,
+                    ayah = vm.referenceAyah,
+                    isPlaying = vm.isPlaying,
+                    onAudioEvents = { event ->
+                        vm.onAudioEvents(event)
+                    }
+                )
         }
     }
 }
@@ -204,7 +229,8 @@ private fun AyetList(
     modifier: Modifier = Modifier,
     state: LazyListState,
     sure: SurahData,
-    typo: Typography
+    typo: Typography,
+    onAyahChanged: (Ayah) -> Unit
 ) {
     LazyColumn(modifier = modifier.fillMaxHeight(1f), state = state) {
         items(count = sure.originals.size) { index: Int ->
@@ -213,9 +239,11 @@ private fun AyetList(
                 original = sure.originals[index],
                 translations = sure.translations[index],
                 pronunciations = sure.pronunciations[index],
+                ayah = sure.ayahs[index],
                 showTranslations = sure.showTranslation,
                 showPronunciations = sure.showPronunciation,
-                typo = typo
+                typo = typo,
+                onAyahChanged = onAyahChanged
             )
         }
     }
@@ -267,12 +295,14 @@ private fun AyetChooser(
 private fun AyetItem(
     modifier: Modifier = Modifier,
     index: Int,
+    ayah: Ayah,
     original: String,
     translations: String,
     pronunciations: String,
     showTranslations: Boolean,
     showPronunciations: Boolean,
-    typo: Typography
+    typo: Typography,
+    onAyahChanged: (Ayah) -> Unit
 ) {
     Column(
         modifier = modifier
@@ -284,12 +314,13 @@ private fun AyetItem(
         Row(horizontalArrangement = Arrangement.SpaceBetween) {
             Text(text = stringResource(id = R.string.sure_ayet, index + 1), style = labelLarge())
             QuranText {
-                Text(
+                ClickableText(
                     modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Justify,
                     text = alternatingColors(text = original),
-                    style = typo.headlineMedium
-                )
+                    style = typo.headlineMedium.copy(textAlign = TextAlign.Justify)
+                ) {
+                    onAyahChanged(ayah)
+                }
             }
         }
         AnimatedVisibility(visible = showPronunciations) {
