@@ -49,7 +49,7 @@ class ExoMediaSessionCallback(
                 mediaController?.seekToNextMediaItem()
                 scope.launch {
                     repository.loadAyahById(mediaController?.currentMediaItem?.mediaId?.toInt() ?: -1)?.let { ayah ->
-                        repository.loadAudioAlt(ayah)
+                        repository.loadAudioAlt(ayah.id, ayah.audio)
                     }
                 }
             }
@@ -58,7 +58,7 @@ class ExoMediaSessionCallback(
                 mediaController?.seekToPreviousMediaItem()
                 scope.launch {
                     repository.loadAyahById(mediaController?.currentMediaItem?.mediaId?.toInt() ?: -1)?.let { ayah ->
-                        repository.loadAudioAlt(ayah)
+                        repository.loadAudioAlt(ayah.id, ayah.audio)
                     }
                 }
             }

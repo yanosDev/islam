@@ -59,6 +59,10 @@ class QuranClassicViewModel @Inject constructor(
     init {
         controllerFuture.addListener({
             controller = controllerFuture.get()
+            viewModelScope.launch {
+                if (controller?.isPlaying == true)
+                    refreshData()
+            }
             controller?.addListener(object : Player.Listener {
                 override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                     super.onMediaItemTransition(mediaItem, reason)
@@ -79,15 +83,17 @@ class QuranClassicViewModel @Inject constructor(
     }
 
     private fun startTimer() {
-        timer = Timer()
-        timer?.scheduleAtFixedRate(
-            timerTask()
-            {
-                viewModelScope.launch {
-                    refreshData()
-                }
-            }, 0, 50
-        )
+        if (timer == null) {
+            timer = Timer()
+            timer?.scheduleAtFixedRate(
+                timerTask()
+                {
+                    viewModelScope.launch {
+                        refreshData()
+                    }
+                }, 0, 50
+            )
+        }
     }
 
     private suspend fun refreshData() {
@@ -135,24 +141,22 @@ class QuranClassicViewModel @Inject constructor(
                     is AudioEvents.PlayPrevious -> {
                         controller?.seekToPreviousMediaItem()
                         repository.loadAyahById(controller?.currentMediaItem?.mediaId?.toInt() ?: -1)?.let { ayah ->
-                            repository.loadAudioAlt(ayah)
+                            repository.loadAudioAlt(ayah.id, ayah.audio)
                         }
                     }
 
                     is AudioEvents.PlayNext -> {
                         controller?.seekToNextMediaItem()
                         repository.loadAyahById(controller?.currentMediaItem?.mediaId?.toInt() ?: -1)?.let { ayah ->
-                            repository.loadAudioAlt(ayah)
+                            repository.loadAudioAlt(ayah.id, ayah.audio)
                         }
                     }
 
                     is AudioEvents.CloseAudio -> {
                         stopTimer()
-                        it.pause()
                         duration = 0
                         progress = 0F
                         progressString = "00:00"
-                        referenceAyah = null
                         showDetailSheet = false
                     }
                 }
@@ -169,12 +173,14 @@ class QuranClassicViewModel @Inject constructor(
                 is JuzSelection -> repository.loadFirstAyahByJuz(selection.juz)
                 else -> null
             }?.let { ayah ->
-                referenceAyah = ayah
-                controller?.seekTo(ayah.id - 1, 0)
-                if (controller?.isPlaying == false)
-                    onAudioEvents(AudioEvents.PlayAudio)
+                if (ayah != referenceAyah) {
+                    referenceAyah = ayah
+                    controller?.seekTo(ayah.id - 1, 0)
+                }
             }
             showDetailSheet = referenceAyah != null
+            if (showDetailSheet)
+                startTimer()
         }
     }
 }

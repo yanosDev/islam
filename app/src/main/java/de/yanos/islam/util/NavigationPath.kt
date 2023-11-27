@@ -22,6 +22,7 @@ import de.yanos.islam.ui.knowledge.topics.main.MainTopicsScreen
 import de.yanos.islam.ui.knowledge.topics.search.SearchQuestionsScreen
 import de.yanos.islam.ui.knowledge.topics.sub.SubTopicsScreen
 import de.yanos.islam.ui.quran.classic.QuranClassicScreen
+import de.yanos.islam.ui.quran.learning.QuranLearningScreen
 import de.yanos.islam.ui.quran.list.main.QuranMainListScreen
 import de.yanos.islam.ui.quran.list.sure.SureListScreen
 import de.yanos.islam.ui.quran.partial.QuranPartialScreen
@@ -53,6 +54,7 @@ object ToRootAfterPermission : NavigationAction {
 sealed class QuranNavigationAction(override val route: String) : NavigationAction {
     object NavigateToQuran : QuranNavigationAction(QuranNavigation.QuranClassic.route)
     object NavigateToQuranSearch : QuranNavigationAction(QuranNavigation.SearchThroughQuran.route)
+    object NavigateToVideoLearnings : QuranNavigationAction(QuranNavigation.QuranLearning.route)
     object NavigateToSureList : QuranNavigationAction(QuranNavigation.SureList.route)
     class NavigateToSure(val id: Int) : QuranNavigationAction(QuranNavigation.QuranPartial.route.replace("{id}", id.toString()))
 }
@@ -145,6 +147,13 @@ sealed class QuranNavigation(override val route: String, override val args: List
             QuranSearchScreen(modifier = Modifier.fillMaxSize(), onNavigationChange = onNavigationChange)
         }
     }
+
+    object QuranLearning : QuranNavigation("quran/learning/") {
+        @Composable
+        override fun View(onNavigationChange: (NavigationAction) -> Unit) {
+            QuranLearningScreen(modifier = Modifier.fillMaxSize(), onNavigationChange = onNavigationChange)
+        }
+    }
 }
 
 sealed class KnowledgeNavigation(override val route: String, override val args: List<NamedNavArgument> = emptyList()) : NavigationPath {
@@ -218,4 +227,5 @@ val allQuran = listOf(
     QuranNavigation.QuranPartial,
     QuranNavigation.QuranClassic,
     QuranNavigation.SearchThroughQuran,
+    QuranNavigation.QuranLearning,
 )

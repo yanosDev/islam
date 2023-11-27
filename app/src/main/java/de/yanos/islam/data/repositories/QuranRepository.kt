@@ -15,7 +15,6 @@ import de.yanos.islam.data.repositories.source.LocalQuranSource
 import de.yanos.islam.data.repositories.source.RemoteQuranSource
 import de.yanos.islam.service.ExoDownloadService
 import de.yanos.islam.util.LoadState
-import de.yanos.islam.util.localFile
 import kotlinx.coroutines.flow.Flow
 import java.io.File
 import javax.inject.Inject
@@ -23,14 +22,13 @@ import javax.inject.Inject
 interface QuranRepository {
     suspend fun isWholeQuranFetched(): Boolean
     suspend fun fetchQuran()
-    suspend fun loadAudio(ayah: Ayah): File?
     fun loadPages(): Flow<List<Page>>
     fun loadAyahs(): Flow<List<Ayah>>
     suspend fun loadAyahById(ayahId: Int): Ayah?
     suspend fun loadFirstAyahBySurahId(surahId: Int): Ayah?
     suspend fun loadFirstAyahByPageId(pageId: Int): Ayah?
     suspend fun loadFirstAyahByJuz(juz: Int): Ayah?
-    suspend fun loadAudioAlt(ayah: Ayah)
+    suspend fun loadAudioAlt(id: Int, uri: String)
 }
 
 class QuranRepositoryImpl @Inject constructor(
@@ -79,26 +77,6 @@ class QuranRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun loadAudio(ayah: Ayah): File? {
-        val audioFile = ayah.audio.localFile(filesDir)
-        val audioAlt = ayah.audioMore?.localFile(filesDir)
-        val finalFile = if (audioFile.exists()) {
-            audioFile
-        } else {
-            val loadState = remote.downloadAudio(ayah.audio)
-            if (loadState is LoadState.Data)
-                loadState.data
-            else if (audioAlt != null) {
-                val altLoadState = remote.downloadAudio(ayah.audioMore)
-                if (altLoadState is LoadState.Data)
-                    audioAlt
-                else null
-            } else null
-        }
-        local.saveLocalAudio(ayah.id, audioFile.absolutePath)
-        return finalFile
-    }
-
     override fun loadPages(): Flow<List<Page>> {
         return local.loadPages()
     }
@@ -119,8 +97,8 @@ class QuranRepositoryImpl @Inject constructor(
         return local.loadFirstAyahByJuz(juz)
     }
 
-    override suspend fun loadAudioAlt(ayah: Ayah) {
-        val downloadRequest: DownloadRequest = DownloadRequest.Builder(ayah.id.toString(), Uri.parse(ayah.audio)).build()
+    override suspend fun loadAudioAlt(id: Int, uri: String) {
+        val downloadRequest: DownloadRequest = DownloadRequest.Builder(id.toString(), Uri.parse(uri)).build()
         DownloadService.sendAddDownload(
             context,
             ExoDownloadService::class.java,

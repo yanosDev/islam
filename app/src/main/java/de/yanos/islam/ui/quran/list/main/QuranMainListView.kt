@@ -74,6 +74,16 @@ fun QuranMainListScreen(
             ) {
                 Text(text = stringResource(id = R.string.quran_search), style = labelMedium())
             }
+            ElevatedButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 2.dp),
+                shape = AbsoluteCutCornerShape(8.dp),
+                border = BorderStroke(1.dp, goldColor()),
+                onClick = { onNavigationChange(QuranNavigationAction.NavigateToVideoLearnings) },
+            ) {
+                Text(text = stringResource(id = R.string.quran_video), style = labelMedium())
+            }
         }
         AnimatedVisibility(visible = !vm.isDBInitialized && isEmpty) {
             DownloadingScreen(downloadingResources = !vm.isDBInitialized)

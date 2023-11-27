@@ -123,10 +123,8 @@ class MainViewModel @Inject constructor(
                             @Suppress("DEPRECATION")
                             geocoder.getFromLocation(lat, lon, 1)?.firstOrNull()?.let { address ->
                                 (address.subAdminArea ?: address.adminArea)?.let { name ->
-                                    if (appSettings.lastLocation != name) {
-                                        appSettings.lastLocation = name
-                                        loadLocationDependentData()
-                                    }
+                                    appSettings.lastLocation = name
+                                    loadLocationDependentData()
                                 }
                             }
                         }

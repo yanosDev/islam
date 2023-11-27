@@ -1,4 +1,6 @@
-package de.yanos.islam.ui.quran.audio
+@file:OptIn(ExperimentalMaterial3Api::class)
+
+package de.yanos.islam.ui.quran.classic.audio
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -12,18 +14,23 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.MusicNote
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.SkipNext
 import androidx.compose.material.icons.rounded.SkipPrevious
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,27 +38,95 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.R
 import de.yanos.islam.data.model.quran.Ayah
 import de.yanos.islam.ui.quran.classic.AudioEvents
-import de.yanos.islam.ui.quran.classic.QuranClassicViewModel
+import de.yanos.islam.util.IslamDivider
+import de.yanos.islam.util.alternatingColors
+import de.yanos.islam.util.arabicNumber
+import de.yanos.islam.util.bodyMedium
+import de.yanos.islam.util.labelMedium
+
+
+@Composable
+fun AyahDetailBottomSheet(
+    modifier: Modifier,
+    ayah: Ayah?,
+    isPlaying: Boolean,
+    progress: Float,
+    onAudioEvents: (AudioEvents) -> Unit,
+    typo: Typography,
+) {
+    ModalBottomSheet(
+        modifier = modifier,
+        onDismissRequest = { onAudioEvents(AudioEvents.CloseAudio) }
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(12.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                //TODO: Replace with drop down
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = stringResource(id = R.string.sure_list_cuz, arabicNumber(ayah?.juz ?: 0)),
+                    style = labelMedium(),
+                )
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = stringResource(id = R.string.sure_list_page, arabicNumber(ayah?.page ?: 0)),
+                    style = labelMedium(),
+                    textAlign = TextAlign.End
+                )
+            }
+            AyahAudioPlayer(
+                modifier = Modifier,
+                item = ayah,
+                isPlaying = isPlaying,
+                progress = progress,
+                onAudioEvent = onAudioEvents
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            IslamDivider(color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = alternatingColors(
+                    text = ayah?.text ?: "",
+                    delimiter = Regex("-|\\s")
+                ),
+                style = typo.headlineMedium.copy(fontSize = typo.headlineLarge.fontSize.times(1.2)),
+                textAlign = TextAlign.End
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            IslamDivider(color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(text = alternatingColors(text = ayah?.transliterationEn ?: "", delimiter = Regex("-|\\s")), style = bodyMedium())
+            Spacer(modifier = Modifier.height(8.dp))
+            IslamDivider(color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = alternatingColors(text = ayah?.translationTr ?: "", delimiter = Regex("-|\\s")), style = bodyMedium())
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+    }
+}
 
 @Composable
 fun AyahAudioPlayer(
     modifier: Modifier,
     item: Ayah?,
+    progress: Float,
     isPlaying: Boolean,
-    onAyahChange: (event: AudioEvents) -> Unit,
-    vm: QuranClassicViewModel = hiltViewModel()
+    onAudioEvent: (event: AudioEvents) -> Unit,
 ) {
     BottomBarPlayer(
         modifier = modifier,
-        progress = vm.progress,
+        progress = progress,
         item = item,
         isPlaying = isPlaying,
-        onAyahChange = onAyahChange,
+        onAyahChange = onAudioEvent,
     )
 }
 

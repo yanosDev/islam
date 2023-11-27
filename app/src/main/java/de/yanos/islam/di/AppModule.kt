@@ -25,7 +25,6 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.offline.DownloadManager
 import androidx.media3.exoplayer.offline.DownloadNotificationHelper
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
-import androidx.media3.exoplayer.util.EventLogger
 import androidx.media3.session.CommandButton
 import androidx.media3.session.MediaController
 import androidx.media3.session.MediaSession
@@ -249,7 +248,7 @@ internal class AppModule {
                     .setDataSourceFactory(dataSourceFactory)
             )
             .build()
-        exoplayer.addAnalyticsListener(EventLogger())
+//        exoplayer.addAnalyticsListener(EventLogger())
         return exoplayer
     }
 

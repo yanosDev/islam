@@ -29,7 +29,7 @@ class ExoDownloadService @Inject constructor(
 
     override fun getDownloadManager(): DownloadManager {
         //Set the maximum number of parallel downloads
-        manager.maxParallelDownloads = 5
+        manager.maxParallelDownloads = 10
         manager.addListener(object : DownloadManager.Listener {
             override fun onDownloadRemoved(downloadManager: DownloadManager, download: Download) {
                 // Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
@@ -55,7 +55,6 @@ class ExoDownloadService @Inject constructor(
     override fun getScheduler(): Scheduler? {
         return null
     }
-
 
     override fun getForegroundNotification(downloads: MutableList<Download>, notMetRequirements: Int): Notification {
         return notificationHelper.buildProgressNotification(applicationContext, R.drawable.ic_launcher, null, getString(R.string.app_name), downloads, Requirements.NETWORK)

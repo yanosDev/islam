@@ -21,6 +21,8 @@ import com.google.android.gms.location.LocationServices
 import retrofit2.Response
 import timber.log.Timber
 import java.io.File
+import java.text.CharacterIterator
+import java.text.StringCharacterIterator
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -240,3 +242,16 @@ fun arabicNumber(number: Int): String = number.toString().map { character ->
 }.joinToString("")
 
 fun String.localFile(dir: File) = File(dir, Uri.parse(this).path!!)
+
+fun Long.humanReadableByteCountSI(): String {
+    var bytes = this
+    if (-1000 < bytes && bytes < 1000) {
+        return "$bytes B"
+    }
+    val ci: CharacterIterator = StringCharacterIterator("kMGTPE")
+    while (bytes <= -999950 || bytes >= 999950) {
+        bytes /= 1000
+        ci.next()
+    }
+    return String.format("%.1f %cB", bytes / 1000.0, ci.current())
+}

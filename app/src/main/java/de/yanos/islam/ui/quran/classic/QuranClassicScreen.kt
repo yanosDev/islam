@@ -4,14 +4,11 @@ package de.yanos.islam.ui.quran.classic
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.HorizontalPager
@@ -21,15 +18,17 @@ import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -40,15 +39,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.R
 import de.yanos.islam.data.model.quran.Ayah
 import de.yanos.islam.data.model.quran.Page
-import de.yanos.islam.ui.quran.audio.AyahAudioPlayer
-import de.yanos.islam.util.IslamDivider
+import de.yanos.islam.ui.quran.classic.audio.AyahDetailBottomSheet
 import de.yanos.islam.util.NavigationAction
 import de.yanos.islam.util.QuranText
-import de.yanos.islam.util.alternatingColors
 import de.yanos.islam.util.arabicNumber
 import de.yanos.islam.util.ayahWithColoredNumber
-import de.yanos.islam.util.bodyMedium
-import de.yanos.islam.util.labelMedium
 import de.yanos.islam.util.quranInnerColor
 import de.yanos.islam.util.quranTypoByConfig
 import kotlinx.coroutines.launch
@@ -75,13 +70,19 @@ fun QuranClassicScreen(
     if (quranViewModel.showDetailSheet)
         AyahDetailBottomSheet(
             modifier = modifier,
-            typo = typo
+            typo = typo,
+            progress = quranViewModel.progress,
+            ayah = quranViewModel.referenceAyah,
+            isPlaying = quranViewModel.isPlaying,
+            onAudioEvents = { event ->
+                quranViewModel.onAudioEvents(event)
+            }
         )
 }
 
 
 @Composable
-fun QuranContent(
+private fun QuranContent(
     modifier: Modifier,
     ayah: Ayah?,
     pages: List<Page>,
@@ -96,7 +97,7 @@ fun QuranContent(
     val pagerState = rememberPagerState { pageCount }
     val scope = rememberCoroutineScope()
 
-    if (index >= 0)
+    if (index >= 0 && pages.size > 0)
         DisposableEffect(index) {
             scope.launch {
                 pagerState.animateScrollToPage(index)
@@ -161,6 +162,18 @@ private fun QuranPage(
     style: TextStyle,
     onAyahSelected: (ayah: Ayah) -> Unit
 ) {
+    val scrollState = rememberScrollState()
+    var scrollToBottom by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
+    DisposableEffect(scrollToBottom) {
+        if (scrollToBottom)
+            scope.launch {
+                scrollState.animateScrollTo(Int.MAX_VALUE)
+            }
+        onDispose { }
+    }
+
     Box(modifier = modifier.wrapContentHeight(), contentAlignment = Alignment.Center) {
         OutlinedCard(
             modifier = Modifier
@@ -194,10 +207,12 @@ private fun QuranPage(
                                 .fillMaxWidth()
                                 .background(color = quranInnerColor.copy(alpha = 0.15f))
                         ) {
-                            val scrollState = rememberScrollState()
                             val ayahsOffsets = mutableMapOf<Int, Int>()
                             val ayahs = page.ayahs.mapIndexed { index, ayah ->
-                                val ayahText = ayahWithColoredNumber(text = ayah.text, ayahNr = ayah.number, fontSize = style.fontSize, isSelected = ayah == selectedAyah)
+                                val isSelected = ayah == selectedAyah
+                                if (isSelected)
+                                    scrollToBottom = index > page.ayahs.size / 2
+                                val ayahText = ayahWithColoredNumber(text = ayah.text, ayahNr = ayah.number, fontSize = style.fontSize, isSelected = isSelected)
                                 ayahsOffsets[ayah.id] = if (index == 0) ayahText.length else ayahText.length + (ayahsOffsets[ayah.id - 1] ?: 0)
                                 ayahText
                             }
@@ -220,63 +235,6 @@ private fun QuranPage(
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun AyahDetailBottomSheet(
-    modifier: Modifier,
-    quranViewModel: QuranClassicViewModel = hiltViewModel(),
-    typo: Typography,
-) {
-    val onEvent = { event: AudioEvents ->
-        quranViewModel.onAudioEvents(event)
-    }
-    ModalBottomSheet(
-        modifier = modifier,
-        onDismissRequest = { onEvent(AudioEvents.CloseAudio) }
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(12.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                //TODO: Replace with drop down
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = stringResource(id = R.string.sure_list_cuz, arabicNumber(quranViewModel.referenceAyah?.juz ?: 0)),
-                    style = labelMedium(),
-                )
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = stringResource(id = R.string.sure_list_page, arabicNumber(quranViewModel.referenceAyah?.page ?: 0)),
-                    style = labelMedium(),
-                    textAlign = TextAlign.End
-                )
-            }
-            AyahAudioPlayer(modifier = Modifier, item = quranViewModel.referenceAyah, isPlaying = quranViewModel.isPlaying, onAyahChange = onEvent)
-            Spacer(modifier = Modifier.height(8.dp))
-            IslamDivider(color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = alternatingColors(
-                    text = quranViewModel.referenceAyah?.text ?: "",
-                    delimiter = Regex("-|\\s")
-                ),
-                style = typo.headlineMedium.copy(fontSize = typo.headlineLarge.fontSize.times(1.2)),
-                textAlign = TextAlign.End
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            IslamDivider(color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(text = alternatingColors(text = quranViewModel.referenceAyah?.transliterationEn ?: "", delimiter = Regex("-|\\s")), style = bodyMedium())
-            Spacer(modifier = Modifier.height(8.dp))
-            IslamDivider(color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = alternatingColors(text = quranViewModel.referenceAyah?.translationTr ?: "", delimiter = Regex("-|\\s")), style = bodyMedium())
-            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }
