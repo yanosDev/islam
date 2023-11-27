@@ -31,6 +31,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.Typography
@@ -317,7 +318,7 @@ private fun AyetItem(
                 ClickableText(
                     modifier = Modifier.fillMaxWidth(),
                     text = alternatingColors(text = original),
-                    style = typo.headlineMedium.copy(textAlign = TextAlign.Justify)
+                    style = typo.headlineMedium.copy(textAlign = TextAlign.Justify, color = MaterialTheme.colorScheme.onSurface),
                 ) {
                     onAyahChanged(ayah)
                 }

@@ -87,7 +87,7 @@ fun AyahDetailBottomSheet(
                 item = ayah,
                 isPlaying = isPlaying,
                 progress = progress,
-                onAudioEvent = onAudioEvents
+                onAudioEvents = onAudioEvents
             )
             Spacer(modifier = Modifier.height(8.dp))
             IslamDivider(color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -116,27 +116,10 @@ fun AyahDetailBottomSheet(
 @Composable
 fun AyahAudioPlayer(
     modifier: Modifier,
-    item: Ayah?,
-    progress: Float,
-    isPlaying: Boolean,
-    onAudioEvent: (event: AudioEvents) -> Unit,
-) {
-    BottomBarPlayer(
-        modifier = modifier,
-        progress = progress,
-        item = item,
-        isPlaying = isPlaying,
-        onAyahChange = onAudioEvent,
-    )
-}
-
-@Composable
-fun BottomBarPlayer(
-    modifier: Modifier,
     progress: Float,
     item: Ayah?,
     isPlaying: Boolean,
-    onAyahChange: (event: AudioEvents) -> Unit
+    onAudioEvents: (event: AudioEvents) -> Unit
 ) {
     Column(modifier = modifier.padding(8.dp)) {
         Row(
@@ -150,9 +133,9 @@ fun BottomBarPlayer(
             MediaPlayerController(
                 modifier = Modifier,
                 isPlaying = isPlaying,
-                onAyahChange = onAyahChange,
+                onAudioEvents = onAudioEvents,
             )
-            Slider(modifier = Modifier.weight(1f), value = progress, onValueChange = { onAyahChange(AudioEvents.UpdateProgress(it)) }, valueRange = 0f..100f)
+            Slider(modifier = Modifier.weight(1f), value = progress, onValueChange = { onAudioEvents(AudioEvents.UpdateProgress(it)) }, valueRange = 0f..100f)
         }
     }
 }
@@ -161,22 +144,22 @@ fun BottomBarPlayer(
 private fun MediaPlayerController(
     modifier: Modifier,
     isPlaying: Boolean,
-    onAyahChange: (event: AudioEvents) -> Unit
+    onAudioEvents: (event: AudioEvents) -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically, modifier = modifier
             .height(56.dp)
             .padding(4.dp)
     ) {
-        PlayerIconItem(icon = Icons.Rounded.SkipPrevious, modifier = Modifier) { onAyahChange(AudioEvents.PlayPrevious) }
+        PlayerIconItem(icon = Icons.Rounded.SkipPrevious, modifier = Modifier) { onAudioEvents(AudioEvents.PlayPrevious) }
         Spacer(modifier = Modifier.size(8.dp))
         PlayerIconItem(
             modifier = Modifier, icon = if (isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow
         ) {
-            if (isPlaying) onAyahChange(AudioEvents.PauseAudio) else onAyahChange(AudioEvents.PlayAudio)
+            if (isPlaying) onAudioEvents(AudioEvents.PauseAudio) else onAudioEvents(AudioEvents.PlayAudio)
         }
         Spacer(modifier = Modifier.size(8.dp))
-        PlayerIconItem(icon = Icons.Rounded.SkipNext, modifier = Modifier) { onAyahChange(AudioEvents.PlayNext) }
+        PlayerIconItem(icon = Icons.Rounded.SkipNext, modifier = Modifier) { onAudioEvents(AudioEvents.PlayNext) }
     }
 }
 
@@ -193,15 +176,12 @@ private fun SurahInfo(
             modifier = Modifier,
             icon = Icons.Rounded.MusicNote,
             borderStroke = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.onSurface)
-        ) {
-
-        }
+        ) { }
         Spacer(modifier = Modifier.size(8.dp))
         Column {
             Text(
                 text = item?.sureName ?: "",
                 style = MaterialTheme.typography.titleSmall,
-                modifier = Modifier.weight(1f),
                 maxLines = 1
             )
             Spacer(modifier = Modifier.size(4.dp))
