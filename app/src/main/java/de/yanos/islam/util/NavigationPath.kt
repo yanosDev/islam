@@ -2,6 +2,7 @@ package de.yanos.islam.util
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Chat
 import androidx.compose.material.icons.rounded.LockClock
 import androidx.compose.material.icons.rounded.MenuBook
 import androidx.compose.material.icons.rounded.Search
@@ -78,6 +79,7 @@ sealed class MainNavigation(override val route: String, override val args: List<
     object Knowledge : MainNavigation("knowledge")
     object Quran : MainNavigation("quran")
     object Praying : MainNavigation("praying")
+    object AI : MainNavigation("ai")
     object Settings : MainNavigation("settings")
 
     companion object {
@@ -100,6 +102,12 @@ sealed class MainNavigation(override val route: String, override val args: List<
                 selectedIcon = Icons.Rounded.MenuBook,
                 unselectedIcon = Icons.Rounded.MenuBook,
                 iconTextId = R.string.tab_quran
+            ),
+            NavigationDestination.TopDestination(
+                route = AI.route,
+                selectedIcon = Icons.Rounded.Chat,
+                unselectedIcon = Icons.Rounded.Chat,
+                iconTextId = R.string.tab_ai
             ),
             NavigationDestination.TopDestination(
                 route = Settings.route,

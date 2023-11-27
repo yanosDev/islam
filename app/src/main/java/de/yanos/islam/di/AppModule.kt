@@ -32,6 +32,8 @@ import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionToken
 import androidx.room.Room
 import androidx.work.WorkManager
+import com.aallam.openai.api.http.Timeout
+import com.aallam.openai.client.OpenAI
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.ListenableFuture
 import com.squareup.moshi.Moshi
@@ -70,6 +72,7 @@ import java.util.Locale
 import java.util.UUID
 import javax.inject.Qualifier
 import javax.inject.Singleton
+import kotlin.time.Duration.Companion.minutes
 
 
 @UnstableApi
@@ -295,6 +298,10 @@ internal class AppModule {
     @Singleton
     fun provideMediaController(@ApplicationContext context: Context, sessionToken: SessionToken): ListenableFuture<MediaController> =
         MediaController.Builder(context, sessionToken).buildAsync()
+
+    @Provides
+    @Singleton
+    fun provideOpenAI(): OpenAI = OpenAI(token = Constants.API_KEY, timeout = Timeout(socket = 2.minutes))
 
     @Provides
     @Singleton

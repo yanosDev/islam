@@ -33,6 +33,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import dagger.hilt.android.AndroidEntryPoint
 import de.yanos.core.ui.theme.AppTheme
 import de.yanos.core.ui.view.DynamicNavigationScreen
+import de.yanos.islam.ui.ai.AIScreen
 import de.yanos.islam.ui.permissions.InitScreen
 import de.yanos.islam.ui.prayer.PrayerScreen
 import de.yanos.islam.ui.settings.SettingsScreen
@@ -136,6 +137,11 @@ private fun IslamNavHost(
                 deepLinks = listOf(navDeepLink { uriPattern = "yanos://de.islam/praying" })
             ) {
                 PrayerScreen(modifier = Modifier.fillMaxSize())
+            }
+            composable(
+                route = MainNavigation.AI.route,
+            ) {
+                AIScreen(modifier = Modifier.fillMaxSize())
             }
             composable(
                 route = MainNavigation.Settings.route,

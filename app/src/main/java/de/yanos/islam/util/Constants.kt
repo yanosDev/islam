@@ -7,4 +7,6 @@ object Constants {
     const val CHANNEL_NAME_ALARM = "Namaz Bildirimler"
     const val CHANNEL_COMMAND_NEXT = "COMMAND_NEXT"
     const val CHANNEL_COMMAND_PREVIOUS = "COMMAND_PREVIOUS"
+
+    const val API_KEY = "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"
 }

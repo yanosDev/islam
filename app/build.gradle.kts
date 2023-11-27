@@ -90,4 +90,10 @@ dependencies {
 
     //Service
     implementation(libs.work)
+
+    //OpenAI
+    implementation(platform("com.aallam.openai:openai-client-bom:3.5.0"))
+    implementation("com.aallam.openai:openai-client")
+    implementation("io.ktor:ktor-client-okhttp")
+
 }
