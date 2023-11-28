@@ -239,6 +239,7 @@ internal class AppModule {
         .setUpstreamDataSourceFactory(httpDataSourceFactory)
         .setCacheWriteDataSinkFactory(null) // Disable writing.
 
+    @AudioPlayer
     @Provides
     @Singleton
     fun provideExoPlayer(
@@ -255,12 +256,19 @@ internal class AppModule {
         return exoplayer
     }
 
+    @VideoPlayer
+    @Provides
+    @Singleton
+    fun provideVideoExoPlayer(@ApplicationContext context: Context): ExoPlayer {
+        return ExoPlayer.Builder(context).build()
+    }
+
     @Provides
     @Singleton
     fun provideMediaSession(
         @ApplicationContext context: Context,
         @IODispatcher dispatcher: CoroutineDispatcher,
-        exoPlayer: ExoPlayer,
+        @AudioPlayer exoPlayer: ExoPlayer,
         mediaController: ListenableFuture<MediaController>,
         repository: QuranRepository
     ): MediaSession {
@@ -342,3 +350,11 @@ annotation class Accelerometer
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class Magnetometer
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class AudioPlayer
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class VideoPlayer

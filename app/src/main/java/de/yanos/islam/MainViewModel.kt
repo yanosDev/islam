@@ -4,19 +4,24 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Geocoder
 import android.media.MediaPlayer
+import android.net.Uri
 import androidx.annotation.RawRes
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaController
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.common.util.concurrent.ListenableFuture
+import com.maxrave.kotlinyoutubeextractor.State
+import com.maxrave.kotlinyoutubeextractor.YTExtractor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import de.yanos.core.utils.IODispatcher
@@ -29,6 +34,7 @@ import de.yanos.islam.data.model.TopicType
 import de.yanos.islam.data.repositories.AwqatRepository
 import de.yanos.islam.data.repositories.QuranRepository
 import de.yanos.islam.di.AzanPlayer
+import de.yanos.islam.di.VideoPlayer
 import de.yanos.islam.service.DailyScheduleWorker
 import de.yanos.islam.util.AppSettings
 import de.yanos.islam.util.getCurrentLocation
@@ -52,7 +58,6 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.concurrent.timerTask
 
-
 @SuppressLint("StaticFieldLeak")
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -65,16 +70,49 @@ class MainViewModel @Inject constructor(
     private val geocoder: Geocoder,
     private val quranRepository: QuranRepository,
     @AzanPlayer private val mediaPlayer: MediaPlayer,
+    @VideoPlayer private val videoPlayer: ExoPlayer,
     private val workManager: WorkManager
 ) : ViewModel() {
     var isReady: Boolean by mutableStateOf(false)
     private var timer: Timer? = null
     private var controller: MediaController? = null
+    private val yt = YTExtractor(con = context, CACHING = true, LOGGING = true, retryCount = 3)
+    private val tecvidList = mutableStateListOf(
+        "dDtzLHC4U_4",
+        "vKPeJqFiiig",
+        "ltzIYbqWpJQ",
+        "a4couhHIX8I",
+        "12bn2RQ0M9Y",
+        "v_3edYHVzO0",
+        "yqAFqln5_Mw",
+        "oArREfO1bg8",
+        "Q9AUm8a7eKM",
+        "wlqn4ldcah0",
+        "dhGCeC4-I_k",
+        "pF8cB0hKcwU",
+        "bt9bOYpyVQM",
+        "sXjZ-cSr3oI",
+    )
+    private val quranList = mutableStateListOf(
+        "3ZIjLikIin0",
+        "nOmoQPzii9c",
+        "c-IHoD9eDN4",
+        "Qsavtk3P1R4",
+        "w-kKDf43tdY",
+        "QK3i7h24Hbk",
+        "tCcPWw72QwM",
+        "tV60vMO2-VY",
+        "5aAICtquAfQ",
+        "2_0VSQWxUU4",
+        "mKSLYTV4DUA",
+        "dFxMhRAhpJQ",
+        "dwKP3yVPZgo",
+        "OkPOmzEJ-4g",
+    )
 
     init {
         controllerFuture.addListener({
             controller = controllerFuture.get()
-
         }, dispatcher.asExecutor())
 
         viewModelScope.launch {
@@ -107,6 +145,60 @@ class MainViewModel @Inject constructor(
 
 
                     it.prepare()
+                }
+            }
+        }
+        viewModelScope.launch {
+            tecvidList.forEach { id ->
+                withContext(dispatcher) {
+                    yt.extract(id)
+                }
+                if (yt.state == State.SUCCESS) {
+                    yt.getYTFiles()?.get(22)?.let { file ->
+                        yt.getVideoMeta()?.let { meta ->
+                            videoPlayer.addMediaItem(
+                                MediaItem.Builder()
+                                    .setMediaId(id)
+                                    .setUri(Uri.parse(file.url))
+                                    .setMediaMetadata(
+                                        MediaMetadata.Builder()
+                                            .setArtworkUri(Uri.parse(meta.sdImageUrl))
+                                            .setTitle(meta.title)
+                                            .setSubtitle(meta.shortDescription)
+                                            .setArtist(meta.author)
+                                            .build()
+                                    )
+                                    .build()
+                            )
+                        }
+                    }
+                }
+            }
+        }
+        viewModelScope.launch {
+            quranList.forEach { id ->
+                withContext(dispatcher) {
+                    yt.extract(id)
+                }
+                if (yt.state == State.SUCCESS) {
+                    yt.getYTFiles()?.get(22)?.let { file ->
+                        yt.getVideoMeta()?.let { meta ->
+                            videoPlayer.addMediaItem(
+                                MediaItem.Builder()
+                                    .setMediaId(id)
+                                    .setUri(Uri.parse(file.url))
+                                    .setMediaMetadata(
+                                        MediaMetadata.Builder()
+                                            .setArtworkUri(Uri.parse(meta.sdImageUrl))
+                                            .setTitle(meta.title)
+                                            .setSubtitle(meta.shortDescription)
+                                            .setArtist(meta.author)
+                                            .build()
+                                    )
+                                    .build()
+                            )
+                        }
+                    }
                 }
             }
         }

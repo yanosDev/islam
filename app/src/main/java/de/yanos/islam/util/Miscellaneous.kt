@@ -3,6 +3,7 @@ package de.yanos.islam.util
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -17,7 +18,11 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.unit.TextUnit
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.google.android.gms.location.LocationServices
+import de.yanos.core.utils.findActivity
 import retrofit2.Response
 import timber.log.Timber
 import java.io.File
@@ -254,4 +259,32 @@ fun Long.humanReadableByteCountSI(): String {
         ci.next()
     }
     return String.format("%.1f %cB", bytes / 1000.0, ci.current())
+}
+fun Context.setScreenOrientation(orientation: Int) {
+    val activity = this.findActivity() ?: return
+    activity.requestedOrientation = orientation
+    if (orientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+        hideSystemUi()
+    } else {
+        showSystemUi()
+    }
+}
+fun Context.hideSystemUi() {
+    val activity = this.findActivity() ?: return
+    val window = activity.window ?: return
+    WindowCompat.setDecorFitsSystemWindows(window, false)
+    WindowInsetsControllerCompat(window, window.decorView).let { controller ->
+        controller.hide(WindowInsetsCompat.Type.systemBars())
+        controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+    }
+}
+
+fun Context.showSystemUi() {
+    val activity = this.findActivity() ?: return
+    val window = activity.window ?: return
+    WindowCompat.setDecorFitsSystemWindows(window, true)
+    WindowInsetsControllerCompat(
+        window,
+        window.decorView
+    ).show(WindowInsetsCompat.Type.systemBars())
 }

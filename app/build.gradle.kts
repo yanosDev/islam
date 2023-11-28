@@ -96,4 +96,5 @@ dependencies {
     implementation("com.aallam.openai:openai-client")
     implementation("io.ktor:ktor-client-okhttp")
 
+    implementation("com.github.maxrave-dev:kotlin-youtubeExtractor:0.0.7")
 }
