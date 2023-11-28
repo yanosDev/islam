@@ -8,15 +8,15 @@ import androidx.media3.session.SessionResult
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import de.yanos.islam.data.repositories.QuranRepository
+import de.yanos.islam.util.AppContainer
 import de.yanos.islam.util.Constants
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.launch
 
-class ExoMediaSessionCallback(
-    private val mediaControllerFuture: ListenableFuture<MediaController>,
+class ExoLearningCallback(
+    private val appContainer: AppContainer,
     private val dispatcher: CoroutineDispatcher,
     private val repository: QuranRepository,
 ) : MediaSession.Callback {
@@ -27,16 +27,7 @@ class ExoMediaSessionCallback(
             dispatcher + job
         )
     }
-    private var mediaController: MediaController? = null
-
-    init {
-        mediaControllerFuture.addListener(
-            {
-                mediaController = mediaControllerFuture.get()
-            },
-            dispatcher.asExecutor()
-        )
-    }
+    private var mediaController: MediaController? = appContainer.audioController
 
     override fun onCustomCommand(
         session: MediaSession,
@@ -48,8 +39,8 @@ class ExoMediaSessionCallback(
             Constants.CHANNEL_COMMAND_NEXT -> {
                 mediaController?.seekToNextMediaItem()
                 scope.launch {
-                    repository.loadAyahById(mediaController?.currentMediaItem?.mediaId?.toInt() ?: -1)?.let { ayah ->
-                        repository.loadAudioAlt(ayah.id, ayah.audio)
+                    mediaController?.currentMediaItem?.let {
+                        repository.loadMedia(it.mediaId, it.requestMetadata.mediaUri?.toString() ?: "")
                     }
                 }
             }
@@ -57,8 +48,8 @@ class ExoMediaSessionCallback(
             Constants.CHANNEL_COMMAND_PREVIOUS -> {
                 mediaController?.seekToPreviousMediaItem()
                 scope.launch {
-                    repository.loadAyahById(mediaController?.currentMediaItem?.mediaId?.toInt() ?: -1)?.let { ayah ->
-                        repository.loadAudioAlt(ayah.id, ayah.audio)
+                    mediaController?.currentMediaItem?.let {
+                        repository.loadMedia(it.mediaId, it.requestMetadata.mediaUri?.toString() ?: "")
                     }
                 }
             }

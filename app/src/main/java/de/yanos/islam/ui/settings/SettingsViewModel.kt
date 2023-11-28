@@ -12,10 +12,12 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.data.repositories.QuranRepository
 import de.yanos.islam.util.AppSettings
-import kotlinx.coroutines.async
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.util.Timer
 import javax.inject.Inject
 import kotlin.concurrent.timerTask
@@ -23,68 +25,71 @@ import kotlin.concurrent.timerTask
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val appSettings: AppSettings,
+    @IODispatcher private val dispatcher: CoroutineDispatcher,
     private val downloadManager: DownloadManager,
-    private val quranRepository: QuranRepository
+    private val quranRepository: QuranRepository,
 ) : ViewModel() {
     private var timer: Timer? = null
-    private val ayahs: MutableList<Pair<Int, String>> = mutableListOf()
-    var audioDownloadState: AudioDownloadState by mutableStateOf(AudioDownloadState.IsIdle)
-    var audioStateString by mutableStateOf("")
+    var downloadState: AudioDownloadState by mutableStateOf(AudioDownloadState.IsIdle)
+    var progress by mutableIntStateOf(0)
+    var max by mutableIntStateOf(0)
 
-    init {
-        timer = Timer()
-        timer?.scheduleAtFixedRate(
-            timerTask()
-            {
-                viewModelScope.launch {
-                    val queuedSize = downloadManager.downloadIndex.getDownloads(
-                        Download.STATE_COMPLETED,
-                        Download.STATE_QUEUED,
-                        Download.STATE_DOWNLOADING,
-                        Download.STATE_STOPPED,
-                        Download.STATE_FAILED,
-                        Download.STATE_REMOVING,
-                        Download.STATE_RESTARTING
-                    ).count
-                    val completedSize = downloadManager.downloadIndex.getDownloads(Download.STATE_COMPLETED).count
-                    val stoppedSize = downloadManager.downloadIndex.getDownloads(Download.STATE_STOPPED).count
-                    audioDownloadState = when {
-                        completedSize == ayahs.size -> AudioDownloadState.IsDownloaded
-                        queuedSize == ayahs.size -> AudioDownloadState.IsDownloading
-                        stoppedSize + completedSize == ayahs.size -> AudioDownloadState.IsPaused
-                        else -> AudioDownloadState.IsIdle
+    fun startTimer() {
+        if (timer == null) {
+            timer = Timer()
+            timer?.scheduleAtFixedRate(
+                timerTask()
+                {
+                    viewModelScope.launch(dispatcher) {
+                        val queuedSize = downloadManager.downloadIndex.getDownloads(
+                            Download.STATE_COMPLETED,
+                            Download.STATE_QUEUED,
+                            Download.STATE_DOWNLOADING,
+                            Download.STATE_STOPPED,
+                            Download.STATE_FAILED,
+                            Download.STATE_REMOVING,
+                            Download.STATE_RESTARTING
+                        )
+                        val completedSize = downloadManager.downloadIndex.getDownloads(Download.STATE_COMPLETED)
+                        val stoppedSize = downloadManager.downloadIndex.getDownloads(Download.STATE_STOPPED)
+                        val download = downloadManager.downloadIndex.getDownloads(Download.STATE_DOWNLOADING)
+                        downloadState = when {
+                            completedSize.count == queuedSize.count && queuedSize.count > 0 -> AudioDownloadState.IsDownloaded
+                            download.count > 0 -> AudioDownloadState.IsDownloading
+                            completedSize.count != queuedSize.count && queuedSize.count > 0 && download.count == 0 -> AudioDownloadState.IsPaused
+                            else -> AudioDownloadState.IsIdle
+                        }
+                        progress = completedSize.count
+                        max = queuedSize.count
+                        Timber.e("Queued: ${queuedSize.count}, Completed: ${completedSize.count}, Downloading: ${download.count}")
+                        completedSize.close()
+                        queuedSize.close()
+                        stoppedSize.close()
+                        download.close()
                     }
-                    audioStateString = "$completedSize/$queuedSize"
-                }
-            }, 1500, 5000
-        )
-        viewModelScope.launch {
-            quranRepository.loadAyahs().collect {
-                ayahs.clear()
-                ayahs.addAll(it.map { ayah -> Pair(ayah.id, ayah.audio) })
-            }
+                }, 0, 5000
+            )
         }
     }
 
-    fun queueDownloadAllAudio() {
+    fun clearTimer() {
+        timer?.cancel()
+        timer = null
+    }
+
+    fun queueDownloadAll() {
         viewModelScope.launch {
-            audioDownloadState = AudioDownloadState.IsDownloading
-            async {
-                ayahs.forEach { (id, uri) ->
-                    quranRepository.loadAudioAlt(id, uri)
-                }
-            }
+            downloadState = AudioDownloadState.IsDownloading
+            quranRepository.loadAllAyahAudio()
+            downloadManager.resumeDownloads()
         }
     }
 
-    fun resumeDownloadingAllAudio() {
-        audioDownloadState = AudioDownloadState.IsDownloading
-        downloadManager.resumeDownloads()
-    }
-
-    fun pauseDownloadingAllAudio() {
-        audioDownloadState = AudioDownloadState.IsPaused
-        downloadManager.pauseDownloads()
+    fun pauseDownloadingAll() {
+        viewModelScope.launch(dispatcher) {
+            downloadState = AudioDownloadState.IsPaused
+            downloadManager.pauseDownloads()
+        }
     }
 
     fun updateFontSize(size: Int) {
@@ -113,9 +118,8 @@ class SettingsViewModel @Inject constructor(
     var quranFontStyle by mutableIntStateOf(appSettings.quranStyle)
 
     override fun onCleared() {
+        clearTimer()
         super.onCleared()
-        timer?.cancel()
-        timer = null
     }
 }
 

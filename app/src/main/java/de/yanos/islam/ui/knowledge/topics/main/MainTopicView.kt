@@ -2,7 +2,6 @@
 
 package de.yanos.islam.ui.knowledge.topics.main
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
@@ -36,7 +35,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.R
 import de.yanos.islam.data.model.Topic
 import de.yanos.islam.data.model.TopicType
-import de.yanos.islam.ui.permissions.DownloadingScreen
 import de.yanos.islam.util.KnowledgeNavigationAction
 import de.yanos.islam.util.Lottie
 import de.yanos.islam.util.NavigationAction
@@ -79,11 +77,6 @@ fun MainTopicsScreen(
                             KnowledgeNavigationAction.NavigateToSubTopic(topic.id)
                         else KnowledgeNavigationAction.NavigateToTopicQuestions(topic.id, null)
                     )
-                }
-            }
-            item {
-                AnimatedVisibility(visible = !vm.isDBInitialized && topics.isEmpty()) {
-                    DownloadingScreen(downloadingResources = !vm.isDBInitialized)
                 }
             }
         }

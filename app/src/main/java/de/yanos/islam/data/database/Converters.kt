@@ -10,4 +10,12 @@ class Converters {
     fun toListIntFromString(stringList: String): List<Int> {
         return stringList.takeIf { it.isNotEmpty() }?.split("::")?.map { it.toInt() } ?: listOf()
     }
+
+    @TypeConverter
+    fun fromListStringToString(intList: List<String>): String = intList.joinToString("::") { it }
+
+    @TypeConverter
+    fun toListStringFromString(stringList: String): List<String> {
+        return stringList.takeIf { it.isNotEmpty() }?.split("::") ?: listOf()
+    }
 }

@@ -5,8 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import androidx.media3.session.MediaController
-import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.data.model.quran.Ayah
@@ -14,6 +12,7 @@ import de.yanos.islam.data.repositories.QuranRepository
 import de.yanos.islam.ui.quran.classic.audio.AudioViewModel
 import de.yanos.islam.ui.quran.list.sure.SureSorting
 import de.yanos.islam.ui.quran.list.sure.sortSure
+import de.yanos.islam.util.AppContainer
 import de.yanos.islam.util.AppSettings
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -24,11 +23,11 @@ import javax.inject.Inject
 @HiltViewModel
 class QuranPartialViewModel @Inject constructor(
     private val appSettings: AppSettings,
-    controllerFuture: ListenableFuture<MediaController>,
+    private val appContainer: AppContainer,
     private val quranRepository: QuranRepository,
     @IODispatcher private val dispatcher: CoroutineDispatcher,
     savedStateHandle: SavedStateHandle
-) : AudioViewModel(controllerFuture, quranRepository, dispatcher) {
+) : AudioViewModel(appContainer, quranRepository) {
     private var sortBy by mutableStateOf(SureSorting.values()[appSettings.sortByOrdinal])
     private val id = savedStateHandle.get<Int>("id")!!
     var surah by mutableStateOf(
@@ -55,7 +54,7 @@ class QuranPartialViewModel @Inject constructor(
 
     fun loadSurah(id: Int) {
         viewModelScope.launch {
-            quranRepository.subsribeSurahAyahs(id).distinctUntilChanged().collect { ayahs ->
+            quranRepository.subscribeSurahAyahs(id).distinctUntilChanged().collect { ayahs ->
                 val surahs = withContext(dispatcher) { quranRepository.sureList() }.sortSure(sortBy)
                 val currentIndex = surahs.indexOfFirst { it.id == id }
                 if (currentIndex > 0) {

@@ -3,6 +3,7 @@
     <string name="tab_topic">Konular</string>
     <string name="tab_quran">Kuran</string>
     <string name="tab_history">Sonuçlar</string>
+    <string name="tab_ai">AI</string>
     <string name="tab_time">Namaz Vakitler</string>
     <string name="tab_setting">Ayarlar</string>
 
@@ -58,10 +59,14 @@
     <string name="praying_daily_verse">Günün Ayeti:</string>
     <string name="praying_daily_hadith">Günün Hadisi:</string>
     <string name="praying_daily_prayer">Günün Duasi:</string>
-    <string name="setting_audio_title">Tüm Sürelerin Ses Kayitlarini indirin %s</string>
+    <string name="setting_download_title">Internetsiz Kullanim</string>
+    <string name="setting_download_description">Internetsiz kullanim icin Ayetlerin Ses Kayitlarini ve Egitim videolari burdan indirebilirsiniz</string>
+    <string name="setting_download_start">Indir</string>
     <string name="setting_font_title">Yazi ayarlari</string>
-    <string name="setting_font_size_title">Yazi Boyutu</string>
-    <string name="setting_font_style_title">Yazi türü</string>
+    <string name="setting_font_size_title">Uygulama Genel Yazisi</string>
+    <string name="setting_font_style_title">Uygulama Genel Yazi Boyutu</string>
+    <string name="setting_quran_size_title">Quran Yazisi</string>
+    <string name="setting_quran_style_title">Quran Yazisinin Boyutu</string>
     <string name="setting_apply_now">Simdi Degisiklikleri gerceklestir</string>
     <string name="font_alogical">Alogical</string>
     <string name="font_open_sans">Open Sans</string>
@@ -106,4 +111,8 @@
 
     <string name="download_list_title">Offline Kullanim icin Ayetleri önceden indiriniz</string>
     <string name="download_list_all">Quranin tamamini indir</string>
+    <string name="download_number">Geriye kalan Ayet ve Video sayisi %s %s</string>
+
+    <string name="ai_title">Bot </string>
+    <string name="ai_description">Burdaki alinan bilgilerin tümü Open Ai den geliyor. Tek kaynak olarak kullanmayiniz. Sorularinizla ilk firsat da bir Hoca ya danismaniz iyi olur!!!</string>
 </resources>

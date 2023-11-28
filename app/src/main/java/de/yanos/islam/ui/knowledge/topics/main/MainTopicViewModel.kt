@@ -11,6 +11,5 @@ class MainTopicViewModel @Inject constructor(
     private val appSettings: AppSettings,
     private val dao: TopicDao
 ) : ViewModel() {
-    val isDBInitialized = appSettings.isDBInitialized
     val list = dao.allMain()
 }

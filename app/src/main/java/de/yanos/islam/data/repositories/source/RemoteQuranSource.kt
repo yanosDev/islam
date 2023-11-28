@@ -1,31 +1,39 @@
+@file:UnstableApi
+
 package de.yanos.islam.data.repositories.source
 
+import android.content.Context
+import android.net.Uri
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.offline.DownloadManager
+import androidx.media3.exoplayer.offline.DownloadRequest
+import androidx.media3.exoplayer.offline.DownloadService
+import dagger.hilt.android.qualifiers.ApplicationContext
 import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.data.api.QuranApi
-import de.yanos.islam.data.api.saveFile
 import de.yanos.islam.data.model.alquran.QuranAudioResponse
 import de.yanos.islam.data.model.alquran.QuranTextResponse
+import de.yanos.islam.service.ExoDownloadService
 import de.yanos.islam.util.LoadState
-import de.yanos.islam.util.localFile
 import de.yanos.islam.util.localResponse
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import retrofit2.awaitResponse
 import timber.log.Timber
-import java.io.File
 import javax.inject.Inject
 
 interface RemoteQuranSource {
     suspend fun loadQuranTranslation(): LoadState<QuranTextResponse>
     suspend fun loadQuranTransliteration(): LoadState<QuranTextResponse>
     suspend fun loadQuranAudio(): LoadState<QuranAudioResponse>
-    suspend fun downloadAudio(url: String): LoadState<File>
+    suspend fun loadMedia(id: String, url: String)
 }
 
 class RemoteQuranSourceImpl @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val api: QuranApi,
-    private val filesDir: File,
-    @IODispatcher private val dispatcher: CoroutineDispatcher
+    @IODispatcher private val dispatcher: CoroutineDispatcher,
+    private val downloadManager: DownloadManager
 ) : RemoteQuranSource {
 
     override suspend fun loadQuranTranslation(): LoadState<QuranTextResponse> {
@@ -64,18 +72,17 @@ class RemoteQuranSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun downloadAudio(url: String): LoadState<File> {
-        return withContext(dispatcher) {
-            try {
-                val destinationFile = url.localFile(filesDir)
-                val response = api.downloadAudio(url)
-                destinationFile.parentFile?.mkdirs()
-                destinationFile.createNewFile()
-                response.saveFile(destinationFile)
-                LoadState.Data(destinationFile)
-            } catch (e: Exception) {
-                Timber.e(e)
-                LoadState.Failure(e)
+    override suspend fun loadMedia(id: String, url: String) {
+        withContext(dispatcher) {
+            val download = downloadManager.downloadIndex.getDownload(id)
+            if (download == null) {
+                val downloadRequest: DownloadRequest = DownloadRequest.Builder(id, Uri.parse(url)).build()
+                DownloadService.sendAddDownload(
+                    context,
+                    ExoDownloadService::class.java,
+                    downloadRequest,
+                    false
+                )
             }
         }
     }

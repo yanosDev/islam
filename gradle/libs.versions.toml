@@ -63,8 +63,10 @@ versionCatalog = "0.8.1"
 work = "2.8.1"
 yanos-lib = "0.1.40"
 media3 = "1.2.0"
+open-ai = "3.6.1"
 
 [libraries]
+open-ai = { module = "com.aallam.openai:openai-client", version.ref = "open-ai" }
 accompanist-flowlayout = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "accompanist" }
 accompanist-navigation-animation = { module = "com.google.accompanist:accompanist-navigation-animation", version.ref = "accompanist" }
 accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanist" }

@@ -11,7 +11,7 @@ import androidx.media3.exoplayer.scheduler.Scheduler
 import dagger.hilt.android.AndroidEntryPoint
 import de.yanos.islam.R
 import de.yanos.islam.util.Constants
-import timber.log.Timber
+import de.yanos.islam.util.humanReadableByteCountSI
 import javax.inject.Inject
 
 @UnstableApi
@@ -28,27 +28,7 @@ class ExoDownloadService @Inject constructor(
     @Inject lateinit var manager: DownloadManager
 
     override fun getDownloadManager(): DownloadManager {
-        //Set the maximum number of parallel downloads
-        manager.maxParallelDownloads = 10
-        manager.addListener(object : DownloadManager.Listener {
-            override fun onDownloadRemoved(downloadManager: DownloadManager, download: Download) {
-                // Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
-            }
-
-            override fun onDownloadsPausedChanged(downloadManager: DownloadManager, downloadsPaused: Boolean) {
-                if (downloadsPaused) {
-                    Timber.e("Downloads paused")
-                } else {
-                    Timber.e("Downloads resumed")
-                }
-            }
-
-            override fun onDownloadChanged(downloadManager: DownloadManager, download: Download, finalException: Exception?) {
-                super.onDownloadChanged(downloadManager, download, finalException)
-            }
-
-        })
-        // return (application as App).appContainer.downloadManager
+        manager.maxParallelDownloads = 5
         return manager
     }
 
@@ -57,6 +37,13 @@ class ExoDownloadService @Inject constructor(
     }
 
     override fun getForegroundNotification(downloads: MutableList<Download>, notMetRequirements: Int): Notification {
-        return notificationHelper.buildProgressNotification(applicationContext, R.drawable.ic_launcher, null, getString(R.string.app_name), downloads, Requirements.NETWORK)
+        return notificationHelper.buildProgressNotification(
+            applicationContext,
+            R.drawable.ic_launcher,
+            null,
+            getString(R.string.download_number, downloads.size.toString(), (downloads.size * 125000L).humanReadableByteCountSI()),
+            downloads,
+            Requirements.NETWORK
+        )
     }
 }

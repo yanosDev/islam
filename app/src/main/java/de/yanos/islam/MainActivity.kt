@@ -33,6 +33,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import dagger.hilt.android.AndroidEntryPoint
 import de.yanos.core.ui.theme.AppTheme
 import de.yanos.core.ui.view.DynamicNavigationScreen
+import de.yanos.islam.ui.ai.AIScreen
 import de.yanos.islam.ui.permissions.InitScreen
 import de.yanos.islam.ui.prayer.PrayerScreen
 import de.yanos.islam.ui.settings.SettingsScreen
@@ -64,6 +65,9 @@ class MainActivity : ComponentActivity() {
             val locationPermissionState = rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION)
             val notificationPermissionState = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
 
+            if (locationPermissionState.status.isGranted) {
+                vm.readLocationData()
+            }
             AppTheme(activity = this, typography = typoByConfig(appSettings)) { modifier, config ->
                 if (locationPermissionState.status.isGranted && notificationPermissionState.status.isGranted) {
                     navController = rememberNavController()
@@ -82,17 +86,6 @@ class MainActivity : ComponentActivity() {
                 } else InitScreen(modifier, locationPermissionState, notificationPermissionState)
             }
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        vm.startSchedule()
-        vm.cancelAllNotifications()
-    }
-
-    override fun onPause() {
-        vm.cancelSchedule()
-        super.onPause()
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -136,6 +129,11 @@ private fun IslamNavHost(
                 deepLinks = listOf(navDeepLink { uriPattern = "yanos://de.islam/praying" })
             ) {
                 PrayerScreen(modifier = Modifier.fillMaxSize())
+            }
+            composable(
+                route = MainNavigation.AI.route,
+            ) {
+                AIScreen(modifier = Modifier.fillMaxSize())
             }
             composable(
                 route = MainNavigation.Settings.route,

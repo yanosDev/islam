@@ -1,4 +1,5 @@
 @file:Suppress("UnstableApiUsage")
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
@@ -9,6 +10,7 @@ plugins {
     id(libs.plugins.hilt.get().pluginId)
 }
 android {
+
     namespace = "de.yanos.islam"
     compileSdk = libs.versions.compileSdk.get().toInt()
     defaultConfig {
@@ -18,6 +20,14 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val token: String = gradleLocalProperties(rootDir).getProperty("open.api.token")
+
+        buildConfigField(
+            "String",
+            "OPEN_API_TOKEN",
+            "\"$token\""
+        )
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -90,4 +100,11 @@ dependencies {
 
     //Service
     implementation(libs.work)
+
+    //OpenAI
+    implementation(platform("com.aallam.openai:openai-client-bom:3.5.0"))
+    implementation("com.aallam.openai:openai-client")
+    implementation("io.ktor:ktor-client-okhttp")
+
+    implementation("com.github.maxrave-dev:kotlin-youtubeExtractor:0.0.7")
 }

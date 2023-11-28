@@ -10,19 +10,15 @@ import androidx.media3.session.SessionResult
 import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.AndroidEntryPoint
 import de.yanos.core.utils.IODispatcher
+import de.yanos.islam.di.VideoPlayer
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import javax.inject.Inject
 
 @UnstableApi
 @AndroidEntryPoint
-class ExoPlaybackService : MediaSessionService(), MediaSession.Callback {
+class ExoVideoPlaybackService : MediaSessionService(), MediaSession.Callback {
     @Inject @IODispatcher lateinit var dispatcher: CoroutineDispatcher
-    @Inject lateinit var mediaSession: MediaSession
-
-    private val job by lazy { Job() }
-    private val scope by lazy { CoroutineScope(dispatcher + job) }
+    @VideoPlayer @Inject lateinit var mediaSession: MediaSession
 
     override fun onCustomCommand(session: MediaSession, controller: MediaSession.ControllerInfo, customCommand: SessionCommand, args: Bundle): ListenableFuture<SessionResult> {
         return when (customCommand.customAction) {

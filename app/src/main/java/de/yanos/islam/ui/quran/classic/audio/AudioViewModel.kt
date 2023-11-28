@@ -9,7 +9,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
-import com.google.common.util.concurrent.ListenableFuture
 import de.yanos.islam.data.model.quran.Ayah
 import de.yanos.islam.data.repositories.QuranRepository
 import de.yanos.islam.ui.quran.classic.AudioEvents
@@ -18,17 +17,16 @@ import de.yanos.islam.ui.quran.classic.JuzSelection
 import de.yanos.islam.ui.quran.classic.PageSelection
 import de.yanos.islam.ui.quran.classic.QuranSelection
 import de.yanos.islam.ui.quran.classic.SurahSelection
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.asExecutor
+import de.yanos.islam.util.AppContainer
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Timer
 import kotlin.concurrent.timerTask
 import kotlin.math.max
 
 open class AudioViewModel(
-    private val controllerFuture: ListenableFuture<MediaController>,
+    private val appContainer: AppContainer,
     private val repository: QuranRepository,
-    dispatcher: CoroutineDispatcher
 ) : ViewModel() {
     var showDetailSheet by mutableStateOf(false)
     var referenceAyah by mutableStateOf<Ayah?>(null)
@@ -37,7 +35,7 @@ open class AudioViewModel(
     var isPlaying by mutableStateOf(false)
 
     private var timer: Timer? = null
-    private var controller: MediaController? = null
+    private var controller: MediaController? = appContainer.audioController
 
     private val controllerListener = object : Player.Listener {
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
@@ -49,14 +47,12 @@ open class AudioViewModel(
     }
 
     init {
-        controllerFuture.addListener({
-            controller = controllerFuture.get()
-            viewModelScope.launch {
-                if (controller?.isPlaying == true)
-                    refreshData()
-            }
+
+        viewModelScope.launch {
+            while (controller == null)
+                delay(1000)
             controller?.addListener(controllerListener)
-        }, dispatcher.asExecutor())
+        }
     }
 
     fun onSelectionChange(selection: QuranSelection) {
@@ -118,14 +114,14 @@ open class AudioViewModel(
                     is AudioEvents.PlayPrevious -> {
                         controller?.seekToPreviousMediaItem()
                         repository.loadAyahById(controller?.currentMediaItem?.mediaId?.toInt() ?: -1)?.let { ayah ->
-                            repository.loadAudioAlt(ayah.id, ayah.audio)
+                            repository.loadMedia(ayah.id.toString(), ayah.audio)
                         }
                     }
 
                     is AudioEvents.PlayNext -> {
                         controller?.seekToNextMediaItem()
                         repository.loadAyahById(controller?.currentMediaItem?.mediaId?.toInt() ?: -1)?.let { ayah ->
-                            repository.loadAudioAlt(ayah.id, ayah.audio)
+                            repository.loadMedia(ayah.id.toString(), ayah.audio)
                         }
                     }
 

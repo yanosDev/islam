@@ -25,6 +25,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.offline.DownloadManager
 import androidx.media3.exoplayer.offline.DownloadNotificationHelper
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.exoplayer.util.EventLogger
 import androidx.media3.session.CommandButton
 import androidx.media3.session.MediaController
 import androidx.media3.session.MediaSession
@@ -32,6 +33,8 @@ import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionToken
 import androidx.room.Room
 import androidx.work.WorkManager
+import com.aallam.openai.api.http.Timeout
+import com.aallam.openai.client.OpenAI
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.ListenableFuture
 import com.squareup.moshi.Moshi
@@ -41,11 +44,11 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import de.yanos.core.BuildConfig
 import de.yanos.core.utils.DebugInterceptor
 import de.yanos.core.utils.DefaultDispatcher
 import de.yanos.core.utils.IODispatcher
 import de.yanos.core.utils.MainDispatcher
+import de.yanos.islam.BuildConfig
 import de.yanos.islam.MainActivity
 import de.yanos.islam.R
 import de.yanos.islam.data.api.AwqatApi
@@ -53,8 +56,11 @@ import de.yanos.islam.data.api.QuranApi
 import de.yanos.islam.data.database.IslamDatabase
 import de.yanos.islam.data.database.IslamDatabaseImpl
 import de.yanos.islam.data.repositories.QuranRepository
-import de.yanos.islam.service.ExoMediaSessionCallback
-import de.yanos.islam.service.ExoPlaybackService
+import de.yanos.islam.service.ExoAudioCallback
+import de.yanos.islam.service.ExoAudioPlaybackService
+import de.yanos.islam.service.ExoLearningCallback
+import de.yanos.islam.service.ExoVideoPlaybackService
+import de.yanos.islam.util.AppContainer
 import de.yanos.islam.util.Constants
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -70,6 +76,7 @@ import java.util.Locale
 import java.util.UUID
 import javax.inject.Qualifier
 import javax.inject.Singleton
+import kotlin.time.Duration.Companion.minutes
 
 
 @UnstableApi
@@ -163,6 +170,14 @@ internal class AppModule {
 
     @Provides
     @Singleton
+    fun provideBotDao(db: IslamDatabase) = db.botDao()
+
+    @Provides
+    @Singleton
+    fun provideVideoDao(db: IslamDatabase) = db.videoDao()
+
+    @Provides
+    @Singleton
     fun provideQuranDao(db: IslamDatabase) = db.quranDao()
 
     @Provides
@@ -223,7 +238,9 @@ internal class AppModule {
         httpDataSourceFactory: HttpDataSource.Factory,
         downloadCache: Cache
     ): DownloadManager {
-        return DownloadManager(context, dataBase, downloadCache, httpDataSourceFactory, Dispatchers.IO.asExecutor())
+        val manager = DownloadManager(context, dataBase, downloadCache, httpDataSourceFactory, Dispatchers.IO.asExecutor())
+        manager.resumeDownloads()
+        return manager
     }
 
     @Provides
@@ -236,6 +253,7 @@ internal class AppModule {
         .setUpstreamDataSourceFactory(httpDataSourceFactory)
         .setCacheWriteDataSinkFactory(null) // Disable writing.
 
+    @AudioPlayer
     @Provides
     @Singleton
     fun provideExoPlayer(
@@ -248,17 +266,36 @@ internal class AppModule {
                     .setDataSourceFactory(dataSourceFactory)
             )
             .build()
-//        exoplayer.addAnalyticsListener(EventLogger())
+        exoplayer.addAnalyticsListener(EventLogger())
         return exoplayer
     }
 
+    @VideoPlayer
+    @Provides
+    @Singleton
+    fun provideVideoExoPlayer(
+        @ApplicationContext context: Context,
+        dataSourceFactory: DataSource.Factory
+    ): ExoPlayer {
+        val exoplayer = ExoPlayer.Builder(context)
+            .setMediaSourceFactory(
+                DefaultMediaSourceFactory(context)
+                    .setDataSourceFactory(dataSourceFactory)
+            )
+            .build()
+        exoplayer.addAnalyticsListener(EventLogger())
+        exoplayer.pauseAtEndOfMediaItems = true
+        return exoplayer
+    }
+
+    @AudioPlayer
     @Provides
     @Singleton
     fun provideMediaSession(
         @ApplicationContext context: Context,
         @IODispatcher dispatcher: CoroutineDispatcher,
-        exoPlayer: ExoPlayer,
-        mediaController: ListenableFuture<MediaController>,
+        @AudioPlayer exoPlayer: ExoPlayer,
+        appContainer: AppContainer,
         repository: QuranRepository
     ): MediaSession {
         val intent = Intent(context.applicationContext, MainActivity::class.java)
@@ -281,35 +318,88 @@ internal class AppModule {
                 .build()
         return MediaSession.Builder(context, exoPlayer)
             .setCustomLayout(ImmutableList.of(previousAyahButton, nextAyahButton))
-            .setCallback(ExoMediaSessionCallback(mediaController, dispatcher, repository))
+            .setCallback(ExoAudioCallback(appContainer, dispatcher, repository))
             .setSessionActivity(pendingIntent)
             .setId(UUID.randomUUID().toString())
             .build()
     }
 
+    @VideoPlayer
     @Provides
     @Singleton
-    fun provideSessionToken(@ApplicationContext context: Context): SessionToken = SessionToken(context, ComponentName(context, ExoPlaybackService::class.java))
+    fun provideVideoMediaSession(
+        @ApplicationContext context: Context,
+        @IODispatcher dispatcher: CoroutineDispatcher,
+        @VideoPlayer exoPlayer: ExoPlayer,
+        appContainer: AppContainer,
+        repository: QuranRepository
+    ): MediaSession {
+        val intent = Intent(context.applicationContext, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            1,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val previousAyahButton = CommandButton.Builder()
+            .setDisplayName("Önceki Ayet")
+            .setIconResId(android.R.drawable.ic_media_previous)
+            .setSessionCommand(SessionCommand(Constants.CHANNEL_COMMAND_PREVIOUS, Bundle()))
+            .build()
+        val nextAyahButton =
+            CommandButton.Builder()
+                .setDisplayName("Sonraki Ayet")
+                .setIconResId(android.R.drawable.ic_media_next)
+                .setSessionCommand(SessionCommand(Constants.CHANNEL_COMMAND_NEXT, Bundle()))
+                .build()
+        return MediaSession.Builder(context, exoPlayer)
+            .setCustomLayout(ImmutableList.of(previousAyahButton, nextAyahButton))
+            .setCallback(ExoLearningCallback(appContainer, dispatcher, repository))
+            .setSessionActivity(pendingIntent)
+            .setId(UUID.randomUUID().toString())
+            .build()
+    }
 
+    @AudioPlayer
     @Provides
     @Singleton
-    fun provideMediaController(@ApplicationContext context: Context, sessionToken: SessionToken): ListenableFuture<MediaController> =
+    fun provideSessionToken(@ApplicationContext context: Context): SessionToken = SessionToken(context, ComponentName(context, ExoAudioPlaybackService::class.java))
+
+    @AudioPlayer
+    @Provides
+    @Singleton
+    fun provideMediaController(@ApplicationContext context: Context, @AudioPlayer sessionToken: SessionToken): ListenableFuture<MediaController> =
+        MediaController.Builder(context, sessionToken).buildAsync()
+
+    @VideoPlayer
+    @Provides
+    @Singleton
+    fun provideVideoSessionToken(@ApplicationContext context: Context): SessionToken = SessionToken(context, ComponentName(context, ExoVideoPlaybackService::class.java))
+
+    @VideoPlayer
+    @Provides
+    @Singleton
+    fun provideVideoMediaController(@ApplicationContext context: Context, @VideoPlayer sessionToken: SessionToken): ListenableFuture<MediaController> =
         MediaController.Builder(context, sessionToken).buildAsync()
 
     @Provides
     @Singleton
+    fun provideOpenAI(): OpenAI = OpenAI(token = BuildConfig.OPEN_API_TOKEN, timeout = Timeout(socket = 2.minutes))
+
+    @Provides
+    @Singleton
     @IODispatcher
-    fun provideIODispatcher() = Dispatchers.IO
+    fun provideIODispatcher(): CoroutineDispatcher = Dispatchers.IO
 
     @Provides
     @Singleton
     @MainDispatcher
-    fun provideMainDispatcher() = Dispatchers.Main
+    fun provideMainDispatcher(): CoroutineDispatcher = Dispatchers.Main
 
     @Provides
     @Singleton
     @DefaultDispatcher
-    fun provideDefaultDispatcher() = Dispatchers.Default
+    fun provideDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
 
     @Provides
     @Singleton
@@ -335,3 +425,11 @@ annotation class Accelerometer
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class Magnetometer
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class AudioPlayer
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class VideoPlayer

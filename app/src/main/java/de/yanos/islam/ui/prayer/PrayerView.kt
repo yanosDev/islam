@@ -2,7 +2,6 @@ package de.yanos.islam.ui.prayer
 
 import android.graphics.Bitmap
 import android.graphics.Matrix
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -56,7 +55,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.R
 import de.yanos.islam.data.model.Schedule
 import de.yanos.islam.data.model.awqat.AwqatDailyContent
-import de.yanos.islam.ui.permissions.DownloadingScreen
 import de.yanos.islam.util.ContentAfterLoading
 import de.yanos.islam.util.IslamDivider
 import de.yanos.islam.util.IslamSwitch
@@ -104,9 +102,6 @@ fun PrayerScreen(
                 )
             }
         }
-    }
-    AnimatedVisibility(visible = !vm.isDBInitialized) {
-        DownloadingScreen(downloadingResources = !vm.isDBInitialized)
     }
 }
 
