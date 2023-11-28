@@ -75,7 +75,7 @@ class RemoteQuranSourceImpl @Inject constructor(
     override suspend fun loadMedia(id: String, url: String) {
         withContext(dispatcher) {
             val download = downloadManager.downloadIndex.getDownload(id)
-            if (download != null) {
+            if (download == null) {
                 val downloadRequest: DownloadRequest = DownloadRequest.Builder(id, Uri.parse(url)).build()
                 DownloadService.sendAddDownload(
                     context,
