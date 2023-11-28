@@ -14,6 +14,7 @@ import de.yanos.islam.util.AppContainer
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,9 +28,11 @@ class QuranLearningViewModel @Inject constructor(
     val controller get() = appContainer.videoController
 
     init {
-        viewModelScope.launch(dispatcher) {
-            while (controller == null)
-                delay(100)
+        viewModelScope.launch {
+            withContext(dispatcher) {
+                while (controller == null)
+                    delay(100)
+            }
 
             for (i in 0 until controller!!.mediaItemCount) {
                 val item = controller!!.getMediaItemAt(i)

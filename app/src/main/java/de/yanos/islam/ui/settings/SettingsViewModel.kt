@@ -82,6 +82,7 @@ class SettingsViewModel @Inject constructor(
             downloadState = AudioDownloadState.IsDownloading
             quranRepository.loadAllAyahAudio()
             quranRepository.loadAllLearningVideos()
+            downloadManager.resumeDownloads()
         }
     }
 

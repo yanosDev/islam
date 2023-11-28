@@ -111,4 +111,5 @@
 
     <string name="download_list_title">Offline Kullanim icin Ayetleri önceden indiriniz</string>
     <string name="download_list_all">Quranin tamamini indir</string>
+    <string name="download_number">Geriye kalan Ayet ve Video sayisi %s %s</string>
 </resources>

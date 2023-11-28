@@ -55,7 +55,6 @@ fun QuranLearningScreen(
                 AndroidView(modifier = Modifier.fillMaxWidth().heightIn(min = 248.dp),
                     factory = { playerView })
             ) {
-                playerView.player?.playWhenReady = true
                 onDispose {
                     playerView.player?.pause()
                 }

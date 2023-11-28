@@ -29,7 +29,7 @@ class AppSettingsImpl @Inject constructor(@ApplicationContext context: Context) 
     override var fontSizeFactor: Int by PreferenceItem<Int>(context) { 0 }
     override var fontStyle: Int by PreferenceItem<Int>(context) { 2 }
     override var quranSizeFactor: Int by PreferenceItem<Int>(context) { 0 }
-    override var quranStyle: Int by PreferenceItem<Int>(context) { 2 }
+    override var quranStyle: Int by PreferenceItem<Int>(context) { 0 }
     override var tokenLastFetch: Long by PreferenceItem<Long>(context) { 0L }
     override var authToken: String by PreferenceItem<String>(context) { "" }
     override var refreshToken: String by PreferenceItem<String>(context) { "" }

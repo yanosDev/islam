@@ -5,6 +5,7 @@ package de.yanos.islam.data.repositories.source
 import android.content.Context
 import android.net.Uri
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.offline.DownloadManager
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -25,13 +26,14 @@ interface RemoteQuranSource {
     suspend fun loadQuranTranslation(): LoadState<QuranTextResponse>
     suspend fun loadQuranTransliteration(): LoadState<QuranTextResponse>
     suspend fun loadQuranAudio(): LoadState<QuranAudioResponse>
-    suspend fun loadAyahAudio(id: String, url: String)
+    suspend fun loadMedia(id: String, url: String)
 }
 
 class RemoteQuranSourceImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val api: QuranApi,
-    @IODispatcher private val dispatcher: CoroutineDispatcher
+    @IODispatcher private val dispatcher: CoroutineDispatcher,
+    private val downloadManager: DownloadManager
 ) : RemoteQuranSource {
 
     override suspend fun loadQuranTranslation(): LoadState<QuranTextResponse> {
@@ -70,15 +72,18 @@ class RemoteQuranSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun loadAyahAudio(id: String, url: String) {
+    override suspend fun loadMedia(id: String, url: String) {
         withContext(dispatcher) {
-            val downloadRequest: DownloadRequest = DownloadRequest.Builder(id, Uri.parse(url)).build()
-            DownloadService.sendAddDownload(
-                context,
-                ExoDownloadService::class.java,
-                downloadRequest,
-                false
-            )
+            val download = downloadManager.downloadIndex.getDownload(id)
+            if (download != null) {
+                val downloadRequest: DownloadRequest = DownloadRequest.Builder(id, Uri.parse(url)).build()
+                DownloadService.sendAddDownload(
+                    context,
+                    ExoDownloadService::class.java,
+                    downloadRequest,
+                    false
+                )
+            }
         }
     }
 }
