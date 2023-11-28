@@ -65,6 +65,9 @@ class MainActivity : ComponentActivity() {
             val locationPermissionState = rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION)
             val notificationPermissionState = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
 
+            if (locationPermissionState.status.isGranted) {
+
+            }
             AppTheme(activity = this, typography = typoByConfig(appSettings)) { modifier, config ->
                 if (locationPermissionState.status.isGranted && notificationPermissionState.status.isGranted) {
                     navController = rememberNavController()

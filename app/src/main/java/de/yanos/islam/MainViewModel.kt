@@ -14,10 +14,8 @@ import de.yanos.islam.data.repositories.AwqatRepository
 import de.yanos.islam.data.repositories.QuranRepository
 import de.yanos.islam.util.AppSettings
 import de.yanos.islam.util.getCurrentLocation
-import de.yanos.islam.util.hasLocationPermission
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -36,34 +34,35 @@ class MainViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(dispatcher) {
-            listOf(
-                async {
-                    if (!appSettings.isDBInitialized) {
-                        db.create(context)
-                        appSettings.isDBInitialized = true
-                    }
-                },
-                async { awqatRepository.fetchAwqatLocationIndependentData() },
-                async {
-                    if (!quranRepository.isWholeQuranFetched())
-                        quranRepository.fetchQuran()
-                },
-            ).awaitAll()
-            if (hasLocationPermission(context))
-                getCurrentLocation(context = context) { lat, lon ->
-                    viewModelScope.launch(dispatcher) {
-                        @Suppress("DEPRECATION")
-                        geocoder.getFromLocation(lat, lon, 1)?.firstOrNull()?.let { address ->
-                            (address.subAdminArea ?: address.adminArea)?.let { name ->
-                                appSettings.lastLocation = name
-                                appSettings.lastLocation.takeIf { it.isNotBlank() }?.let {
-                                    awqatRepository.fetchCityData(it)
-                                }
+            async {
+                if (!appSettings.isDBInitialized) {
+                    db.create(context)
+                    appSettings.isDBInitialized = true
+                }
+            }
+            async { awqatRepository.fetchAwqatLocationIndependentData() }
+            async {
+                if (!quranRepository.isWholeQuranFetched())
+                    quranRepository.fetchQuran()
+            }
+        }
+    }
+
+    fun readLocationData() {
+        viewModelScope.launch(dispatcher) {
+            getCurrentLocation(context = context) { lat, lon ->
+                viewModelScope.launch(dispatcher) {
+                    @Suppress("DEPRECATION")
+                    geocoder.getFromLocation(lat, lon, 1)?.firstOrNull()?.let { address ->
+                        (address.subAdminArea ?: address.adminArea)?.let { name ->
+                            appSettings.lastLocation = name
+                            appSettings.lastLocation.takeIf { it.isNotBlank() }?.let {
+                                awqatRepository.fetchCityData(it)
                             }
                         }
                     }
                 }
+            }
         }
     }
-
 }
