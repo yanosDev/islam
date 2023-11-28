@@ -85,17 +85,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        vm.startSchedule()
-        vm.cancelAllNotifications()
-    }
-
-    override fun onPause() {
-        vm.cancelSchedule()
-        super.onPause()
-    }
-
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         navController?.handleDeepLink(intent)

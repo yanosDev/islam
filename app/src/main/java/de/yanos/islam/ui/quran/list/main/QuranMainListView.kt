@@ -1,6 +1,5 @@
 package de.yanos.islam.ui.quran.list.main
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,7 +27,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.R
-import de.yanos.islam.ui.permissions.DownloadingScreen
 import de.yanos.islam.util.Lottie
 import de.yanos.islam.util.NavigationAction
 import de.yanos.islam.util.QuranNavigationAction
@@ -108,9 +106,6 @@ fun QuranMainListScreen(
                     Text(modifier = Modifier.weight(1f), text = stringResource(id = R.string.quran_video), style = labelMedium())
                 }
             }
-        }
-        AnimatedVisibility(visible = !vm.isDBInitialized && isEmpty) {
-            DownloadingScreen(downloadingResources = !vm.isDBInitialized)
         }
     }
 

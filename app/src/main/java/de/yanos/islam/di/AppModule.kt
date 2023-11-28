@@ -318,17 +318,17 @@ internal class AppModule {
     @Provides
     @Singleton
     @IODispatcher
-    fun provideIODispatcher() = Dispatchers.IO
+    fun provideIODispatcher(): CoroutineDispatcher = Dispatchers.IO
 
     @Provides
     @Singleton
     @MainDispatcher
-    fun provideMainDispatcher() = Dispatchers.Main
+    fun provideMainDispatcher(): CoroutineDispatcher = Dispatchers.Main
 
     @Provides
     @Singleton
     @DefaultDispatcher
-    fun provideDefaultDispatcher() = Dispatchers.Default
+    fun provideDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
 
     @Provides
     @Singleton
