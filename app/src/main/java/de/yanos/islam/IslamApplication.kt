@@ -8,10 +8,8 @@ import android.os.StrictMode.ThreadPolicy
 import android.os.StrictMode.VmPolicy
 import android.util.Log
 import androidx.hilt.work.HiltWorkerFactory
-import androidx.media3.session.MediaController
 import androidx.work.Configuration
 import androidx.work.WorkManager
-import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.HiltAndroidApp
 import de.yanos.core.BuildConfig
 import de.yanos.core.utils.IODispatcher
@@ -32,14 +30,14 @@ class IslamApplication : Application(), Configuration.Provider {
     @Inject lateinit var notificationManager: NotificationManager
     @Inject @IODispatcher lateinit var dispatcher: CoroutineDispatcher
     @Inject lateinit var workManager: WorkManager
-    @Inject lateinit var mediaControllerFuture: ListenableFuture<MediaController>
     @Inject lateinit var appContainer: AppContainer
+
     override fun onCreate() {
         StrictMode.setThreadPolicy(
             ThreadPolicy.Builder()
                 .detectDiskReads()
                 .detectDiskWrites()
-                .detectNetwork() // or .detectAll() for all detectable problems
+                .detectAll() // or .detectAll() for all detectable problems
                 .penaltyLog()
                 .build()
         )
@@ -57,12 +55,17 @@ class IslamApplication : Application(), Configuration.Provider {
         createAlarmChannel()
         createDownloadChannel()
 
-        workManager.queueVideoWorker()
         workManager.queuePeriodicDailyWorker()
-        mediaControllerFuture.addListener({
-            if (mediaControllerFuture.get() != null) {
-                appContainer.audioController = mediaControllerFuture.get()
+        appContainer.mediaControllerFuture.addListener({
+            if (appContainer.mediaControllerFuture.get() != null) {
+                appContainer.audioController = appContainer.mediaControllerFuture.get()
                 workManager.queueAudioWorker()
+            }
+        }, dispatcher.asExecutor())
+        appContainer.videoMediaControllerFuture.addListener({
+            if (appContainer.videoMediaControllerFuture.get() != null) {
+                appContainer.videoController = appContainer.videoMediaControllerFuture.get()
+                workManager.queueVideoWorker()
             }
         }, dispatcher.asExecutor())
     }

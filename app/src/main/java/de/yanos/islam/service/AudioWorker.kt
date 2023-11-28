@@ -25,7 +25,6 @@ import de.yanos.islam.util.safeLet
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.util.UUID
 
 @HiltWorker
@@ -52,13 +51,11 @@ class AudioWorker @AssistedInject constructor(
                     it.toMedia(applicationContext)
                 }
                 withContext(mainDispatcher) {
-                    Timber.e("PERFORMANCE: ${System.currentTimeMillis()}")
                     items.groupBy { it.mediaId.toInt() / 100 }.forEach { (_, subItems) ->
                         controller?.addMediaItems(subItems)
                         delay(100)
                     }
                     controller?.prepare()
-                    Timber.e("PERFORMANCE END: ${System.currentTimeMillis()}")
                 }
                 Result.success()
             }

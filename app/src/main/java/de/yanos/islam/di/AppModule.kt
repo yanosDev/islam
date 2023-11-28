@@ -25,6 +25,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.offline.DownloadManager
 import androidx.media3.exoplayer.offline.DownloadNotificationHelper
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.exoplayer.util.EventLogger
 import androidx.media3.session.CommandButton
 import androidx.media3.session.MediaController
 import androidx.media3.session.MediaSession
@@ -55,8 +56,9 @@ import de.yanos.islam.data.api.QuranApi
 import de.yanos.islam.data.database.IslamDatabase
 import de.yanos.islam.data.database.IslamDatabaseImpl
 import de.yanos.islam.data.repositories.QuranRepository
+import de.yanos.islam.service.ExoAudioPlaybackService
 import de.yanos.islam.service.ExoMediaSessionCallback
-import de.yanos.islam.service.ExoPlaybackService
+import de.yanos.islam.service.ExoVideoPlaybackService
 import de.yanos.islam.util.AppContainer
 import de.yanos.islam.util.Constants
 import kotlinx.coroutines.CoroutineDispatcher
@@ -257,17 +259,28 @@ internal class AppModule {
                     .setDataSourceFactory(dataSourceFactory)
             )
             .build()
-//        exoplayer.addAnalyticsListener(EventLogger())
+        exoplayer.addAnalyticsListener(EventLogger())
         return exoplayer
     }
 
     @VideoPlayer
     @Provides
     @Singleton
-    fun provideVideoExoPlayer(@ApplicationContext context: Context): ExoPlayer {
-        return ExoPlayer.Builder(context).build()
+    fun provideVideoExoPlayer(
+        @ApplicationContext context: Context,
+        dataSourceFactory: DataSource.Factory
+    ): ExoPlayer {
+        val exoplayer = ExoPlayer.Builder(context)
+            .setMediaSourceFactory(
+                DefaultMediaSourceFactory(context)
+                    .setDataSourceFactory(dataSourceFactory)
+            )
+            .build()
+        exoplayer.addAnalyticsListener(EventLogger())
+        return exoplayer
     }
 
+    @AudioPlayer
     @Provides
     @Singleton
     fun provideMediaSession(
@@ -303,13 +316,62 @@ internal class AppModule {
             .build()
     }
 
+    @VideoPlayer
     @Provides
     @Singleton
-    fun provideSessionToken(@ApplicationContext context: Context): SessionToken = SessionToken(context, ComponentName(context, ExoPlaybackService::class.java))
+    fun provideVideoMediaSession(
+        @ApplicationContext context: Context,
+        @IODispatcher dispatcher: CoroutineDispatcher,
+        @VideoPlayer exoPlayer: ExoPlayer,
+        appContainer: AppContainer,
+        repository: QuranRepository
+    ): MediaSession {
+        val intent = Intent(context.applicationContext, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        /*val previousAyahButton = CommandButton.Builder()
+            .setDisplayName("Önceki Ayet")
+            .setIconResId(android.R.drawable.ic_media_previous)
+            .setSessionCommand(SessionCommand(Constants.CHANNEL_COMMAND_PREVIOUS, Bundle()))
+            .build()
+        val nextAyahButton =
+            CommandButton.Builder()
+                .setDisplayName("Sonraki Ayet")
+                .setIconResId(android.R.drawable.ic_media_next)
+                .setSessionCommand(SessionCommand(Constants.CHANNEL_COMMAND_NEXT, Bundle()))
+                .build()*/
+        return MediaSession.Builder(context, exoPlayer)
+//            .setCustomLayout(ImmutableList.of(previousAyahButton, nextAyahButton))
+//            .setCallback(ExoMediaSessionCallback(appContainer, dispatcher, repository))
+            .setSessionActivity(pendingIntent)
+            .setId(UUID.randomUUID().toString())
+            .build()
+    }
 
+    @AudioPlayer
     @Provides
     @Singleton
-    fun provideMediaController(@ApplicationContext context: Context, sessionToken: SessionToken): ListenableFuture<MediaController> =
+    fun provideSessionToken(@ApplicationContext context: Context): SessionToken = SessionToken(context, ComponentName(context, ExoAudioPlaybackService::class.java))
+
+    @AudioPlayer
+    @Provides
+    @Singleton
+    fun provideMediaController(@ApplicationContext context: Context, @AudioPlayer sessionToken: SessionToken): ListenableFuture<MediaController> =
+        MediaController.Builder(context, sessionToken).buildAsync()
+
+    @VideoPlayer
+    @Provides
+    @Singleton
+    fun provideVideoSessionToken(@ApplicationContext context: Context): SessionToken = SessionToken(context, ComponentName(context, ExoVideoPlaybackService::class.java))
+
+    @VideoPlayer
+    @Provides
+    @Singleton
+    fun provideVideoMediaController(@ApplicationContext context: Context, @VideoPlayer sessionToken: SessionToken): ListenableFuture<MediaController> =
         MediaController.Builder(context, sessionToken).buildAsync()
 
     @Provides

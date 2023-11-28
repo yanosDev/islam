@@ -61,7 +61,7 @@ class SettingsViewModel @Inject constructor(
                         queuedSize.close()
                         stoppedSize.close()
                     }
-                }, 1500, 5000
+                }, 0, 5000
             )
         }
     }
