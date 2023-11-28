@@ -66,7 +66,7 @@ class MainActivity : ComponentActivity() {
             val notificationPermissionState = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
 
             if (locationPermissionState.status.isGranted) {
-
+                vm.readLocationData()
             }
             AppTheme(activity = this, typography = typoByConfig(appSettings)) { modifier, config ->
                 if (locationPermissionState.status.isGranted && notificationPermissionState.status.isGranted) {

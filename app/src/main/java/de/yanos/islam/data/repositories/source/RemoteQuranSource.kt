@@ -25,7 +25,7 @@ interface RemoteQuranSource {
     suspend fun loadQuranTranslation(): LoadState<QuranTextResponse>
     suspend fun loadQuranTransliteration(): LoadState<QuranTextResponse>
     suspend fun loadQuranAudio(): LoadState<QuranAudioResponse>
-    suspend fun loadAyahAudio(id: Int, url: String)
+    suspend fun loadAyahAudio(id: String, url: String)
 }
 
 class RemoteQuranSourceImpl @Inject constructor(
@@ -70,9 +70,9 @@ class RemoteQuranSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun loadAyahAudio(id: Int, url: String) {
+    override suspend fun loadAyahAudio(id: String, url: String) {
         withContext(dispatcher) {
-            val downloadRequest: DownloadRequest = DownloadRequest.Builder(id.toString(), Uri.parse(url)).build()
+            val downloadRequest: DownloadRequest = DownloadRequest.Builder(id, Uri.parse(url)).build()
             DownloadService.sendAddDownload(
                 context,
                 ExoDownloadService::class.java,

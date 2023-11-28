@@ -6,6 +6,6 @@ import de.yanos.islam.data.model.VideoLearning
 
 @Dao
 interface VideoDao : BaseDao<VideoLearning> {
-    @Query("SELECT * FROM VideoLearning")
+    @Query("SELECT * FROM VideoLearning ORDER BY `index`")
     suspend fun loadAll(): List<VideoLearning>
 }

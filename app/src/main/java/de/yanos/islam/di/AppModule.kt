@@ -233,7 +233,9 @@ internal class AppModule {
         httpDataSourceFactory: HttpDataSource.Factory,
         downloadCache: Cache
     ): DownloadManager {
-        return DownloadManager(context, dataBase, downloadCache, httpDataSourceFactory, Dispatchers.IO.asExecutor())
+        val manager = DownloadManager(context, dataBase, downloadCache, httpDataSourceFactory, Dispatchers.IO.asExecutor())
+        manager.resumeDownloads()
+        return manager
     }
 
     @Provides

@@ -4,31 +4,45 @@ import android.content.Context
 import android.net.Uri
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.media3.exoplayer.ExoPlayer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.di.VideoPlayer
+import de.yanos.islam.util.AppContainer
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class QuranLearningViewModel @Inject constructor(
     @ApplicationContext context: Context,
-    @VideoPlayer internal val player: ExoPlayer
+    @IODispatcher private val dispatcher: CoroutineDispatcher,
+    private val appContainer: AppContainer,
+    @VideoPlayer val player: ExoPlayer
 ) : ViewModel() {
     internal val learnings = mutableStateListOf<Learning>()
+    val controller get() = appContainer.videoController
 
     init {
-        for (i in 0 until player.mediaItemCount) {
-            val item = player.getMediaItemAt(i)
-            learnings.add(
-                Learning(
-                    id = item.mediaId,
-                    thumbUri = item.mediaMetadata.artworkUri!!,
-                    title = item.mediaMetadata.title!!.toString(),
-                    subTitle = item.mediaMetadata.subtitle!!.toString(),
-                    author = item.mediaMetadata.artist!!.toString(),
+        viewModelScope.launch(dispatcher) {
+            while (controller == null)
+                delay(100)
+
+            for (i in 0 until controller!!.mediaItemCount) {
+                val item = controller!!.getMediaItemAt(i)
+                learnings.add(
+                    Learning(
+                        id = item.mediaId,
+                        thumbUri = item.mediaMetadata.artworkUri!!,
+                        title = item.mediaMetadata.title!!.toString(),
+                        subTitle = item.mediaMetadata.subtitle!!.toString(),
+                        author = item.mediaMetadata.artist!!.toString(),
+                    )
                 )
-            )
+            }
         }
     }
 }

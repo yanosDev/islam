@@ -16,6 +16,8 @@ import de.yanos.islam.util.AppSettings
 import de.yanos.islam.util.getCurrentLocation
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -34,22 +36,26 @@ class MainViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(dispatcher) {
-            async {
-                if (!appSettings.isDBInitialized) {
-                    db.create(context)
-                    appSettings.isDBInitialized = true
-                }
-            }
-            async { awqatRepository.fetchAwqatLocationIndependentData() }
-            async {
-                if (!quranRepository.isWholeQuranFetched())
-                    quranRepository.fetchQuran()
+            if (!appSettings.isDBInitialized) {
+                listOf(
+                    async {
+                        db.create(context)
+                    },
+                    async { awqatRepository.fetchAwqatLocationIndependentData() },
+                    async {
+                        if (!quranRepository.isWholeQuranFetched())
+                            quranRepository.fetchQuran()
+                    }
+                ).awaitAll()
+                appSettings.isDBInitialized = true
             }
         }
     }
 
     fun readLocationData() {
         viewModelScope.launch(dispatcher) {
+            while (!appSettings.isDBInitialized)
+                delay(500)
             getCurrentLocation(context = context) { lat, lon ->
                 viewModelScope.launch(dispatcher) {
                     @Suppress("DEPRECATION")

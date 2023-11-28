@@ -17,6 +17,7 @@ import de.yanos.islam.data.repositories.QuranRepository
 import de.yanos.islam.util.AppSettings
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.util.Timer
 import javax.inject.Inject
 import kotlin.concurrent.timerTask
@@ -51,17 +52,20 @@ class SettingsViewModel @Inject constructor(
                         )
                         val completedSize = downloadManager.downloadIndex.getDownloads(Download.STATE_COMPLETED)
                         val stoppedSize = downloadManager.downloadIndex.getDownloads(Download.STATE_STOPPED)
+                        val download = downloadManager.downloadIndex.getDownloads(Download.STATE_DOWNLOADING)
                         downloadState = when {
                             completedSize.count == queuedSize.count && queuedSize.count > 0 -> AudioDownloadState.IsDownloaded
-                            queuedSize.count > completedSize.count -> AudioDownloadState.IsDownloading
-                            stoppedSize.count + completedSize.count == queuedSize.count && queuedSize.count > 0 -> AudioDownloadState.IsPaused
+                            download.count > 0 -> AudioDownloadState.IsDownloading
+                            completedSize.count != queuedSize.count && queuedSize.count > 0 && download.count == 0 -> AudioDownloadState.IsPaused
                             else -> AudioDownloadState.IsIdle
                         }
                         progress = completedSize.count
                         max = queuedSize.count
+                        Timber.e("Queued: ${queuedSize.count}, Completed: ${completedSize.count}, Downloading: ${download.count}")
                         completedSize.close()
                         queuedSize.close()
                         stoppedSize.close()
+                        download.close()
                     }
                 }, 0, 5000
             )
@@ -81,14 +85,11 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun resumeDownloadingAll() {
-        downloadState = AudioDownloadState.IsDownloading
-        downloadManager.resumeDownloads()
-    }
-
     fun pauseDownloadingAll() {
-        downloadState = AudioDownloadState.IsPaused
-        downloadManager.pauseDownloads()
+        viewModelScope.launch(dispatcher) {
+            downloadState = AudioDownloadState.IsPaused
+            downloadManager.pauseDownloads()
+        }
     }
 
     fun updateFontSize(size: Int) {

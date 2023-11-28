@@ -96,17 +96,19 @@ class QuranRepositoryImpl @Inject constructor(
     }
 
     override suspend fun loadAyahAudio(id: Int, uri: String) {
-        remote.loadAyahAudio(id, uri)
+        remote.loadAyahAudio(id.toString(), uri)
     }
 
     override suspend fun loadAllAyahAudio() {
         local.ayahList().forEach {
-            remote.loadAyahAudio(it.id, it.audio)
+            remote.loadAyahAudio(it.id.toString(), it.audio)
         }
     }
 
     override suspend fun loadAllLearningVideos() {
-        TODO("Not yet implemented")
+        local.learningList().forEach {
+            remote.loadAyahAudio(it.id, it.remoteUrl)
+        }
     }
 
     override fun subscribeSurahAyahs(id: Int): Flow<List<Ayah>> {

@@ -17,10 +17,14 @@ import com.maxrave.kotlinyoutubeextractor.YTExtractor
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import de.yanos.core.utils.IODispatcher
+import de.yanos.core.utils.MainDispatcher
 import de.yanos.islam.data.database.dao.VideoDao
 import de.yanos.islam.data.model.VideoLearning
+import de.yanos.islam.util.AppContainer
+import de.yanos.islam.util.AppSettings
 import de.yanos.islam.util.safeLet
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import java.util.UUID
 
@@ -29,27 +33,54 @@ class VideoWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
     @IODispatcher private val dispatcher: CoroutineDispatcher,
+    @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
+    private val appContainer: AppContainer,
+    private val appSettings: AppSettings,
     private val dao: VideoDao
 ) : CoroutineWorker(appContext, params) {
+    private val controller get() = appContainer.videoController
+
     override suspend fun doWork(): Result {
         return withContext(dispatcher) {
-            val yt = YTExtractor(con = applicationContext, CACHING = false, LOGGING = true, retryCount = 3)
-            tecvids.mapNotNull {
-                extractVideo(it, yt)
-            }.let(dao::insert)
-            basics.mapNotNull {
-                extractVideo(it, yt)
-            }.let(dao::insert)
-            Result.success()
+            while (controller == null)
+                delay(1000)
+
+            if (dao.loadAll().isEmpty()) {
+                val yt = YTExtractor(con = applicationContext, CACHING = false, LOGGING = true, retryCount = 3)
+                basics.mapIndexedNotNull { index, s ->
+                    extractVideo(s, index, yt)
+                }.let(dao::insert)
+                tecvids.mapIndexedNotNull { index, s ->
+                    extractVideo(s, index + basics.size, yt)
+                }.let(dao::insert)
+            }
+            val currentList = dao.loadAll()
+            if (currentList.isEmpty())
+                Result.retry()
+            else {
+                val items = currentList.map {
+                    it.toMedia()
+                }
+                withContext(mainDispatcher) {
+                    items.forEach {
+                        controller?.addMediaItem(it)
+                        delay(100)
+                    }
+                    controller?.seekTo(appSettings.lastPlayedLearningIndex, 0)
+                    controller?.prepare()
+                }
+                Result.success()
+            }
         }
     }
 
-    private suspend fun extractVideo(it: String, yt: YTExtractor): VideoLearning? {
+    private suspend fun extractVideo(it: String, index: Int, yt: YTExtractor): VideoLearning? {
         yt.extract(it)
         if (yt.state != State.SUCCESS) return null
-        return safeLet(yt.getYTFiles()?.get(22), yt.getVideoMeta()) { file, meta ->
+        return safeLet(yt.getYTFiles()?.get(18), yt.getVideoMeta()) { file, meta ->
             VideoLearning(
                 id = meta.videoId ?: UUID.randomUUID().toString(),
+                index = index,
                 remoteUrl = file.url ?: "",
                 thumbRemoteUrl = meta.thumbUrl,
                 title = meta.title ?: "",
@@ -90,10 +121,10 @@ fun WorkManager.queueVideoWorker() {
 
 fun VideoLearning.toMedia() = MediaItem.Builder()
     .setMediaId(id)
-    .setUri(Uri.parse(localPath))
+    .setUri(Uri.parse(remoteUrl))
     .setMediaMetadata(
         MediaMetadata.Builder()
-            .setArtworkUri(Uri.parse(localThumbUrl))
+            .setArtworkUri(Uri.parse(thumbRemoteUrl))
             .setTitle(title)
             .setSubtitle(description)
             .setArtist(author)

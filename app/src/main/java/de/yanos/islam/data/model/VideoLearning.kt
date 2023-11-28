@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey
 @Entity
 data class VideoLearning(
     @PrimaryKey val id: String,
+    val index: Int,
     val remoteUrl: String,
     val localPath: String? = null,
     val thumbRemoteUrl: String,

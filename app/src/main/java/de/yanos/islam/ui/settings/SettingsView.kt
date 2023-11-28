@@ -76,7 +76,7 @@ fun SettingsScreen(
                 downloadProgress = vm.progress,
                 downloadMax = vm.max,
                 pauseDownload = { vm.pauseDownloadingAll() },
-                resumeDownload = { vm.resumeDownloadingAll() },
+                resumeDownload = { vm.queueDownloadAll() },
                 startDownload = { vm.queueDownloadAll() })
         }
         item {
@@ -160,7 +160,12 @@ fun MediaCard(
                     .alpha(0.4f), text = stringResource(id = R.string.setting_download_description), style = titleSmall()
             )
             if (downloadMax > 0 && downloadMax != downloadProgress)
-                LinearProgressIndicator(modifier = Modifier.weight(1f))
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(4.dp)
+                        .height(16.dp)
+                )
         }
     }
 }
