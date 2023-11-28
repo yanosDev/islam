@@ -24,7 +24,7 @@ interface QuranRepository {
     suspend fun loadFirstAyahBySurahId(surahId: Int): Ayah?
     suspend fun loadFirstAyahByPageId(pageId: Int): Ayah?
     suspend fun loadFirstAyahByJuz(juz: Int): Ayah?
-    suspend fun loadAyahAudio(id: Int, uri: String)
+    suspend fun loadMedia(id: String, uri: String)
     suspend fun loadAllAyahAudio()
     suspend fun loadAllLearningVideos()
     suspend fun sureList(): List<Surah>
@@ -95,8 +95,8 @@ class QuranRepositoryImpl @Inject constructor(
         return local.loadFirstAyahByJuz(juz)
     }
 
-    override suspend fun loadAyahAudio(id: Int, uri: String) {
-        remote.loadMedia(id.toString(), uri)
+    override suspend fun loadMedia(id: String, uri: String) {
+        remote.loadMedia(id, uri)
     }
 
     override suspend fun loadAllAyahAudio() {

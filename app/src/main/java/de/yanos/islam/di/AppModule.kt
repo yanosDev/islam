@@ -56,8 +56,9 @@ import de.yanos.islam.data.api.QuranApi
 import de.yanos.islam.data.database.IslamDatabase
 import de.yanos.islam.data.database.IslamDatabaseImpl
 import de.yanos.islam.data.repositories.QuranRepository
+import de.yanos.islam.service.ExoAudioCallback
 import de.yanos.islam.service.ExoAudioPlaybackService
-import de.yanos.islam.service.ExoMediaSessionCallback
+import de.yanos.islam.service.ExoLearningCallback
 import de.yanos.islam.service.ExoVideoPlaybackService
 import de.yanos.islam.util.AppContainer
 import de.yanos.islam.util.Constants
@@ -279,6 +280,7 @@ internal class AppModule {
             )
             .build()
         exoplayer.addAnalyticsListener(EventLogger())
+        exoplayer.pauseAtEndOfMediaItems = true
         return exoplayer
     }
 
@@ -312,7 +314,7 @@ internal class AppModule {
                 .build()
         return MediaSession.Builder(context, exoPlayer)
             .setCustomLayout(ImmutableList.of(previousAyahButton, nextAyahButton))
-            .setCallback(ExoMediaSessionCallback(appContainer, dispatcher, repository))
+            .setCallback(ExoAudioCallback(appContainer, dispatcher, repository))
             .setSessionActivity(pendingIntent)
             .setId(UUID.randomUUID().toString())
             .build()
@@ -331,11 +333,11 @@ internal class AppModule {
         val intent = Intent(context.applicationContext, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
             context,
-            0,
+            1,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        /*val previousAyahButton = CommandButton.Builder()
+        val previousAyahButton = CommandButton.Builder()
             .setDisplayName("Önceki Ayet")
             .setIconResId(android.R.drawable.ic_media_previous)
             .setSessionCommand(SessionCommand(Constants.CHANNEL_COMMAND_PREVIOUS, Bundle()))
@@ -345,10 +347,10 @@ internal class AppModule {
                 .setDisplayName("Sonraki Ayet")
                 .setIconResId(android.R.drawable.ic_media_next)
                 .setSessionCommand(SessionCommand(Constants.CHANNEL_COMMAND_NEXT, Bundle()))
-                .build()*/
+                .build()
         return MediaSession.Builder(context, exoPlayer)
-//            .setCustomLayout(ImmutableList.of(previousAyahButton, nextAyahButton))
-//            .setCallback(ExoMediaSessionCallback(appContainer, dispatcher, repository))
+            .setCustomLayout(ImmutableList.of(previousAyahButton, nextAyahButton))
+            .setCallback(ExoLearningCallback(appContainer, dispatcher, repository))
             .setSessionActivity(pendingIntent)
             .setId(UUID.randomUUID().toString())
             .build()

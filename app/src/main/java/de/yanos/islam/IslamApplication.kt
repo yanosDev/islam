@@ -37,10 +37,8 @@ class IslamApplication : Application(), Configuration.Provider {
         )
         StrictMode.setVmPolicy(
             VmPolicy.Builder()
-                .detectLeakedSqlLiteObjects()
-                .detectLeakedClosableObjects()
+                .detectAll()
                 .penaltyLog()
-                .penaltyDeath()
                 .build()
         )
         super.onCreate()

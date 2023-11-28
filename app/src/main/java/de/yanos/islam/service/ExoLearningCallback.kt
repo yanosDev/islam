@@ -15,7 +15,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-class ExoMediaSessionCallback(
+class ExoLearningCallback(
     private val appContainer: AppContainer,
     private val dispatcher: CoroutineDispatcher,
     private val repository: QuranRepository,
@@ -39,8 +39,8 @@ class ExoMediaSessionCallback(
             Constants.CHANNEL_COMMAND_NEXT -> {
                 mediaController?.seekToNextMediaItem()
                 scope.launch {
-                    repository.loadAyahById(mediaController?.currentMediaItem?.mediaId?.toInt() ?: -1)?.let { ayah ->
-                        repository.loadAyahAudio(ayah.id, ayah.audio)
+                    mediaController?.currentMediaItem?.let {
+                        repository.loadMedia(it.mediaId, it.requestMetadata.mediaUri?.toString() ?: "")
                     }
                 }
             }
@@ -48,8 +48,8 @@ class ExoMediaSessionCallback(
             Constants.CHANNEL_COMMAND_PREVIOUS -> {
                 mediaController?.seekToPreviousMediaItem()
                 scope.launch {
-                    repository.loadAyahById(mediaController?.currentMediaItem?.mediaId?.toInt() ?: -1)?.let { ayah ->
-                        repository.loadAyahAudio(ayah.id, ayah.audio)
+                    mediaController?.currentMediaItem?.let {
+                        repository.loadMedia(it.mediaId, it.requestMetadata.mediaUri?.toString() ?: "")
                     }
                 }
             }

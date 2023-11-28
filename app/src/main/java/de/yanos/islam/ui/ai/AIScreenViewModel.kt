@@ -43,6 +43,10 @@ class AIScreenViewModel @Inject constructor(
             requestInProgress = false
         }
     }
+
+    override fun onCleared() {
+        super.onCleared()
+    }
 }
 
 data class UserRequest(val id: UUID = UUID.randomUUID(), val text: String, val replyList: List<AssistantReply>)
