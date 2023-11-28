@@ -11,18 +11,21 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.maxrave.kotlinyoutubeextractor.State
 import com.maxrave.kotlinyoutubeextractor.YTExtractor
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import de.yanos.core.utils.IODispatcher
+import de.yanos.core.utils.MainDispatcher
 import de.yanos.islam.R
-import de.yanos.islam.data.database.dao.VideoDao
+import de.yanos.islam.data.database.dao.QuranDao
 import de.yanos.islam.data.model.VideoLearning
 import de.yanos.islam.data.model.quran.Ayah
+import de.yanos.islam.util.AppContainer
 import de.yanos.islam.util.safeLet
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.util.UUID
 
 @HiltWorker
@@ -30,20 +33,35 @@ class AudioWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
     @IODispatcher private val dispatcher: CoroutineDispatcher,
-    private val dao: VideoDao
+    @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
+    private val dao: QuranDao,
+    private val appContainer: AppContainer,
 ) : CoroutineWorker(appContext, params) {
+
+    private val controller get() = appContainer.audioController
     override suspend fun doWork(): Result {
         return withContext(dispatcher) {
-            val yt = YTExtractor(con = applicationContext, CACHING = false, LOGGING = true, retryCount = 3)
-            if (yt.state == State.SUCCESS) {
-                tecvids.mapNotNull {
-                    extractVideo(it, yt)
-                }.let(dao::insert)
-                basics.mapNotNull {
-                    extractVideo(it, yt)
-                }.let(dao::insert)
+            while (controller == null) {
+                delay(1000L)
+            }
+            if (dao.ayahSize() != 6236) {
+                delay(5000)
+                Result.retry()
+            } else {
+                val items = dao.ayahList().map {
+                    it.toMedia(applicationContext)
+                }
+                withContext(mainDispatcher) {
+                    Timber.e("PERFORMANCE: ${System.currentTimeMillis()}")
+                    items.groupBy { it.mediaId.toInt() / 100 }.forEach { (_, subItems) ->
+                        controller?.addMediaItems(subItems)
+                        delay(100)
+                    }
+                    controller?.prepare()
+                    Timber.e("PERFORMANCE END: ${System.currentTimeMillis()}")
+                }
                 Result.success()
-            } else Result.retry()
+            }
         }
     }
 

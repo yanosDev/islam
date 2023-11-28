@@ -11,8 +11,6 @@ import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.AndroidEntryPoint
 import de.yanos.core.utils.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import javax.inject.Inject
 
 @UnstableApi
@@ -20,9 +18,6 @@ import javax.inject.Inject
 class ExoPlaybackService : MediaSessionService(), MediaSession.Callback {
     @Inject @IODispatcher lateinit var dispatcher: CoroutineDispatcher
     @Inject lateinit var mediaSession: MediaSession
-
-    private val job by lazy { Job() }
-    private val scope by lazy { CoroutineScope(dispatcher + job) }
 
     override fun onCustomCommand(session: MediaSession, controller: MediaSession.ControllerInfo, customCommand: SessionCommand, args: Bundle): ListenableFuture<SessionResult> {
         return when (customCommand.customAction) {

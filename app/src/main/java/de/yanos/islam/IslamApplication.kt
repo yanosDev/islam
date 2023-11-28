@@ -8,16 +8,20 @@ import android.os.StrictMode.ThreadPolicy
 import android.os.StrictMode.VmPolicy
 import android.util.Log
 import androidx.hilt.work.HiltWorkerFactory
+import androidx.media3.session.MediaController
 import androidx.work.Configuration
 import androidx.work.WorkManager
+import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.HiltAndroidApp
 import de.yanos.core.BuildConfig
 import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.service.queueAudioWorker
 import de.yanos.islam.service.queuePeriodicDailyWorker
 import de.yanos.islam.service.queueVideoWorker
+import de.yanos.islam.util.AppContainer
 import de.yanos.islam.util.Constants
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.asExecutor
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -28,7 +32,8 @@ class IslamApplication : Application(), Configuration.Provider {
     @Inject lateinit var notificationManager: NotificationManager
     @Inject @IODispatcher lateinit var dispatcher: CoroutineDispatcher
     @Inject lateinit var workManager: WorkManager
-
+    @Inject lateinit var mediaControllerFuture: ListenableFuture<MediaController>
+    @Inject lateinit var appContainer: AppContainer
     override fun onCreate() {
         StrictMode.setThreadPolicy(
             ThreadPolicy.Builder()
@@ -53,8 +58,13 @@ class IslamApplication : Application(), Configuration.Provider {
         createDownloadChannel()
 
         workManager.queueVideoWorker()
-        workManager.queueAudioWorker()
         workManager.queuePeriodicDailyWorker()
+        mediaControllerFuture.addListener({
+            if (mediaControllerFuture.get() != null) {
+                appContainer.audioController = mediaControllerFuture.get()
+                workManager.queueAudioWorker()
+            }
+        }, dispatcher.asExecutor())
     }
 
     private fun createDownloadChannel() {

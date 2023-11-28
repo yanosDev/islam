@@ -5,13 +5,12 @@ package de.yanos.islam.ui.quran.classic
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.viewModelScope
-import androidx.media3.session.MediaController
-import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.data.model.quran.Page
 import de.yanos.islam.data.repositories.QuranRepository
 import de.yanos.islam.ui.quran.classic.audio.AudioViewModel
+import de.yanos.islam.util.AppContainer
 import de.yanos.islam.util.AppSettings
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -21,11 +20,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class QuranClassicViewModel @Inject constructor(
+    private val appContainer: AppContainer,
     private val appSettings: AppSettings,
-    controllerFuture: ListenableFuture<MediaController>,
     @IODispatcher private val dispatcher: CoroutineDispatcher,
     private val repository: QuranRepository,
-) : AudioViewModel(controllerFuture, repository, dispatcher) {
+) : AudioViewModel(appContainer, repository) {
     var pages = mutableStateListOf<Page>()
     val quranStyle get() = appSettings.quranStyle
     val quranSizeFactor get() = appSettings.quranSizeFactor
