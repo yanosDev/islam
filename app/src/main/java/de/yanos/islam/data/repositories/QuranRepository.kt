@@ -26,6 +26,7 @@ interface QuranRepository {
     suspend fun loadFirstAyahByJuz(juz: Int): Ayah?
     suspend fun loadAyahAudio(id: Int, uri: String)
     suspend fun loadAllAyahAudio()
+    suspend fun loadAllLearningVideos()
     suspend fun sureList(): List<Surah>
 }
 
@@ -102,6 +103,10 @@ class QuranRepositoryImpl @Inject constructor(
         local.ayahList().forEach {
             remote.loadAyahAudio(it.id, it.audio)
         }
+    }
+
+    override suspend fun loadAllLearningVideos() {
+        TODO("Not yet implemented")
     }
 
     override fun subscribeSurahAyahs(id: Int): Flow<List<Ayah>> {

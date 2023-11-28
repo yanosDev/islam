@@ -61,8 +61,10 @@
     <string name="praying_daily_prayer">Günün Duasi:</string>
     <string name="setting_audio_title">Ayetlerin tüm ses kayitlari %s</string>
     <string name="setting_font_title">Yazi ayarlari</string>
-    <string name="setting_font_size_title">Yazi Boyutu</string>
-    <string name="setting_font_style_title">Yazi türü</string>
+    <string name="setting_font_size_title">Uygulama Genel Yazisi</string>
+    <string name="setting_font_style_title">Uygulama Genel Yazi Boyutu</string>
+    <string name="setting_quran_size_title">Quran Yazisi</string>
+    <string name="setting_quran_style_title">Quran Yazisinin Boyutu</string>
     <string name="setting_apply_now">Simdi Degisiklikleri gerceklestir</string>
     <string name="font_alogical">Alogical</string>
     <string name="font_open_sans">Open Sans</string>

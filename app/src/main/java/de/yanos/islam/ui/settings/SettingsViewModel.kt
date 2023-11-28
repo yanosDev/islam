@@ -29,8 +29,8 @@ class SettingsViewModel @Inject constructor(
     private val quranRepository: QuranRepository,
 ) : ViewModel() {
     private var timer: Timer? = null
-    var audioDownloadState: AudioDownloadState by mutableStateOf(AudioDownloadState.IsIdle)
-    var audioStateString by mutableStateOf("")
+    var downloadState: AudioDownloadState by mutableStateOf(AudioDownloadState.IsIdle)
+    var downloadProgressString by mutableStateOf("")
 
     fun startTimer() {
         if (timer == null) {
@@ -50,13 +50,13 @@ class SettingsViewModel @Inject constructor(
                         )
                         val completedSize = downloadManager.downloadIndex.getDownloads(Download.STATE_COMPLETED)
                         val stoppedSize = downloadManager.downloadIndex.getDownloads(Download.STATE_STOPPED)
-                        audioDownloadState = when {
+                        downloadState = when {
                             completedSize.count == queuedSize.count && queuedSize.count > 0 -> AudioDownloadState.IsDownloaded
                             queuedSize.count > completedSize.count -> AudioDownloadState.IsDownloading
                             stoppedSize.count + completedSize.count == queuedSize.count && queuedSize.count > 0 -> AudioDownloadState.IsPaused
                             else -> AudioDownloadState.IsIdle
                         }
-                        audioStateString = "${completedSize.count}/${queuedSize.count}"
+                        downloadProgressString = "${completedSize.count}/${queuedSize.count}"
                         completedSize.close()
                         queuedSize.close()
                         stoppedSize.close()
@@ -71,20 +71,21 @@ class SettingsViewModel @Inject constructor(
         timer = null
     }
 
-    fun queueDownloadAllAudio() {
+    fun queueDownloadAll() {
         viewModelScope.launch {
-            audioDownloadState = AudioDownloadState.IsDownloading
+            downloadState = AudioDownloadState.IsDownloading
             quranRepository.loadAllAyahAudio()
+            quranRepository.loadAllLearningVideos()
         }
     }
 
-    fun resumeDownloadingAllAudio() {
-        audioDownloadState = AudioDownloadState.IsDownloading
+    fun resumeDownloadingAll() {
+        downloadState = AudioDownloadState.IsDownloading
         downloadManager.resumeDownloads()
     }
 
-    fun pauseDownloadingAllAudio() {
-        audioDownloadState = AudioDownloadState.IsPaused
+    fun pauseDownloadingAll() {
+        downloadState = AudioDownloadState.IsPaused
         downloadManager.pauseDownloads()
     }
 

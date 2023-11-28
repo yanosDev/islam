@@ -119,7 +119,7 @@ fun IslamRadio(
             onClick = onClick
         )
         TextButton(onClick = onClick) {
-            Text(modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Start, text = stringResource(id = text), style = bodyMedium())
+            Text(modifier = Modifier, textAlign = TextAlign.Start, text = stringResource(id = text), style = labelSmall())
         }
     }
 }

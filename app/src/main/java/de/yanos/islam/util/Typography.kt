@@ -36,7 +36,6 @@ interface Style {
 }
 
 enum class FontStyle(override val textId: Int, override val fontId: Int) : Style {
-    Alogical(R.string.font_alogical, R.font.alogical),
     OpenSans(R.string.font_open_sans, R.font.open_sans),
     Roboto(R.string.font_roboto, R.font.roboto),
     Ubuntu(R.string.font_ubuntu, R.font.ubuntu),
@@ -44,9 +43,7 @@ enum class FontStyle(override val textId: Int, override val fontId: Int) : Style
 }
 
 enum class QuranFontStyle(override val textId: Int, override val fontId: Int) : Style {
-    AlQalam(R.string.font_qalam, R.font.quran_al_qalam),
     Scheherazade(R.string.font_scheherazade, R.font.scheherazade),
-    Saleem(R.string.font_saleem, R.font.saleem),
     Arabic(R.string.font_arabic, R.font.arabic),
 }
 

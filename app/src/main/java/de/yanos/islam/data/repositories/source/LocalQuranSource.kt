@@ -2,6 +2,8 @@ package de.yanos.islam.data.repositories.source
 
 import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.data.database.dao.QuranDao
+import de.yanos.islam.data.database.dao.VideoDao
+import de.yanos.islam.data.model.VideoLearning
 import de.yanos.islam.data.model.quran.Ayah
 import de.yanos.islam.data.model.quran.Page
 import de.yanos.islam.data.model.quran.Surah
@@ -27,11 +29,13 @@ interface LocalQuranSource {
     fun subscribeSurahAyahs(id: Int): Flow<List<Ayah>>
     suspend fun sureList(): List<Surah>
     suspend fun ayahList(): List<Ayah>
+    suspend fun learningList(): List<VideoLearning>
 }
 
 class LocalQuranSourceImpl @Inject constructor(
     @IODispatcher private val dispatcher: CoroutineDispatcher,
     private val dao: QuranDao,
+    private val videoDao: VideoDao
 ) : LocalQuranSource {
     override suspend fun insertSure(sure: Surah, ayahs: List<Ayah>) {
         withContext(dispatcher) {
@@ -103,7 +107,12 @@ class LocalQuranSourceImpl @Inject constructor(
         }
     }
 
+    override suspend fun learningList(): List<VideoLearning> {
+        return withContext(dispatcher) { videoDao.loadAll() }
+    }
+
     override suspend fun isQuranLoaded(): Boolean {
         return withContext(dispatcher) { dao.ayahSize() == 6236 }
     }
+
 }
