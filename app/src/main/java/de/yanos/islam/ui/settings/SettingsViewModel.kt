@@ -32,38 +32,51 @@ class SettingsViewModel @Inject constructor(
     var audioStateString by mutableStateOf("")
 
     init {
-        timer = Timer()
-        timer?.scheduleAtFixedRate(
-            timerTask()
-            {
-                viewModelScope.launch {
-                    val queuedSize = downloadManager.downloadIndex.getDownloads(
-                        Download.STATE_COMPLETED,
-                        Download.STATE_QUEUED,
-                        Download.STATE_DOWNLOADING,
-                        Download.STATE_STOPPED,
-                        Download.STATE_FAILED,
-                        Download.STATE_REMOVING,
-                        Download.STATE_RESTARTING
-                    ).count
-                    val completedSize = downloadManager.downloadIndex.getDownloads(Download.STATE_COMPLETED).count
-                    val stoppedSize = downloadManager.downloadIndex.getDownloads(Download.STATE_STOPPED).count
-                    audioDownloadState = when {
-                        completedSize == ayahs.size -> AudioDownloadState.IsDownloaded
-                        queuedSize == ayahs.size -> AudioDownloadState.IsDownloading
-                        stoppedSize + completedSize == ayahs.size -> AudioDownloadState.IsPaused
-                        else -> AudioDownloadState.IsIdle
-                    }
-                    audioStateString = "$completedSize/$queuedSize"
-                }
-            }, 1500, 5000
-        )
         viewModelScope.launch {
             quranRepository.loadAyahs().collect {
                 ayahs.clear()
                 ayahs.addAll(it.map { ayah -> Pair(ayah.id, ayah.audio) })
             }
         }
+    }
+
+    fun startTimer() {
+        if (timer == null) {
+            timer = Timer()
+            timer?.scheduleAtFixedRate(
+                timerTask()
+                {
+                    viewModelScope.launch {
+                        val queuedSize = downloadManager.downloadIndex.getDownloads(
+                            Download.STATE_COMPLETED,
+                            Download.STATE_QUEUED,
+                            Download.STATE_DOWNLOADING,
+                            Download.STATE_STOPPED,
+                            Download.STATE_FAILED,
+                            Download.STATE_REMOVING,
+                            Download.STATE_RESTARTING
+                        )
+                        val completedSize = downloadManager.downloadIndex.getDownloads(Download.STATE_COMPLETED)
+                        val stoppedSize = downloadManager.downloadIndex.getDownloads(Download.STATE_STOPPED)
+                        audioDownloadState = when {
+                            completedSize.count == ayahs.size -> AudioDownloadState.IsDownloaded
+                            queuedSize.count == ayahs.size -> AudioDownloadState.IsDownloading
+                            stoppedSize.count + completedSize.count == ayahs.size -> AudioDownloadState.IsPaused
+                            else -> AudioDownloadState.IsIdle
+                        }
+                        audioStateString = "${completedSize.count}/${queuedSize.count}"
+                        completedSize.close()
+                        queuedSize.close()
+                        stoppedSize.close()
+                    }
+                }, 1500, 5000
+            )
+        }
+    }
+
+    fun clearTimer() {
+        timer?.cancel()
+        timer = null
     }
 
     fun queueDownloadAllAudio() {
@@ -113,9 +126,8 @@ class SettingsViewModel @Inject constructor(
     var quranFontStyle by mutableIntStateOf(appSettings.quranStyle)
 
     override fun onCleared() {
+        clearTimer()
         super.onCleared()
-        timer?.cancel()
-        timer = null
     }
 }
 

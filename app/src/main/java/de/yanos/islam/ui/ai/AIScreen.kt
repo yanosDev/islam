@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalFoundationApi::class)
+@file:OptIn(ExperimentalFoundationApi::class, ExperimentalFoundationApi::class)
 
 package de.yanos.islam.ui.ai
 
@@ -20,8 +20,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,12 +41,13 @@ fun AIScreen(
     Column(modifier = modifier, verticalArrangement = Arrangement.Bottom) {
         LazyColumn(modifier = Modifier.padding(4.dp), reverseLayout = true) {
             stickyHeader {
-                OutlinedTextField(
+                TextField(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp),
                     maxLines = 3,
                     value = currentInput,
+                    shape = RoundedCornerShape(16.dp),
                     onValueChange = { currentInput = it },
                     trailingIcon = {
                         IconButton(enabled = !vm.requestInProgress, onClick = { vm.sendRequest(currentInput) }) {
@@ -73,7 +74,7 @@ fun AIScreen(
                 item {
                     Spacer(modifier = Modifier.padding(4.dp))
                 }
-                stickyHeader {
+                item {
                     UserRequest(text = request.text)
                 }
                 item {

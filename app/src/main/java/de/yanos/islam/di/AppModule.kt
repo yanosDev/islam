@@ -43,11 +43,11 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import de.yanos.core.BuildConfig
 import de.yanos.core.utils.DebugInterceptor
 import de.yanos.core.utils.DefaultDispatcher
 import de.yanos.core.utils.IODispatcher
 import de.yanos.core.utils.MainDispatcher
+import de.yanos.islam.BuildConfig
 import de.yanos.islam.MainActivity
 import de.yanos.islam.R
 import de.yanos.islam.data.api.AwqatApi
@@ -163,6 +163,10 @@ internal class AppModule {
     @Provides
     @Singleton
     fun provideTopicDao(db: IslamDatabase) = db.topicDao()
+
+    @Provides
+    @Singleton
+    fun provideVideoDao(db: IslamDatabase) = db.videoDao()
 
     @Provides
     @Singleton
@@ -309,7 +313,7 @@ internal class AppModule {
 
     @Provides
     @Singleton
-    fun provideOpenAI(): OpenAI = OpenAI(token = Constants.API_KEY, timeout = Timeout(socket = 2.minutes))
+    fun provideOpenAI(): OpenAI = OpenAI(token = BuildConfig.OPEN_API_TOKEN, timeout = Timeout(socket = 2.minutes))
 
     @Provides
     @Singleton

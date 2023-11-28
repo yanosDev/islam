@@ -46,7 +46,6 @@ import de.yanos.islam.util.QuranNavigation
 import de.yanos.islam.util.ToRootAfterPermission
 import de.yanos.islam.util.allKnowledge
 import de.yanos.islam.util.allQuran
-import de.yanos.islam.util.typoByConfig
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -65,22 +64,24 @@ class MainActivity : ComponentActivity() {
             val locationPermissionState = rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION)
             val notificationPermissionState = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
 
-            AppTheme(activity = this, typography = typoByConfig(appSettings)) { modifier, config ->
-                if (locationPermissionState.status.isGranted && notificationPermissionState.status.isGranted) {
-                    navController = rememberNavController()
-                    DynamicNavigationScreen(
-                        modifier = modifier.padding(top = 48.dp), // TODO: Check statusbar problem
-                        config = config.copy(),
-                        destinations = MainNavigation.all,
-                        navController = navController!!
-                    ) { contentModifier ->
-                        IslamNavHost(
-                            modifier = contentModifier,
-                            startRoute = MainNavigation.all[0].route,
+            vm.typo?.let { typo ->
+                AppTheme(activity = this, typography = typo) { modifier, config ->
+                    if (locationPermissionState.status.isGranted && notificationPermissionState.status.isGranted) {
+                        navController = rememberNavController()
+                        DynamicNavigationScreen(
+                            modifier = modifier.padding(top = 48.dp), // TODO: Check statusbar problem
+                            config = config.copy(),
+                            destinations = MainNavigation.all,
                             navController = navController!!
-                        )
-                    }
-                } else InitScreen(modifier, locationPermissionState, notificationPermissionState)
+                        ) { contentModifier ->
+                            IslamNavHost(
+                                modifier = contentModifier,
+                                startRoute = MainNavigation.all[0].route,
+                                navController = navController!!
+                            )
+                        }
+                    } else InitScreen(modifier, locationPermissionState, notificationPermissionState)
+                }
             }
         }
     }

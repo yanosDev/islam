@@ -19,9 +19,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,12 +39,22 @@ import de.yanos.islam.util.Lottie
 import de.yanos.islam.util.QuranFontStyle
 import de.yanos.islam.util.labelMedium
 import de.yanos.islam.util.titleMedium
+import kotlinx.coroutines.launch
 
 @Composable
 fun SettingsScreen(
     modifier: Modifier = Modifier,
     vm: SettingsViewModel = hiltViewModel()
 ) {
+    val scope = rememberCoroutineScope()
+    DisposableEffect(scope) {
+        scope.launch {
+            vm.startTimer()
+        }
+        onDispose {
+            vm.clearTimer()
+        }
+    }
     var recreate by remember { mutableStateOf(false) }
     if (recreate) {
         (LocalContext.current as? Activity)?.recreate()
