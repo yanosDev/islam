@@ -112,4 +112,7 @@
     <string name="download_list_title">Offline Kullanim icin Ayetleri önceden indiriniz</string>
     <string name="download_list_all">Quranin tamamini indir</string>
     <string name="download_number">Geriye kalan Ayet ve Video sayisi %s %s</string>
+
+    <string name="ai_title">Bot </string>
+    <string name="ai_description">Burdaki alinan bilgilerin tümü Open Ai den geliyor. Tek kaynak olarak kullanmayiniz. Sorularinizla ilk firsat da bir Hoca ya danismaniz iyi olur!!!</string>
 </resources>

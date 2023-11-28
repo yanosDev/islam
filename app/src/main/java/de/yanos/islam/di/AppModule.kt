@@ -170,6 +170,10 @@ internal class AppModule {
 
     @Provides
     @Singleton
+    fun provideBotDao(db: IslamDatabase) = db.botDao()
+
+    @Provides
+    @Singleton
     fun provideVideoDao(db: IslamDatabase) = db.videoDao()
 
     @Provides

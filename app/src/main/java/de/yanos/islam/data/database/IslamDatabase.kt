@@ -6,12 +6,14 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import de.yanos.islam.data.database.dao.AwqatDao
+import de.yanos.islam.data.database.dao.BotDao
 import de.yanos.islam.data.database.dao.ChallengeDao
 import de.yanos.islam.data.database.dao.QuizDao
 import de.yanos.islam.data.database.dao.QuranDao
 import de.yanos.islam.data.database.dao.SearchDao
 import de.yanos.islam.data.database.dao.TopicDao
 import de.yanos.islam.data.database.dao.VideoDao
+import de.yanos.islam.data.model.BotReply
 import de.yanos.islam.data.model.Challenge
 import de.yanos.islam.data.model.Degree
 import de.yanos.islam.data.model.Quiz
@@ -40,6 +42,7 @@ interface IslamDatabase {
     fun awqatDao(): AwqatDao
     fun searchDao(): SearchDao
     fun videoDao(): VideoDao
+    fun botDao(): BotDao
     suspend fun create(context: Context)
 }
 
@@ -59,7 +62,8 @@ interface IslamDatabase {
         Schedule::class,
         Surah::class,
         Ayah::class,
-        VideoLearning::class
+        VideoLearning::class,
+        BotReply::class
     ],
     version = 1
 )
@@ -71,6 +75,7 @@ internal abstract class IslamDatabaseImpl : IslamDatabase, RoomDatabase() {
     abstract override fun searchDao(): SearchDao
     abstract override fun quranDao(): QuranDao
     abstract override fun videoDao(): VideoDao
+    abstract override fun botDao(): BotDao
 
     override suspend fun create(context: Context) {
         TopicResource.values().forEach { topic ->
