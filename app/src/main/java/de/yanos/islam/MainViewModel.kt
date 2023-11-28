@@ -10,12 +10,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.media3.common.MediaItem
-import androidx.media3.common.MediaMetadata
-import androidx.media3.session.MediaController
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import de.yanos.core.utils.IODispatcher
@@ -28,7 +22,6 @@ import de.yanos.islam.data.model.TopicType
 import de.yanos.islam.data.repositories.AwqatRepository
 import de.yanos.islam.data.repositories.QuranRepository
 import de.yanos.islam.di.AzanPlayer
-import de.yanos.islam.service.DailyScheduleWorker
 import de.yanos.islam.util.AppSettings
 import de.yanos.islam.util.getCurrentLocation
 import de.yanos.islam.util.hasLocationPermission
@@ -36,17 +29,13 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
-import java.time.Duration
-import java.time.LocalDateTime
 import java.util.Timer
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.concurrent.timerTask
 
@@ -61,47 +50,9 @@ class MainViewModel @Inject constructor(
     private val geocoder: Geocoder,
     private val quranRepository: QuranRepository,
     @AzanPlayer private val mediaPlayer: MediaPlayer,
-    private val workManager: WorkManager
 ) : ViewModel() {
     var isReady: Boolean by mutableStateOf(false)
     private var timer: Timer? = null
-    private var controller: MediaController? = null
-
-    init {
-        viewModelScope.launch {
-            while (controller == null)
-                delay(100)
-            quranRepository.loadAyahs().collect { ayahs ->
-                controller?.let {
-                    ayahs.groupBy { ayah -> ayah.page }.forEach { (_, value) ->
-                        it.addMediaItems(value.map { ayah ->
-                            MediaItem.Builder()
-                                .setMediaId(ayah.id.toString())
-                                .setUri(ayah.audio)
-                                .setMediaMetadata(
-                                    MediaMetadata.Builder()
-                                        .setTitle(
-                                            context.getString(R.string.sure_list_page, ayah.page.toString())
-                                                    + ", "
-                                                    + context.getString(R.string.sure_list_cuz, ayah.juz.toString())
-                                                    + ", "
-                                                    + context.getString(R.string.sure_ayet, ayah.number)
-                                        )
-                                        .setArtist(ayah.sureName)
-                                        .build()
-                                )
-                                .build()
-                        })
-
-                        delay(100)
-                    }
-
-
-                    it.prepare()
-                }
-            }
-        }
-    }
 
     fun startSchedule() {
         timer = Timer()
@@ -152,7 +103,7 @@ class MainViewModel @Inject constructor(
             if (!isReady && !isLoading) {
                 isLoading = true
                 listOf(
-                    async { initDailyWorker() },
+                    async { },
                     async { loadDailyAwqatList() },
                     async { loadQuran() },
                 ).awaitAll()
@@ -171,19 +122,6 @@ class MainViewModel @Inject constructor(
             if (!quranRepository.isWholeQuranFetched())
                 quranRepository.fetchQuran()
         }
-    }
-
-    private fun initDailyWorker(): Boolean {
-        val now = LocalDateTime.now()
-        val delay = when {
-            now.hour < 1 -> Duration.ofHours(0L)
-            else -> Duration.ofHours(24L - now.hour)
-        }.plusMinutes(20)
-        val periodicWorkRequest = PeriodicWorkRequestBuilder<DailyScheduleWorker>(24, TimeUnit.HOURS)
-            .setInitialDelay(delay)
-            .build()
-        workManager.enqueueUniquePeriodicWork("daily", ExistingPeriodicWorkPolicy.UPDATE, periodicWorkRequest)
-        return true
     }
 
     private suspend fun loadDailyAwqatList() {

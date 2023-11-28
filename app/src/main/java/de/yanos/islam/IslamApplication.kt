@@ -9,9 +9,13 @@ import android.os.StrictMode.VmPolicy
 import android.util.Log
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import androidx.work.WorkManager
 import dagger.hilt.android.HiltAndroidApp
 import de.yanos.core.BuildConfig
 import de.yanos.core.utils.IODispatcher
+import de.yanos.islam.service.queueAudioWorker
+import de.yanos.islam.service.queuePeriodicDailyWorker
+import de.yanos.islam.service.queueVideoWorker
 import de.yanos.islam.util.Constants
 import kotlinx.coroutines.CoroutineDispatcher
 import timber.log.Timber
@@ -23,6 +27,7 @@ class IslamApplication : Application(), Configuration.Provider {
     @Inject lateinit var workerFactory: HiltWorkerFactory
     @Inject lateinit var notificationManager: NotificationManager
     @Inject @IODispatcher lateinit var dispatcher: CoroutineDispatcher
+    @Inject lateinit var workManager: WorkManager
 
     override fun onCreate() {
         StrictMode.setThreadPolicy(
@@ -46,6 +51,10 @@ class IslamApplication : Application(), Configuration.Provider {
 
         createAlarmChannel()
         createDownloadChannel()
+
+        workManager.queueVideoWorker()
+        workManager.queueAudioWorker()
+        workManager.queuePeriodicDailyWorker()
     }
 
     private fun createDownloadChannel() {
@@ -56,7 +65,6 @@ class IslamApplication : Application(), Configuration.Provider {
         )
 
         notificationManager.createNotificationChannel(channel)
-
     }
 
     private fun createAlarmChannel() {

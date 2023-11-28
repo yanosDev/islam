@@ -7,6 +7,9 @@ import android.content.Context
 import android.content.Intent
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -18,11 +21,13 @@ import de.yanos.islam.util.AppSettings
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -95,4 +100,18 @@ class DailyScheduleWorker @AssistedInject constructor(
                 )
             )
     }
+}
+
+
+fun WorkManager.queuePeriodicDailyWorker() {
+    val now = LocalDateTime.now()
+    val delay = when {
+        now.hour < 1 -> Duration.ofHours(0L)
+        else -> Duration.ofHours(24L - now.hour)
+    }.plusMinutes(20)
+    val periodicWorkRequest = PeriodicWorkRequestBuilder<DailyScheduleWorker>(24, TimeUnit.HOURS)
+        .setInitialDelay(delay)
+        .build()
+    enqueueUniquePeriodicWork("daily", ExistingPeriodicWorkPolicy.UPDATE, periodicWorkRequest)
+
 }
