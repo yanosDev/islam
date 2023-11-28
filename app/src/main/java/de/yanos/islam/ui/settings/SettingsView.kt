@@ -128,13 +128,11 @@ fun MediaCard(
     resumeDownload: () -> Unit,
     startDownload: () -> Unit,
 ) {
-    Column(modifier = modifier.padding(8.dp)) {
-        Text(text = stringResource(id = R.string.setting_download_title), style = titleSmall())
-        Text(
-            modifier = Modifier
-                .padding(horizontal = 2.dp)
-                .alpha(0.4f), text = stringResource(id = R.string.setting_download_description), style = titleSmall()
-        )
+    Row(
+        modifier = modifier
+            .padding(8.dp)
+            .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Top
+    ) {
         IconButton(onClick = {
             when (state) {
                 AudioDownloadState.IsDownloading -> pauseDownload()
@@ -143,19 +141,26 @@ fun MediaCard(
                 else -> {}
             }
         }) {
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Icon(
-                    modifier = Modifier.size(48.dp),
-                    imageVector = when (state) {
-                        AudioDownloadState.IsDownloading -> Icons.Rounded.Pause
-                        AudioDownloadState.IsDownloaded -> Icons.Rounded.DownloadDone
-                        AudioDownloadState.IsPaused -> Icons.Rounded.PlayArrow
-                        else -> Icons.Rounded.Download
-                    }, contentDescription = ""
-                )
-                if (downloadMax > 0 && downloadMax != downloadProgress)
-                    LinearProgressIndicator(modifier = Modifier.weight(1f))
-            }
+            Icon(
+                modifier = Modifier.size(48.dp),
+                imageVector = when (state) {
+                    AudioDownloadState.IsDownloading -> Icons.Rounded.Pause
+                    AudioDownloadState.IsDownloaded -> Icons.Rounded.DownloadDone
+                    AudioDownloadState.IsPaused -> Icons.Rounded.PlayArrow
+                    else -> Icons.Rounded.Download
+                }, contentDescription = ""
+            )
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        Column {
+            Text(text = stringResource(id = R.string.setting_download_title), style = titleSmall())
+            Text(
+                modifier = Modifier
+                    .padding(horizontal = 2.dp)
+                    .alpha(0.4f), text = stringResource(id = R.string.setting_download_description), style = titleSmall()
+            )
+            if (downloadMax > 0 && downloadMax != downloadProgress)
+                LinearProgressIndicator(modifier = Modifier.weight(1f))
         }
     }
 }
