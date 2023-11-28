@@ -30,7 +30,8 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
     private var timer: Timer? = null
     var downloadState: AudioDownloadState by mutableStateOf(AudioDownloadState.IsIdle)
-    var downloadProgressString by mutableStateOf("")
+    var progress by mutableIntStateOf(0)
+    var max by mutableIntStateOf(0)
 
     fun startTimer() {
         if (timer == null) {
@@ -56,7 +57,8 @@ class SettingsViewModel @Inject constructor(
                             stoppedSize.count + completedSize.count == queuedSize.count && queuedSize.count > 0 -> AudioDownloadState.IsPaused
                             else -> AudioDownloadState.IsIdle
                         }
-                        downloadProgressString = "${completedSize.count}/${queuedSize.count}"
+                        progress = completedSize.count
+                        max = queuedSize.count
                         completedSize.close()
                         queuedSize.close()
                         stoppedSize.close()

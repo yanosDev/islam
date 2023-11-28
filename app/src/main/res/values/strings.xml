@@ -59,7 +59,9 @@
     <string name="praying_daily_verse">Günün Ayeti:</string>
     <string name="praying_daily_hadith">Günün Hadisi:</string>
     <string name="praying_daily_prayer">Günün Duasi:</string>
-    <string name="setting_audio_title">Ayetlerin tüm ses kayitlari %s</string>
+    <string name="setting_download_title">Internetsiz Kullanim</string>
+    <string name="setting_download_description">Internetsiz kullanim icin Ayetlerin Ses Kayitlarini ve Egitim videolari burdan indirebilirsiniz</string>
+    <string name="setting_download_start">Indir</string>
     <string name="setting_font_title">Yazi ayarlari</string>
     <string name="setting_font_size_title">Uygulama Genel Yazisi</string>
     <string name="setting_font_style_title">Uygulama Genel Yazi Boyutu</string>

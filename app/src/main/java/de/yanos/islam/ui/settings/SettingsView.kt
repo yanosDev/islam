@@ -20,7 +20,7 @@ import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,6 +32,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -72,7 +73,8 @@ fun SettingsScreen(
             MediaCard(
                 modifier = Modifier,
                 state = vm.downloadState,
-                audioProgress = vm.downloadProgressString,
+                downloadProgress = vm.progress,
+                downloadMax = vm.max,
                 pauseDownload = { vm.pauseDownloadingAll() },
                 resumeDownload = { vm.resumeDownloadingAll() },
                 startDownload = { vm.queueDownloadAll() })
@@ -120,24 +122,30 @@ fun SettingsScreen(
 fun MediaCard(
     modifier: Modifier,
     state: AudioDownloadState,
-    audioProgress: String,
+    downloadProgress: Int,
+    downloadMax: Int,
     pauseDownload: () -> Unit,
     resumeDownload: () -> Unit,
     startDownload: () -> Unit,
 ) {
-    OutlinedCard(modifier = modifier.padding(8.dp)) {
-        Row(modifier = Modifier.padding(8.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
-            Text(modifier = Modifier.weight(1f), text = stringResource(id = R.string.setting_audio_title, audioProgress), style = titleSmall())
-            Spacer(modifier = Modifier.padding(4.dp))
-            IconButton(onClick = {
-                when (state) {
-                    AudioDownloadState.IsDownloading -> pauseDownload()
-                    AudioDownloadState.IsIdle -> startDownload()
-                    AudioDownloadState.IsPaused -> resumeDownload()
-                    else -> {}
-                }
-            }) {
+    Column(modifier = modifier.padding(8.dp)) {
+        Text(text = stringResource(id = R.string.setting_download_title), style = titleSmall())
+        Text(
+            modifier = Modifier
+                .padding(horizontal = 2.dp)
+                .alpha(0.4f), text = stringResource(id = R.string.setting_download_description), style = titleSmall()
+        )
+        IconButton(onClick = {
+            when (state) {
+                AudioDownloadState.IsDownloading -> pauseDownload()
+                AudioDownloadState.IsIdle -> startDownload()
+                AudioDownloadState.IsPaused -> resumeDownload()
+                else -> {}
+            }
+        }) {
+            Row(modifier = Modifier.fillMaxWidth()) {
                 Icon(
+                    modifier = Modifier.size(48.dp),
                     imageVector = when (state) {
                         AudioDownloadState.IsDownloading -> Icons.Rounded.Pause
                         AudioDownloadState.IsDownloaded -> Icons.Rounded.DownloadDone
@@ -145,6 +153,8 @@ fun MediaCard(
                         else -> Icons.Rounded.Download
                     }, contentDescription = ""
                 )
+                if (downloadMax > 0 && downloadMax != downloadProgress)
+                    LinearProgressIndicator(modifier = Modifier.weight(1f))
             }
         }
     }
