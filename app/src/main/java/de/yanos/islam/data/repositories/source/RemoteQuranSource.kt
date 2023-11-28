@@ -1,9 +1,18 @@
+@file:UnstableApi
+
 package de.yanos.islam.data.repositories.source
 
+import android.content.Context
+import android.net.Uri
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.offline.DownloadRequest
+import androidx.media3.exoplayer.offline.DownloadService
+import dagger.hilt.android.qualifiers.ApplicationContext
 import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.data.api.QuranApi
 import de.yanos.islam.data.model.alquran.QuranAudioResponse
 import de.yanos.islam.data.model.alquran.QuranTextResponse
+import de.yanos.islam.service.ExoDownloadService
 import de.yanos.islam.util.LoadState
 import de.yanos.islam.util.localResponse
 import kotlinx.coroutines.CoroutineDispatcher
@@ -16,9 +25,11 @@ interface RemoteQuranSource {
     suspend fun loadQuranTranslation(): LoadState<QuranTextResponse>
     suspend fun loadQuranTransliteration(): LoadState<QuranTextResponse>
     suspend fun loadQuranAudio(): LoadState<QuranAudioResponse>
+    suspend fun loadAyahAudio(id: Int, url: String)
 }
 
 class RemoteQuranSourceImpl @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val api: QuranApi,
     @IODispatcher private val dispatcher: CoroutineDispatcher
 ) : RemoteQuranSource {
@@ -56,6 +67,18 @@ class RemoteQuranSourceImpl @Inject constructor(
                 Timber.e(e)
                 LoadState.Failure(e)
             }
+        }
+    }
+
+    override suspend fun loadAyahAudio(id: Int, url: String) {
+        withContext(dispatcher) {
+            val downloadRequest: DownloadRequest = DownloadRequest.Builder(id.toString(), Uri.parse(url)).build()
+            DownloadService.sendAddDownload(
+                context,
+                ExoDownloadService::class.java,
+                downloadRequest,
+                false
+            )
         }
     }
 }

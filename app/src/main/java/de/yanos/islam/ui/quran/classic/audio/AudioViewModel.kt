@@ -118,14 +118,14 @@ open class AudioViewModel(
                     is AudioEvents.PlayPrevious -> {
                         controller?.seekToPreviousMediaItem()
                         repository.loadAyahById(controller?.currentMediaItem?.mediaId?.toInt() ?: -1)?.let { ayah ->
-                            repository.loadAudioAlt(ayah.id, ayah.audio)
+                            repository.loadAyahAudio(ayah.id, ayah.audio)
                         }
                     }
 
                     is AudioEvents.PlayNext -> {
                         controller?.seekToNextMediaItem()
                         repository.loadAyahById(controller?.currentMediaItem?.mediaId?.toInt() ?: -1)?.let { ayah ->
-                            repository.loadAudioAlt(ayah.id, ayah.audio)
+                            repository.loadAyahAudio(ayah.id, ayah.audio)
                         }
                     }
 

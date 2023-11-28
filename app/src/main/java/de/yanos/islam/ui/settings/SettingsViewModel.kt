@@ -12,9 +12,10 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.data.repositories.QuranRepository
 import de.yanos.islam.util.AppSettings
-import kotlinx.coroutines.async
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import java.util.Timer
 import javax.inject.Inject
@@ -23,22 +24,13 @@ import kotlin.concurrent.timerTask
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val appSettings: AppSettings,
+    @IODispatcher private val dispatcher: CoroutineDispatcher,
     private val downloadManager: DownloadManager,
-    private val quranRepository: QuranRepository
+    private val quranRepository: QuranRepository,
 ) : ViewModel() {
     private var timer: Timer? = null
-    private val ayahs: MutableList<Pair<Int, String>> = mutableListOf()
     var audioDownloadState: AudioDownloadState by mutableStateOf(AudioDownloadState.IsIdle)
     var audioStateString by mutableStateOf("")
-
-    init {
-        viewModelScope.launch {
-            quranRepository.loadAyahs().collect {
-                ayahs.clear()
-                ayahs.addAll(it.map { ayah -> Pair(ayah.id, ayah.audio) })
-            }
-        }
-    }
 
     fun startTimer() {
         if (timer == null) {
@@ -46,7 +38,7 @@ class SettingsViewModel @Inject constructor(
             timer?.scheduleAtFixedRate(
                 timerTask()
                 {
-                    viewModelScope.launch {
+                    viewModelScope.launch(dispatcher) {
                         val queuedSize = downloadManager.downloadIndex.getDownloads(
                             Download.STATE_COMPLETED,
                             Download.STATE_QUEUED,
@@ -59,9 +51,9 @@ class SettingsViewModel @Inject constructor(
                         val completedSize = downloadManager.downloadIndex.getDownloads(Download.STATE_COMPLETED)
                         val stoppedSize = downloadManager.downloadIndex.getDownloads(Download.STATE_STOPPED)
                         audioDownloadState = when {
-                            completedSize.count == ayahs.size -> AudioDownloadState.IsDownloaded
-                            queuedSize.count == ayahs.size -> AudioDownloadState.IsDownloading
-                            stoppedSize.count + completedSize.count == ayahs.size -> AudioDownloadState.IsPaused
+                            completedSize.count == queuedSize.count && queuedSize.count > 0 -> AudioDownloadState.IsDownloaded
+                            queuedSize.count > completedSize.count -> AudioDownloadState.IsDownloading
+                            stoppedSize.count + completedSize.count == queuedSize.count && queuedSize.count > 0 -> AudioDownloadState.IsPaused
                             else -> AudioDownloadState.IsIdle
                         }
                         audioStateString = "${completedSize.count}/${queuedSize.count}"
@@ -82,11 +74,7 @@ class SettingsViewModel @Inject constructor(
     fun queueDownloadAllAudio() {
         viewModelScope.launch {
             audioDownloadState = AudioDownloadState.IsDownloading
-            async {
-                ayahs.forEach { (id, uri) ->
-                    quranRepository.loadAudioAlt(id, uri)
-                }
-            }
+            quranRepository.loadAllAyahAudio()
         }
     }
 

@@ -3,17 +3,13 @@
 package de.yanos.islam.data.repositories
 
 import android.content.Context
-import android.net.Uri
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.offline.DownloadRequest
-import androidx.media3.exoplayer.offline.DownloadService
 import dagger.hilt.android.qualifiers.ApplicationContext
 import de.yanos.islam.data.model.quran.Ayah
 import de.yanos.islam.data.model.quran.Page
 import de.yanos.islam.data.model.quran.Surah
 import de.yanos.islam.data.repositories.source.LocalQuranSource
 import de.yanos.islam.data.repositories.source.RemoteQuranSource
-import de.yanos.islam.service.ExoDownloadService
 import de.yanos.islam.util.LoadState
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -23,12 +19,13 @@ interface QuranRepository {
     suspend fun fetchQuran()
     fun loadPages(): Flow<List<Page>>
     fun loadAyahs(): Flow<List<Ayah>>
+    fun subscribeSurahAyahs(id: Int): Flow<List<Ayah>>
     suspend fun loadAyahById(ayahId: Int): Ayah?
     suspend fun loadFirstAyahBySurahId(surahId: Int): Ayah?
     suspend fun loadFirstAyahByPageId(pageId: Int): Ayah?
     suspend fun loadFirstAyahByJuz(juz: Int): Ayah?
-    suspend fun loadAudioAlt(id: Int, uri: String)
-    fun subsribeSurahAyahs(id: Int): Flow<List<Ayah>>
+    suspend fun loadAyahAudio(id: Int, uri: String)
+    suspend fun loadAllAyahAudio()
     suspend fun sureList(): List<Surah>
 }
 
@@ -97,18 +94,18 @@ class QuranRepositoryImpl @Inject constructor(
         return local.loadFirstAyahByJuz(juz)
     }
 
-    override suspend fun loadAudioAlt(id: Int, uri: String) {
-        val downloadRequest: DownloadRequest = DownloadRequest.Builder(id.toString(), Uri.parse(uri)).build()
-        DownloadService.sendAddDownload(
-            context,
-            ExoDownloadService::class.java,
-            downloadRequest,
-            false
-        )
+    override suspend fun loadAyahAudio(id: Int, uri: String) {
+        remote.loadAyahAudio(id, uri)
     }
 
-    override fun subsribeSurahAyahs(id: Int): Flow<List<Ayah>> {
-        return local.subsribeSurahAyahs(id)
+    override suspend fun loadAllAyahAudio() {
+        local.ayahList().forEach {
+            remote.loadAyahAudio(it.id, it.audio)
+        }
+    }
+
+    override fun subscribeSurahAyahs(id: Int): Flow<List<Ayah>> {
+        return local.subscribeSurahAyahs(id)
     }
 
     override suspend fun sureList(): List<Surah> {

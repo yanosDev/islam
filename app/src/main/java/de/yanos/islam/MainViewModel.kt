@@ -5,7 +5,6 @@ import android.content.Context
 import android.location.Geocoder
 import android.media.MediaPlayer
 import androidx.annotation.RawRes
-import androidx.compose.material3.Typography
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -17,7 +16,6 @@ import androidx.media3.session.MediaController
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import de.yanos.core.utils.IODispatcher
@@ -34,7 +32,6 @@ import de.yanos.islam.service.DailyScheduleWorker
 import de.yanos.islam.util.AppSettings
 import de.yanos.islam.util.getCurrentLocation
 import de.yanos.islam.util.hasLocationPermission
-import de.yanos.islam.util.typoByConfig
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -59,7 +56,6 @@ class MainViewModel @Inject constructor(
     val appSettings: AppSettings,
     private val awqatRepository: AwqatRepository,
     @ApplicationContext private val context: Context,
-    private val controllerFuture: ListenableFuture<MediaController>,
     private val db: IslamDatabase,
     @IODispatcher private val dispatcher: CoroutineDispatcher,
     private val geocoder: Geocoder,
@@ -67,16 +63,11 @@ class MainViewModel @Inject constructor(
     @AzanPlayer private val mediaPlayer: MediaPlayer,
     private val workManager: WorkManager
 ) : ViewModel() {
-    var typo: Typography? by mutableStateOf(null)
     var isReady: Boolean by mutableStateOf(false)
     private var timer: Timer? = null
     private var controller: MediaController? = null
 
     init {
-        viewModelScope.launch(dispatcher) {
-            typo = typoByConfig(appSettings)
-        }
-
         viewModelScope.launch {
             while (controller == null)
                 delay(100)
