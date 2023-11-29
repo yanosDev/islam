@@ -4,12 +4,10 @@ package de.yanos.islam
 
 import android.Manifest
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
@@ -50,7 +48,6 @@ import de.yanos.islam.util.typoByConfig
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val vm: MainViewModel by viewModels()
@@ -94,7 +91,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 private fun IslamNavHost(
     modifier: Modifier = Modifier,

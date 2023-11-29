@@ -77,7 +77,7 @@ class VideoWorker @AssistedInject constructor(
     private suspend fun extractVideo(it: String, index: Int, yt: YTExtractor): VideoLearning? {
         yt.extract(it)
         if (yt.state != State.SUCCESS) return null
-        return safeLet(yt.getYTFiles()?.get(18), yt.getVideoMeta()) { file, meta ->
+        return safeLet(yt.getYTFiles()?.get(22), yt.getVideoMeta()) { file, meta ->
             VideoLearning(
                 id = meta.videoId ?: UUID.randomUUID().toString(),
                 index = index,

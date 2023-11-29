@@ -7,7 +7,6 @@ import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -205,12 +204,15 @@ fun hasLocationPermission(context: Context): Boolean {
 }
 
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 fun hasNotificationPermission(context: Context): Boolean {
-    return ContextCompat.checkSelfPermission(
-        context,
-        Manifest.permission.POST_NOTIFICATIONS
-    ) == PackageManager.PERMISSION_GRANTED
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.POST_NOTIFICATIONS
+        ) == PackageManager.PERMISSION_GRANTED
+    } else {
+        true
+    }
 }
 
 
@@ -260,6 +262,7 @@ fun Long.humanReadableByteCountSI(): String {
     }
     return String.format("%.1f %cB", bytes / 1000.0, ci.current())
 }
+
 fun Context.setScreenOrientation(orientation: Int) {
     val activity = this.findActivity() ?: return
     activity.requestedOrientation = orientation
@@ -269,6 +272,7 @@ fun Context.setScreenOrientation(orientation: Int) {
         showSystemUi()
     }
 }
+
 fun Context.hideSystemUi() {
     val activity = this.findActivity() ?: return
     val window = activity.window ?: return
@@ -296,4 +300,3 @@ inline fun <T1 : Any, T2 : Any, R : Any> safeLet(p1: T1?, p2: T2?, block: (T1, T
 inline fun <T1 : Any, T2 : Any, T3 : Any, R : Any> safeLet(p1: T1?, p2: T2?, p3: T3?, block: (T1, T2, T3) -> R?): R? {
     return if (p1 != null && p2 != null && p3 != null) block(p1, p2, p3) else null
 }
-
