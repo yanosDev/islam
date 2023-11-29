@@ -49,10 +49,14 @@ class VideoWorker @AssistedInject constructor(
                 val yt = YTExtractor(con = applicationContext, CACHING = false, LOGGING = true, retryCount = 3)
                 basics.mapIndexedNotNull { index, s ->
                     extractVideo(s, index, yt)
-                }.let(dao::insert)
+                }.let {
+                    dao.insertImmediate(it)
+                }
                 tecvids.mapIndexedNotNull { index, s ->
                     extractVideo(s, index + basics.size, yt)
-                }.let(dao::insert)
+                }.let {
+                    dao.insertImmediate(it)
+                }
             }
             val currentList = dao.loadAll()
             if (currentList.isEmpty())
@@ -82,7 +86,7 @@ class VideoWorker @AssistedInject constructor(
                 id = meta.videoId ?: UUID.randomUUID().toString(),
                 index = index,
                 remoteUrl = file.url ?: "",
-                thumbRemoteUrl = meta.thumbUrl,
+                thumbRemoteUrl = meta.thumbUrl.replace("http:", "https:"),
                 title = meta.title ?: "",
                 description = meta.shortDescription ?: "",
                 author = meta.author ?: ""
