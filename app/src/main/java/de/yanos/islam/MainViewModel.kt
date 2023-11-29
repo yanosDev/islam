@@ -34,21 +34,32 @@ class MainViewModel @Inject constructor(
     private val quranRepository: QuranRepository,
 ) : ViewModel() {
 
+    private var isPrefetchDone = false
+
     init {
         viewModelScope.launch(dispatcher) {
-            if (!appSettings.isDBInitialized) {
-                listOf(
-                    async {
+            var creationDone = false
+            var locationDone = false
+            var quranDone = false
+            listOf(
+                async {
+                    if (appSettings.isDBInitialized) {
                         db.create(context)
-                    },
-                    async { awqatRepository.fetchAwqatLocationIndependentData() },
-                    async {
-                        if (!quranRepository.isWholeQuranFetched())
-                            quranRepository.fetchQuran()
+                        appSettings.isDBInitialized = true
                     }
-                ).awaitAll()
-                appSettings.isDBInitialized = true
-            }
+                    creationDone = true
+                },
+                async {
+                    awqatRepository.fetchAwqatLocationIndependentData()
+                    locationDone = true
+                },
+                async {
+                    if (!quranRepository.isWholeQuranFetched())
+                        quranRepository.fetchQuran()
+                    quranDone = true
+                }
+            ).awaitAll()
+            isPrefetchDone = creationDone && locationDone && quranDone
         }
     }
 
