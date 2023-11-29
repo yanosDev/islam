@@ -17,7 +17,6 @@ import javax.inject.Inject
 interface LocalQuranSource {
     suspend fun isQuranLoaded(): Boolean
     suspend fun insertSure(sure: Surah, ayahs: List<Ayah>)
-    suspend fun saveLocalAudio(id: Int, localAudio: String)
 
     suspend fun loadAyahById(ayahId: Int): Ayah?
     suspend fun loadFirstAyahBySurahId(surahId: Int): Ayah?
@@ -40,12 +39,6 @@ class LocalQuranSourceImpl @Inject constructor(
     override suspend fun insertSure(sure: Surah, ayahs: List<Ayah>) {
         withContext(dispatcher) {
             dao.insertSure(sure, ayahs)
-        }
-    }
-
-    override suspend fun saveLocalAudio(id: Int, localAudio: String) {
-        withContext(dispatcher) {
-            dao.updateLocalAudio(id, localAudio)
         }
     }
 

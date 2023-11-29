@@ -120,7 +120,7 @@ fun LearnItem(learning: VideoLearning, isCurrentlySelected: Boolean, playItem: (
         Column(
             modifier = Modifier
                 .wrapContentHeight()
-                .padding(vertical = 8.dp), verticalArrangement = Arrangement.SpaceEvenly
+                .padding(vertical = 8.dp, horizontal = 4.dp), verticalArrangement = Arrangement.SpaceEvenly
         ) {
             Text(modifier = Modifier.fillMaxWidth(), text = learning.title, style = MaterialTheme.typography.labelMedium)
             //Text(text = learning.subTitle)
