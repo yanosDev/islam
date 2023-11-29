@@ -41,9 +41,6 @@ interface QuranDao : BaseDao<Ayah> {
     @Query("SELECT * FROM Ayah ORDER BY id")
     fun ayahList(): List<Ayah>
 
-    @Query("UPDATE Ayah SET localAudio = :localAudio WHERE id = :id")
-    fun updateLocalAudio(id: Int, localAudio: String)
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSure(surah: Surah)
 

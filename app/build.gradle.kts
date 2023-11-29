@@ -1,4 +1,5 @@
 @file:Suppress("UnstableApiUsage")
+
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
 @Suppress("DSL_SCOPE_VIOLATION")
@@ -62,7 +63,9 @@ dependencies {
     implementation(libs.androidx.compose.materialWindow)
     implementation(libs.androidx.compose.material.iconsExtended)
     implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.coil.kt.compose)
     debugImplementation(libs.androidx.compose.ui.tooling)
+    debugImplementation(libs.leak.canary)
     androidTestImplementation(composeBom)
 
     //DI
@@ -97,14 +100,14 @@ dependencies {
     implementation(libs.androidx.media3.ui)
     implementation(libs.androidx.media3.session)
     implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.yt.extractor)
 
     //Service
     implementation(libs.work)
 
     //OpenAI
-    implementation(platform("com.aallam.openai:openai-client-bom:3.5.0"))
-    implementation("com.aallam.openai:openai-client")
-    implementation("io.ktor:ktor-client-okhttp")
-
-    implementation("com.github.maxrave-dev:kotlin-youtubeExtractor:0.0.7")
+    val aiBom = platform(libs.open.ai.bom)
+    implementation(aiBom)
+    implementation(libs.open.ai)
+    implementation(libs.ktor.client)
 }

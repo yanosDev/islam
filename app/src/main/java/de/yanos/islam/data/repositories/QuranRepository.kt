@@ -61,8 +61,6 @@ class QuranRepositoryImpl @Inject constructor(
                         sureName = surahAudio.englishName,
                         number = ayahAudio.number,
                         audio = ayahAudio.audio,
-                        audioMore = ayahAudio.audioSecondary.firstOrNull(),
-                        localAudio = null,
                         text = ayahAudio.text,
                         translationTr = translationSurah?.ayahs?.get(index)?.text ?: "",
                         transliterationEn = transliterationSurah?.ayahs?.get(index)?.text ?: "",

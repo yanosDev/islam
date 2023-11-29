@@ -9,7 +9,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -44,7 +43,6 @@ import de.yanos.islam.util.titleSmall
 
 
 @SuppressLint("UnrememberedMutableState")
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun InitScreen(
     modifier: Modifier = Modifier,
@@ -67,7 +65,6 @@ fun InitScreen(
     )
 }
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun InitContent(
     modifier: Modifier,
@@ -119,12 +116,15 @@ fun InitContent(
             )
         }
         AnimatedVisibility(visible = showNotificationPermission) {
-            NotificationPermission(onPermissionDenied = {
-                if (!activity.shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS))
-                    activity.startActivity(intent)
-                onShowNotificationPermissionClick(false)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                NotificationPermission(
+                    onPermissionDenied = {
+                        if (!activity.shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS))
+                            activity.startActivity(intent)
+                        onShowNotificationPermissionClick(false)
+                    }
+                )
             }
-            )
         }
     }
 }

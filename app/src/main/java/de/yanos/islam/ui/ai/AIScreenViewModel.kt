@@ -45,7 +45,7 @@ class AIScreenViewModel @Inject constructor(
                 Timber.e(e)
                 listOf("Malesef yardimci olamicam")
             }
-            botDao.insert(BotReply(question = text, replies = completion, ts = System.currentTimeMillis()))
+            botDao.insert(BotReply(question = text, replies = completion.flatMap { it.split("\n\n").reversed() }.map { it.trim() }, ts = System.currentTimeMillis()))
             withContext(mainDispatcher) {
                 requestInProgress = false
             }

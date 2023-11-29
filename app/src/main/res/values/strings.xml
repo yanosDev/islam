@@ -115,4 +115,5 @@
 
     <string name="ai_title">Bot </string>
     <string name="ai_description">Burdaki alinan bilgilerin tümü Open Ai den geliyor. Tek kaynak olarak kullanmayiniz. Sorularinizla ilk firsat da bir Hoca ya danismaniz iyi olur!!!</string>
+    <string name="ai_placeholder">Sorunuz veyatta isteginizi buraya yazin</string>
 </resources>
