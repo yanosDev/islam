@@ -1,12 +1,15 @@
 package de.yanos.islam.data.repositories.source
 
 import de.yanos.core.utils.IODispatcher
+import de.yanos.islam.data.database.dao.BookmarkDao
 import de.yanos.islam.data.database.dao.QuranDao
 import de.yanos.islam.data.database.dao.VideoDao
+import de.yanos.islam.data.model.Bookmark
 import de.yanos.islam.data.model.VideoLearning
 import de.yanos.islam.data.model.quran.Ayah
 import de.yanos.islam.data.model.quran.Page
 import de.yanos.islam.data.model.quran.Surah
+import de.yanos.islam.util.Constants
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -25,15 +28,19 @@ interface LocalQuranSource {
 
     fun loadPages(): Flow<List<Page>>
     fun loadAyahs(): Flow<List<Ayah>>
-    fun subscribeSurahAyahs(id: Int): Flow<List<Ayah>>
+    fun loadBookmarks(): Flow<List<Bookmark>>
+    fun loadSurahAyahs(id: Int): Flow<List<Ayah>>
+
     suspend fun sureList(): List<Surah>
     suspend fun ayahList(): List<Ayah>
     suspend fun learningList(): List<VideoLearning>
+    suspend fun createBookmark(bookmark: Bookmark)
 }
 
 class LocalQuranSourceImpl @Inject constructor(
     @IODispatcher private val dispatcher: CoroutineDispatcher,
     private val dao: QuranDao,
+    private val bookmarkDao: BookmarkDao,
     private val videoDao: VideoDao
 ) : LocalQuranSource {
     override suspend fun insertSure(sure: Surah, ayahs: List<Ayah>) {
@@ -84,7 +91,11 @@ class LocalQuranSourceImpl @Inject constructor(
         return dao.subscribeAyahs()
     }
 
-    override fun subscribeSurahAyahs(id: Int): Flow<List<Ayah>> {
+    override fun loadBookmarks(): Flow<List<Bookmark>> {
+        return bookmarkDao.loadBookmarks()
+    }
+
+    override fun loadSurahAyahs(id: Int): Flow<List<Ayah>> {
         return dao.subsribeSurahAyahs(id)
     }
 
@@ -104,8 +115,14 @@ class LocalQuranSourceImpl @Inject constructor(
         return withContext(dispatcher) { videoDao.loadAll() }
     }
 
+    override suspend fun createBookmark(bookmark: Bookmark) {
+        withContext(dispatcher) {
+            bookmarkDao.insert(bookmark)
+        }
+    }
+
     override suspend fun isQuranLoaded(): Boolean {
-        return withContext(dispatcher) { dao.ayahSize() == 6236 }
+        return withContext(dispatcher) { dao.ayahSize() == Constants.AYAH_TOTAL }
     }
 
 }

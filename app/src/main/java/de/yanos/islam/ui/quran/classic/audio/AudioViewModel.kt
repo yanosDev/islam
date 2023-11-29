@@ -28,7 +28,8 @@ open class AudioViewModel(
     private val appContainer: AppContainer,
     private val repository: QuranRepository,
 ) : ViewModel() {
-    var showDetailSheet by mutableStateOf(false)
+    var showAyahDetails by mutableStateOf(false)
+    var showQuickMenu by mutableStateOf(false)
     var referenceAyah by mutableStateOf<Ayah?>(null)
 
     var progress by mutableFloatStateOf(0F)
@@ -55,7 +56,7 @@ open class AudioViewModel(
         }
     }
 
-    fun onSelectionChange(selection: QuranSelection) {
+    fun onSelectionChange(selection: QuranSelection, triggerDetailSheet: Boolean = true) {
         viewModelScope.launch {
             when (selection) {
                 is AyahSelection -> repository.loadAyahById(selection.ayahId)
@@ -69,8 +70,9 @@ open class AudioViewModel(
                     controller?.seekTo(ayah.id - 1, 0)
                 }
             }
-            showDetailSheet = referenceAyah != null
-            if (showDetailSheet)
+            if (triggerDetailSheet)
+                showAyahDetails = referenceAyah != null
+            if (showAyahDetails)
                 startTimer()
         }
     }
@@ -128,7 +130,7 @@ open class AudioViewModel(
                     is AudioEvents.CloseAudio -> {
                         stopTimer()
                         progress = 0F
-                        showDetailSheet = false
+                        showAyahDetails = false
                     }
                 }
             }

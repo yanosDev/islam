@@ -2,9 +2,9 @@
 
 package de.yanos.islam.data.repositories
 
-import android.content.Context
 import androidx.media3.common.util.UnstableApi
-import dagger.hilt.android.qualifiers.ApplicationContext
+import de.yanos.islam.data.model.Bookmark
+import de.yanos.islam.data.model.BookmarkType
 import de.yanos.islam.data.model.quran.Ayah
 import de.yanos.islam.data.model.quran.Page
 import de.yanos.islam.data.model.quran.Surah
@@ -19,6 +19,7 @@ interface QuranRepository {
     suspend fun fetchQuran()
     fun loadPages(): Flow<List<Page>>
     fun loadAyahs(): Flow<List<Ayah>>
+    fun loadBookmarks(): Flow<List<Bookmark>>
     fun subscribeSurahAyahs(id: Int): Flow<List<Ayah>>
     suspend fun loadAyahById(ayahId: Int): Ayah?
     suspend fun loadFirstAyahBySurahId(surahId: Int): Ayah?
@@ -28,10 +29,10 @@ interface QuranRepository {
     suspend fun loadAllAyahAudio()
     suspend fun loadAllLearningVideos()
     suspend fun sureList(): List<Surah>
+    suspend fun createBookmarkByPage(page: Page)
 }
 
 class QuranRepositoryImpl @Inject constructor(
-    @ApplicationContext private val context: Context,
     private val local: LocalQuranSource,
     private val remote: RemoteQuranSource
 ) : QuranRepository {
@@ -81,6 +82,10 @@ class QuranRepositoryImpl @Inject constructor(
         return local.loadAyahs()
     }
 
+    override fun loadBookmarks(): Flow<List<Bookmark>> {
+        return local.loadBookmarks()
+    }
+
     override suspend fun loadFirstAyahBySurahId(surahId: Int): Ayah? {
         return local.loadFirstAyahBySurahId(surahId)
     }
@@ -110,11 +115,16 @@ class QuranRepositoryImpl @Inject constructor(
     }
 
     override fun subscribeSurahAyahs(id: Int): Flow<List<Ayah>> {
-        return local.subscribeSurahAyahs(id)
+        return local.loadSurahAyahs(id)
     }
 
     override suspend fun sureList(): List<Surah> {
         return local.sureList()
+    }
+
+    override suspend fun createBookmarkByPage(page: Page) {
+        local.createBookmark(Bookmark(nr = page.page, type = BookmarkType.PageType))
+        local.createBookmark(Bookmark(nr = page.ayahs.first().juz, type = BookmarkType.JuzType))
     }
 
     override suspend fun loadAyahById(ayahId: Int): Ayah? {

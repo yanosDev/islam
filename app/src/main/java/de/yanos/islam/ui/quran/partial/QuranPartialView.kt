@@ -136,7 +136,7 @@ fun QuranPartialScreen(
                 onDispose { }
             }
             AyetList(modifier = Modifier.weight(1f), state = state, sure = vm.surah, typo = typo, onAyahChanged = { vm.onSelectionChange(AyahSelection(it.id)) })
-            if (vm.showDetailSheet)
+            if (vm.showAyahDetails)
                 AyahDetailBottomSheet(
                     modifier = modifier,
                     typo = typo,

@@ -19,6 +19,7 @@ import de.yanos.islam.data.database.dao.QuranDao
 import de.yanos.islam.data.model.quran.Ayah
 import de.yanos.islam.util.AppContainer
 import de.yanos.islam.util.AppSettings
+import de.yanos.islam.util.Constants
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -36,26 +37,21 @@ class AudioWorker @AssistedInject constructor(
     private val controller get() = appContainer.audioController
     override suspend fun doWork(): Result {
         return withContext(dispatcher) {
-            while (controller == null)
+            while (controller == null || dao.ayahSize() != Constants.AYAH_TOTAL)
                 delay(1000L)
 
-            if (dao.ayahSize() != 6236) {
-                delay(5000)
-                Result.retry()
-            } else {
-                val items = dao.ayahList().map {
-                    it.toMedia(applicationContext)
-                }
-                withContext(mainDispatcher) {
-                    items.groupBy { it.mediaId.toInt() / 100 }.forEach { (_, subItems) ->
-                        controller?.addMediaItems(subItems)
-                        delay(100)
-                    }
-                    controller?.seekTo(appSettings.lastPlayedAyahIndex, 0)
-                    controller?.prepare()
-                }
-                Result.success()
+            val items = dao.ayahList().map {
+                it.toMedia(applicationContext)
             }
+            withContext(mainDispatcher) {
+                items.groupBy { it.mediaId.toInt() / 100 }.forEach { (_, subItems) ->
+                    controller?.addMediaItems(subItems)
+                    delay(100)
+                }
+                controller?.seekTo(appSettings.lastPlayedAyahIndex, 0)
+                controller?.prepare()
+            }
+            Result.success()
         }
     }
 }
@@ -73,6 +69,7 @@ fun Ayah.toMedia(context: Context) = MediaItem.Builder()
     .setUri(audio)
     .setMediaMetadata(
         MediaMetadata.Builder()
+            .setDescription(Constants.AUDIO)
             .setTitle(
                 context.getString(R.string.sure_list_page, page.toString())
                         + ", "

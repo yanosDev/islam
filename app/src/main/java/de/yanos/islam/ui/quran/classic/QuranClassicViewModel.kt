@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.yanos.core.utils.IODispatcher
+import de.yanos.islam.data.model.Bookmark
 import de.yanos.islam.data.model.quran.Page
 import de.yanos.islam.data.repositories.QuranRepository
 import de.yanos.islam.ui.quran.classic.audio.AudioViewModel
@@ -28,7 +29,7 @@ class QuranClassicViewModel @Inject constructor(
     var pages = mutableStateListOf<Page>()
     val quranStyle get() = appSettings.quranStyle
     val quranSizeFactor get() = appSettings.quranSizeFactor
-
+    val quickMarks = repository.loadBookmarks()
 
     init {
         viewModelScope.launch(dispatcher) {
@@ -36,8 +37,15 @@ class QuranClassicViewModel @Inject constructor(
                 withContext(Dispatchers.Main) {
                     pages.clear()
                     pages.addAll(it)
+                    referenceAyah = pages.flatMap { it.ayahs }.first { it.id == appSettings.lastPlayedAyahIndex + 1 }
                 }
             }
+        }
+    }
+
+    fun createBookmark(page: Page) {
+        viewModelScope.launch {
+            repository.createBookmarkByPage(page)
         }
     }
 }
@@ -47,12 +55,13 @@ data class AyahSelection(val ayahId: Int) : QuranSelection
 data class SurahSelection(val surahId: Int) : QuranSelection
 data class PageSelection(val page: Int) : QuranSelection
 data class JuzSelection(val juz: Int) : QuranSelection
+data class BookmarkSelection(val mark: Bookmark) : QuranSelection
 
 sealed interface AudioEvents {
-    object PlayAudio : AudioEvents
-    object PauseAudio : AudioEvents
-    object CloseAudio : AudioEvents
-    object PlayPrevious : AudioEvents
-    object PlayNext : AudioEvents
+    data object PlayAudio : AudioEvents
+    data object PauseAudio : AudioEvents
+    data object CloseAudio : AudioEvents
+    data object PlayPrevious : AudioEvents
+    data object PlayNext : AudioEvents
     data class UpdateProgress(val newProgress: Float) : AudioEvents
 }

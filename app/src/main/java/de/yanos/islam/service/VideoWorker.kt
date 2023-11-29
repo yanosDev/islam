@@ -22,6 +22,7 @@ import de.yanos.islam.data.database.dao.VideoDao
 import de.yanos.islam.data.model.VideoLearning
 import de.yanos.islam.util.AppContainer
 import de.yanos.islam.util.AppSettings
+import de.yanos.islam.util.Constants
 import de.yanos.islam.util.safeLet
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
@@ -45,7 +46,7 @@ class VideoWorker @AssistedInject constructor(
             while (controller == null)
                 delay(1000)
 
-            if (dao.loadAll().isEmpty()) {
+            if (dao.loadAll().size < Constants.LEARNINGS_MAX) {
                 val yt = YTExtractor(con = applicationContext, CACHING = false, LOGGING = true, retryCount = 3)
                 basics.mapIndexedNotNull { index, s ->
                     extractVideo(s, index, yt)
@@ -128,6 +129,7 @@ fun VideoLearning.toMedia() = MediaItem.Builder()
     .setUri(Uri.parse(remoteUrl))
     .setMediaMetadata(
         MediaMetadata.Builder()
+            .setDescription(Constants.VIDEO)
             .setArtworkUri(Uri.parse(thumbRemoteUrl))
             .setTitle(title)
             .setSubtitle(description)

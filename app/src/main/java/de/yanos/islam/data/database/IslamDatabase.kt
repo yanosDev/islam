@@ -6,6 +6,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import de.yanos.islam.data.database.dao.AwqatDao
+import de.yanos.islam.data.database.dao.BookmarkDao
 import de.yanos.islam.data.database.dao.BotDao
 import de.yanos.islam.data.database.dao.ChallengeDao
 import de.yanos.islam.data.database.dao.QuizDao
@@ -13,6 +14,7 @@ import de.yanos.islam.data.database.dao.QuranDao
 import de.yanos.islam.data.database.dao.SearchDao
 import de.yanos.islam.data.database.dao.TopicDao
 import de.yanos.islam.data.database.dao.VideoDao
+import de.yanos.islam.data.model.Bookmark
 import de.yanos.islam.data.model.BotReply
 import de.yanos.islam.data.model.Challenge
 import de.yanos.islam.data.model.Degree
@@ -43,6 +45,7 @@ interface IslamDatabase {
     fun searchDao(): SearchDao
     fun videoDao(): VideoDao
     fun botDao(): BotDao
+    fun bookmarkDao(): BookmarkDao
     suspend fun create(context: Context)
 }
 
@@ -63,9 +66,10 @@ interface IslamDatabase {
         Surah::class,
         Ayah::class,
         VideoLearning::class,
-        BotReply::class
+        BotReply::class,
+        Bookmark::class
     ],
-    version = 1
+    version = 2
 )
 internal abstract class IslamDatabaseImpl : IslamDatabase, RoomDatabase() {
     abstract override fun topicDao(): TopicDao
@@ -76,6 +80,7 @@ internal abstract class IslamDatabaseImpl : IslamDatabase, RoomDatabase() {
     abstract override fun quranDao(): QuranDao
     abstract override fun videoDao(): VideoDao
     abstract override fun botDao(): BotDao
+    abstract override fun bookmarkDao(): BookmarkDao
 
     override suspend fun create(context: Context) {
         TopicResource.values().forEach { topic ->

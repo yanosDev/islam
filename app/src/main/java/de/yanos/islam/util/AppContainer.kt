@@ -28,7 +28,8 @@ class AppContainer @Inject constructor(
             audioController?.addListener(object : Player.Listener {
                 override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                     super.onMediaItemTransition(mediaItem, reason)
-                    if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_SEEK)
+
+                    if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_SEEK && mediaItem?.mediaMetadata?.description == Constants.AUDIO)
                         appSettings.lastPlayedAyahIndex = audioController?.currentMediaItemIndex ?: 0
                 }
             })
@@ -38,7 +39,7 @@ class AppContainer @Inject constructor(
             videoController?.addListener(object : Player.Listener {
                 override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                     super.onMediaItemTransition(mediaItem, reason)
-                    if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_SEEK)
+                    if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_SEEK && mediaItem?.mediaMetadata?.description == Constants.VIDEO)
                         appSettings.lastPlayedLearningIndex = videoController?.currentMediaItemIndex ?: 0
 
                 }

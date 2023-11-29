@@ -62,6 +62,7 @@ import de.yanos.islam.service.ExoLearningCallback
 import de.yanos.islam.service.ExoVideoPlaybackService
 import de.yanos.islam.util.AppContainer
 import de.yanos.islam.util.Constants
+import de.yanos.islam.util.Migrations
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
@@ -145,6 +146,9 @@ internal class AppModule {
     @Singleton
     fun provideDB(@ApplicationContext context: Context): IslamDatabase {
         return Room.databaseBuilder(context, IslamDatabaseImpl::class.java, "islam_db")
+            .addMigrations(
+                Migrations.MIGRATION_1_2
+            )
             .fallbackToDestructiveMigration()
             .build()
     }
@@ -167,6 +171,10 @@ internal class AppModule {
     @Provides
     @Singleton
     fun provideTopicDao(db: IslamDatabase) = db.topicDao()
+
+    @Provides
+    @Singleton
+    fun provideBookmarkDao(db: IslamDatabase) = db.bookmarkDao()
 
     @Provides
     @Singleton
