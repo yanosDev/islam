@@ -7,13 +7,10 @@ import de.yanos.islam.data.database.dao.VideoDao
 import de.yanos.islam.data.model.QuranBookmark
 import de.yanos.islam.data.model.VideoLearning
 import de.yanos.islam.data.model.quran.Ayah
-import de.yanos.islam.data.model.quran.Page
 import de.yanos.islam.data.model.quran.Surah
 import de.yanos.islam.util.Constants
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -26,7 +23,6 @@ interface LocalQuranSource {
     suspend fun loadFirstAyahByPageId(pageId: Int): Ayah?
     suspend fun loadFirstAyahByJuz(juz: Int): Ayah?
 
-    fun loadPages(): Flow<List<Page>>
     fun loadAyahs(): Flow<List<Ayah>>
     fun loadBookmarks(): Flow<List<QuranBookmark>>
     fun loadSurahAyahs(id: Int): Flow<List<Ayah>>
@@ -71,20 +67,6 @@ class LocalQuranSourceImpl @Inject constructor(
     override suspend fun loadFirstAyahByJuz(juz: Int): Ayah? {
         return withContext(dispatcher) {
             dao.loadFirstAyahByJuz(juz)
-        }
-    }
-
-    override fun loadPages(): Flow<List<Page>> {
-        return combine(flow {
-            emit(withContext(dispatcher) {
-                dao.sureList()
-            })
-        }, dao.subscribeAyahs()) { surahs, ayahs ->
-            ayahs.groupBy { it.page }.map {
-                surahs.find { surah -> surah.id == it.value.first().sureId }?.let { surah ->
-                    Page(it.key, surah.name, surah.id, it.value)
-                }
-            }.filterNotNull()
         }
     }
 

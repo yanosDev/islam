@@ -25,4 +25,9 @@ object Migrations {
             )
         }
     }
+    val MIGRATION_4_5: Migration = object : Migration(4, 5) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE `QuranBookmark` ADD COLUMN ayahId INTEGER NOT NULL DEFAULT 0")
+        }
+    }
 }

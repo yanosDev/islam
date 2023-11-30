@@ -13,6 +13,7 @@ import de.yanos.islam.data.model.quran.Ayah
 import de.yanos.islam.data.repositories.QuranRepository
 import de.yanos.islam.ui.quran.classic.AudioEvents
 import de.yanos.islam.ui.quran.classic.AyahSelection
+import de.yanos.islam.ui.quran.classic.BookmarkSelection
 import de.yanos.islam.ui.quran.classic.JuzSelection
 import de.yanos.islam.ui.quran.classic.PageSelection
 import de.yanos.islam.ui.quran.classic.QuranSelection
@@ -53,6 +54,7 @@ open class AudioViewModel(
             while (controller == null)
                 delay(1000)
             controller?.addListener(controllerListener)
+            refreshData()
         }
     }
 
@@ -63,6 +65,7 @@ open class AudioViewModel(
                 is SurahSelection -> repository.loadFirstAyahBySurahId(selection.surahId)
                 is PageSelection -> repository.loadFirstAyahByPageId(selection.page)
                 is JuzSelection -> repository.loadFirstAyahByJuz(selection.juz)
+                is BookmarkSelection -> repository.loadFirstAyahByPageId(selection.mark.ayahId)
                 else -> null
             }?.let { ayah ->
                 if (ayah != referenceAyah) {

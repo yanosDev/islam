@@ -29,8 +29,8 @@ class AppContainer @Inject constructor(
                 override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                     super.onMediaItemTransition(mediaItem, reason)
 
-                    if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_SEEK && mediaItem?.mediaMetadata?.description == Constants.AUDIO && audioController?.mediaItemCount == Constants.AYAH_TOTAL)
-                        appSettings.lastPlayedAyahIndex = audioController?.currentMediaItemIndex ?: 0
+                    /*                 if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_SEEK && mediaItem?.mediaMetadata?.description == Constants.AUDIO && audioController?.mediaItemCount == Constants.AYAH_TOTAL)
+                                         appSettings.lastPlayedAyahIndex = audioController?.currentMediaItemIndex ?: 0*/
                 }
             })
         }, dispatcher.asExecutor())
@@ -39,8 +39,8 @@ class AppContainer @Inject constructor(
             videoController?.addListener(object : Player.Listener {
                 override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                     super.onMediaItemTransition(mediaItem, reason)
-                    if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_SEEK && mediaItem?.mediaMetadata?.description == Constants.VIDEO && audioController?.mediaItemCount == Constants.LEARNINGS_MAX)
-                        appSettings.lastPlayedLearningIndex = videoController?.currentMediaItemIndex ?: 0
+                    /*                    if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_SEEK && mediaItem?.mediaMetadata?.description == Constants.VIDEO && audioController?.mediaItemCount == Constants.LEARNINGS_MAX)
+                                            appSettings.lastPlayedLearningIndex = videoController?.currentMediaItemIndex ?: 0*/
 
                 }
             })

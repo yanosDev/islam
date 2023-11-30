@@ -22,6 +22,7 @@ interface AppSettings {
     var sortByOrdinal: Int
     var lastPlayedAyahIndex: Int
     var lastPlayedLearningIndex: Int
+    var lastOpenPage: Int
 }
 
 class AppSettingsImpl @Inject constructor(@ApplicationContext context: Context) : AppSettings {
@@ -41,4 +42,5 @@ class AppSettingsImpl @Inject constructor(@ApplicationContext context: Context) 
     override var sortByOrdinal: Int by PreferenceItem<Int>(context) { 0 }
     override var lastPlayedAyahIndex: Int by PreferenceItem<Int>(context) { 0 }
     override var lastPlayedLearningIndex: Int by PreferenceItem<Int>(context) { 0 }
+    override var lastOpenPage: Int by PreferenceItem<Int>(context) { 0 }
 }

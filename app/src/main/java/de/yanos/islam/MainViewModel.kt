@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import de.yanos.core.utils.IODispatcher
-import de.yanos.core.utils.MainDispatcher
 import de.yanos.islam.data.database.IslamDatabase
 import de.yanos.islam.data.repositories.AwqatRepository
 import de.yanos.islam.data.repositories.QuranRepository
@@ -29,7 +28,6 @@ class MainViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val db: IslamDatabase,
     @IODispatcher private val dispatcher: CoroutineDispatcher,
-    @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
     private val geocoder: Geocoder,
     private val quranRepository: QuranRepository,
 ) : ViewModel() {
@@ -54,7 +52,7 @@ class MainViewModel @Inject constructor(
                     locationDone = true
                 },
                 async {
-//                    if (!quranRepository.isWholeQuranFetched())
+                    if (!quranRepository.isWholeQuranFetched())
                         quranRepository.fetchQuran()
                     quranDone = true
                 }

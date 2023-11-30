@@ -7,6 +7,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class BookmarkDao : BaseDao<QuranBookmark> {
-    @Query("SELECT * FROM QuranBookmark ORDER BY id DESC")
+    @Query("SELECT * FROM QuranBookmark ORDER BY id DESC LIMIT 3")
     abstract fun loadBookmarks(): Flow<List<QuranBookmark>>
 }

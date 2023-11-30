@@ -11,4 +11,5 @@ data class QuranBookmark(
     val juz: Int,
     val surahName: String,
     val ayah: Int,
+    val ayahId: Int,
 )

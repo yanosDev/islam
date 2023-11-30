@@ -1,5 +1,7 @@
 package de.yanos.islam.ui.quran.classic
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,14 +29,18 @@ class QuranClassicViewModel @Inject constructor(
     val quranStyle get() = appSettings.quranStyle
     val quranSizeFactor get() = appSettings.quranSizeFactor
     val quickMarks = repository.loadBookmarks()
+    val initPage by mutableIntStateOf(appSettings.lastOpenPage)
 
     init {
         viewModelScope.launch(dispatcher) {
-            repository.loadPages().collect {
-                withContext(Dispatchers.Main) {
-                    pages.clear()
-                    pages.addAll(it)
-                    referenceAyah = pages.flatMap { it.ayahs }.first { it.id == appSettings.lastPlayedAyahIndex + 1 }
+            repository.loadAyahs().collect { ayahs ->
+                ayahs.groupBy { it.page }.map {
+                    Page(it.key, it.value.first().sureName, it.value.first().sureId, it.value)
+                }.let {
+                    withContext(Dispatchers.Main) {
+                        pages.clear()
+                        pages.addAll(it)
+                    }
                 }
             }
         }
@@ -44,6 +50,10 @@ class QuranClassicViewModel @Inject constructor(
         viewModelScope.launch {
             repository.createBookmarkByPage(page, referenceAyah)
         }
+    }
+
+    fun updateCurrentPage(page: Int) {
+        appSettings.lastOpenPage = page
     }
 }
 

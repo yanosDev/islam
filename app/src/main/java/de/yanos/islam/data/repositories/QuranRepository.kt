@@ -16,7 +16,6 @@ import javax.inject.Inject
 interface QuranRepository {
     suspend fun isWholeQuranFetched(): Boolean
     suspend fun fetchQuran()
-    fun loadPages(): Flow<List<Page>>
     fun loadAyahs(): Flow<List<Ayah>>
     fun loadBookmarks(): Flow<List<QuranBookmark>>
     fun subscribeSurahAyahs(id: Int): Flow<List<Ayah>>
@@ -76,10 +75,6 @@ class QuranRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun loadPages(): Flow<List<Page>> {
-        return local.loadPages()
-    }
-
     override fun loadAyahs(): Flow<List<Ayah>> {
         return local.loadAyahs()
     }
@@ -134,7 +129,7 @@ class QuranRepositoryImpl @Inject constructor(
 
     override suspend fun createBookmarkByPage(page: Page, ayah: Ayah?) {
         val ref = ayah.takeIf { it?.page == page.page } ?: page.ayahs.first()
-        local.createBookmark(QuranBookmark(page = ref.page, juz = ref.juz, surahName = ref.sureName, ayah = ref.number))
+        local.createBookmark(QuranBookmark(page = ref.page, juz = ref.juz, surahName = ref.sureName, ayah = ref.number, ayahId = ref.id))
     }
 
     override suspend fun loadAyahById(ayahId: Int): Ayah? {
