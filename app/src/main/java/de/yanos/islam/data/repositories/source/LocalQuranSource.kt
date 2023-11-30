@@ -4,7 +4,7 @@ import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.data.database.dao.BookmarkDao
 import de.yanos.islam.data.database.dao.QuranDao
 import de.yanos.islam.data.database.dao.VideoDao
-import de.yanos.islam.data.model.Bookmark
+import de.yanos.islam.data.model.QuranBookmark
 import de.yanos.islam.data.model.VideoLearning
 import de.yanos.islam.data.model.quran.Ayah
 import de.yanos.islam.data.model.quran.Page
@@ -28,13 +28,14 @@ interface LocalQuranSource {
 
     fun loadPages(): Flow<List<Page>>
     fun loadAyahs(): Flow<List<Ayah>>
-    fun loadBookmarks(): Flow<List<Bookmark>>
+    fun loadBookmarks(): Flow<List<QuranBookmark>>
     fun loadSurahAyahs(id: Int): Flow<List<Ayah>>
 
     suspend fun sureList(): List<Surah>
     suspend fun ayahList(): List<Ayah>
+    suspend fun ayahSize(): Int
     suspend fun learningList(): List<VideoLearning>
-    suspend fun createBookmark(bookmark: Bookmark)
+    suspend fun createBookmark(bookmark: QuranBookmark)
 }
 
 class LocalQuranSourceImpl @Inject constructor(
@@ -91,7 +92,7 @@ class LocalQuranSourceImpl @Inject constructor(
         return dao.subscribeAyahs()
     }
 
-    override fun loadBookmarks(): Flow<List<Bookmark>> {
+    override fun loadBookmarks(): Flow<List<QuranBookmark>> {
         return bookmarkDao.loadBookmarks()
     }
 
@@ -106,16 +107,18 @@ class LocalQuranSourceImpl @Inject constructor(
     }
 
     override suspend fun ayahList(): List<Ayah> {
-        return withContext(dispatcher) {
-            dao.ayahList()
-        }
+        return withContext(dispatcher) { dao.ayahList() }
+    }
+
+    override suspend fun ayahSize(): Int {
+        return withContext(dispatcher) { dao.ayahSize() }
     }
 
     override suspend fun learningList(): List<VideoLearning> {
         return withContext(dispatcher) { videoDao.loadAll() }
     }
 
-    override suspend fun createBookmark(bookmark: Bookmark) {
+    override suspend fun createBookmark(bookmark: QuranBookmark) {
         withContext(dispatcher) {
             bookmarkDao.insert(bookmark)
         }

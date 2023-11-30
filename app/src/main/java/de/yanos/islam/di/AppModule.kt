@@ -146,9 +146,7 @@ internal class AppModule {
     @Singleton
     fun provideDB(@ApplicationContext context: Context): IslamDatabase {
         return Room.databaseBuilder(context, IslamDatabaseImpl::class.java, "islam_db")
-            .addMigrations(
-                Migrations.MIGRATION_1_2
-            )
+            .addMigrations(Migrations.MIGRATION_1_2, Migrations.MIGRATION_2_3, Migrations.MIGRATION_3_4)
             .fallbackToDestructiveMigration()
             .build()
     }
@@ -248,6 +246,7 @@ internal class AppModule {
     ): DownloadManager {
         val manager = DownloadManager(context, dataBase, downloadCache, httpDataSourceFactory, Dispatchers.IO.asExecutor())
         manager.resumeDownloads()
+        manager.minRetryCount = 10
         return manager
     }
 

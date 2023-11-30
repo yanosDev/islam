@@ -145,7 +145,7 @@ sealed class QuranNavigation(override val route: String, override val args: List
     object QuranClassic : QuranNavigation("quran/book") {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
-            QuranClassicScreen(modifier = Modifier.fillMaxSize(), onNavigationChange = onNavigationChange)
+            QuranClassicScreen(modifier = Modifier.fillMaxSize())
         }
     }
 

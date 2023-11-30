@@ -3,8 +3,7 @@
 package de.yanos.islam.data.repositories
 
 import androidx.media3.common.util.UnstableApi
-import de.yanos.islam.data.model.Bookmark
-import de.yanos.islam.data.model.BookmarkType
+import de.yanos.islam.data.model.QuranBookmark
 import de.yanos.islam.data.model.quran.Ayah
 import de.yanos.islam.data.model.quran.Page
 import de.yanos.islam.data.model.quran.Surah
@@ -19,7 +18,7 @@ interface QuranRepository {
     suspend fun fetchQuran()
     fun loadPages(): Flow<List<Page>>
     fun loadAyahs(): Flow<List<Ayah>>
-    fun loadBookmarks(): Flow<List<Bookmark>>
+    fun loadBookmarks(): Flow<List<QuranBookmark>>
     fun subscribeSurahAyahs(id: Int): Flow<List<Ayah>>
     suspend fun loadAyahById(ayahId: Int): Ayah?
     suspend fun loadFirstAyahBySurahId(surahId: Int): Ayah?
@@ -29,7 +28,9 @@ interface QuranRepository {
     suspend fun loadAllAyahAudio()
     suspend fun loadAllLearningVideos()
     suspend fun sureList(): List<Surah>
-    suspend fun createBookmarkByPage(page: Page)
+    suspend fun ayahSize(): Int
+    suspend fun ayahList(): List<Ayah>
+    suspend fun createBookmarkByPage(page: Page, ayah: Ayah?)
 }
 
 class QuranRepositoryImpl @Inject constructor(
@@ -58,10 +59,11 @@ class QuranRepositoryImpl @Inject constructor(
                 val ayahs = surahAudio.ayahs.mapIndexed { index, ayahAudio ->
                     Ayah(
                         id = ayahAudio.number,
-                        sureId = surahAudio.number,
+                        sureId = ayahAudio.numberInSurah,
                         sureName = surahAudio.englishName,
                         number = ayahAudio.number,
                         audio = ayahAudio.audio,
+                        audioAlt = ayahAudio.audioSecondary.firstOrNull(),
                         text = ayahAudio.text,
                         translationTr = translationSurah?.ayahs?.get(index)?.text ?: "",
                         transliterationEn = transliterationSurah?.ayahs?.get(index)?.text ?: "",
@@ -82,7 +84,7 @@ class QuranRepositoryImpl @Inject constructor(
         return local.loadAyahs()
     }
 
-    override fun loadBookmarks(): Flow<List<Bookmark>> {
+    override fun loadBookmarks(): Flow<List<QuranBookmark>> {
         return local.loadBookmarks()
     }
 
@@ -122,9 +124,17 @@ class QuranRepositoryImpl @Inject constructor(
         return local.sureList()
     }
 
-    override suspend fun createBookmarkByPage(page: Page) {
-        local.createBookmark(Bookmark(nr = page.page, type = BookmarkType.PageType))
-        local.createBookmark(Bookmark(nr = page.ayahs.first().juz, type = BookmarkType.JuzType))
+    override suspend fun ayahSize(): Int {
+        return local.ayahSize()
+    }
+
+    override suspend fun ayahList(): List<Ayah> {
+        return local.ayahList()
+    }
+
+    override suspend fun createBookmarkByPage(page: Page, ayah: Ayah?) {
+        val ref = ayah.takeIf { it?.page == page.page } ?: page.ayahs.first()
+        local.createBookmark(QuranBookmark(page = ref.page, juz = ref.juz, surahName = ref.sureName, ayah = ref.number))
     }
 
     override suspend fun loadAyahById(ayahId: Int): Ayah? {

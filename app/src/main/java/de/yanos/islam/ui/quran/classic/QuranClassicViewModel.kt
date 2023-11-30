@@ -1,13 +1,10 @@
-@file:OptIn(ExperimentalFoundationApi::class)
-
 package de.yanos.islam.ui.quran.classic
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.yanos.core.utils.IODispatcher
-import de.yanos.islam.data.model.Bookmark
+import de.yanos.islam.data.model.QuranBookmark
 import de.yanos.islam.data.model.quran.Page
 import de.yanos.islam.data.repositories.QuranRepository
 import de.yanos.islam.ui.quran.classic.audio.AudioViewModel
@@ -45,7 +42,7 @@ class QuranClassicViewModel @Inject constructor(
 
     fun createBookmark(page: Page) {
         viewModelScope.launch {
-            repository.createBookmarkByPage(page)
+            repository.createBookmarkByPage(page, referenceAyah)
         }
     }
 }
@@ -55,7 +52,7 @@ data class AyahSelection(val ayahId: Int) : QuranSelection
 data class SurahSelection(val surahId: Int) : QuranSelection
 data class PageSelection(val page: Int) : QuranSelection
 data class JuzSelection(val juz: Int) : QuranSelection
-data class BookmarkSelection(val mark: Bookmark) : QuranSelection
+data class BookmarkSelection(val mark: QuranBookmark) : QuranSelection
 
 sealed interface AudioEvents {
     data object PlayAudio : AudioEvents

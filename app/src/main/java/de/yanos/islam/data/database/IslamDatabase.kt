@@ -14,11 +14,11 @@ import de.yanos.islam.data.database.dao.QuranDao
 import de.yanos.islam.data.database.dao.SearchDao
 import de.yanos.islam.data.database.dao.TopicDao
 import de.yanos.islam.data.database.dao.VideoDao
-import de.yanos.islam.data.model.Bookmark
 import de.yanos.islam.data.model.BotReply
 import de.yanos.islam.data.model.Challenge
 import de.yanos.islam.data.model.Degree
 import de.yanos.islam.data.model.Quiz
+import de.yanos.islam.data.model.QuranBookmark
 import de.yanos.islam.data.model.Schedule
 import de.yanos.islam.data.model.Search
 import de.yanos.islam.data.model.Topic
@@ -67,9 +67,9 @@ interface IslamDatabase {
         Ayah::class,
         VideoLearning::class,
         BotReply::class,
-        Bookmark::class
+        QuranBookmark::class
     ],
-    version = 2
+    version = 4
 )
 internal abstract class IslamDatabaseImpl : IslamDatabase, RoomDatabase() {
     abstract override fun topicDao(): TopicDao

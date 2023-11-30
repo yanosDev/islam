@@ -10,6 +10,7 @@ data class Ayah(
     val sureName: String,
     val number: Int,
     val audio: String,
+    val audioAlt: String?,
     val text: String,
     val translationTr: String,
     val transliterationEn: String,

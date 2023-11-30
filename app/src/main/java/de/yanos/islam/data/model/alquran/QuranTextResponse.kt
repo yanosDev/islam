@@ -24,4 +24,4 @@ data class DataAudio(val surahs: List<SurahAudio>)
 data class SurahAudio(val number: Int, val name: String, val englishName: String, val englishNameTranslation: String, val ayahs: List<AyahAudio>, val revelationType: String)
 
 @JsonClass(generateAdapter = true)
-data class AyahAudio(val number: Int, val audio: String, val audioSecondary: List<String>, val text: String, val juz: Int, val page: Int)
+data class AyahAudio(val number: Int, val numberInSurah: Int, val audio: String, val audioSecondary: List<String>, val text: String, val juz: Int, val page: Int)

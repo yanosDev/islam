@@ -4,6 +4,7 @@ package de.yanos.islam.ui.quran.classic
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -25,6 +27,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BookmarkAdd
 import androidx.compose.material.icons.filled.Bookmarks
+import androidx.compose.material.icons.rounded.Bookmark
+import androidx.compose.material.icons.rounded.NavigateNext
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -52,13 +56,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.R
-import de.yanos.islam.data.model.Bookmark
-import de.yanos.islam.data.model.BookmarkType
+import de.yanos.islam.data.model.QuranBookmark
 import de.yanos.islam.data.model.quran.Ayah
 import de.yanos.islam.data.model.quran.Page
 import de.yanos.islam.ui.quran.classic.audio.AyahDetailBottomSheet
 import de.yanos.islam.util.Constants
-import de.yanos.islam.util.NavigationAction
 import de.yanos.islam.util.QuranText
 import de.yanos.islam.util.arabicNumber
 import de.yanos.islam.util.ayahWithColoredNumber
@@ -70,20 +72,17 @@ import kotlinx.coroutines.launch
 @Composable
 fun QuranClassicScreen(
     modifier: Modifier = Modifier,
-    quranViewModel: QuranClassicViewModel = hiltViewModel(),
-    onNavigationChange: (NavigationAction) -> Unit
+    quranViewModel: QuranClassicViewModel = hiltViewModel()
 ) {
     val typo = quranTypoByConfig(quranViewModel.quranSizeFactor, quranViewModel.quranStyle)
-    val onBookmarkSelected = { bookmark: Bookmark -> quranViewModel.onSelectionChange(BookmarkSelection(bookmark), false) }
+    val onBookmarkSelected = { bookmark: QuranBookmark -> quranViewModel.onSelectionChange(BookmarkSelection(bookmark), false) }
 
     QuranContent(
         modifier = modifier,
         ayah = quranViewModel.referenceAyah,
         index = (quranViewModel.referenceAyah?.page ?: 0) - 1,
         pages = quranViewModel.pages,
-        onPageSelected = { page: Int -> quranViewModel.onSelectionChange(PageSelection(page)) },
         onSurahSelected = { surahID: Int -> quranViewModel.onSelectionChange(SurahSelection(surahID)) },
-        onJuzSelected = { juz: Int -> quranViewModel.onSelectionChange(JuzSelection(juz)) },
         onAyahSelected = { ayah: Ayah -> quranViewModel.onSelectionChange(AyahSelection(ayah.id)) },
         onShowQuickMenu = { quranViewModel.showQuickMenu = true },
         onAddBookmark = quranViewModel::createBookmark,
@@ -124,8 +123,6 @@ private fun QuranContent(
     pages: List<Page>,
     index: Int,
     onSurahSelected: (Int) -> Unit,
-    onPageSelected: (Int) -> Unit,
-    onJuzSelected: (Int) -> Unit,
     onAyahSelected: (ayah: Ayah) -> Unit,
     onAddBookmark: (page: Page) -> Unit,
     onShowQuickMenu: () -> Unit,
@@ -149,8 +146,6 @@ private fun QuranContent(
                 modifier = Modifier.wrapContentHeight(),
                 page = pages[pageNumber],
                 onSurahSelected = onSurahSelected,
-                onJuzSelected = onJuzSelected,
-                onPageSelected = onPageSelected,
                 onShowQuickMenu = onShowQuickMenu,
                 onAddBookmark = onAddBookmark,
                 typo = typo,
@@ -172,21 +167,16 @@ private fun QuranHeader(
     page: Page,
     typo: Typography,
     onSurahSelected: (Int) -> Unit,
-    onPageSelected: (Int) -> Unit,
-    onJuzSelected: (Int) -> Unit,
     onShowQuickMenu: () -> Unit,
     onAddBookmark: (page: Page) -> Unit
 ) {
     Row(
         modifier = modifier
             .wrapContentHeight()
-            .heightIn(48.dp), verticalAlignment = Alignment.CenterVertically
+            .heightIn(72.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        TextButton(
-            onClick = { onJuzSelected(page.pageSurahId) },
-        ) {
-            Text(textAlign = TextAlign.Center, text = stringResource(id = R.string.sure_list_cuz, arabicNumber(page.ayahs.first().juz)), style = typo.labelLarge)
-        }
+        Text(textAlign = TextAlign.Center, text = stringResource(id = R.string.sure_list_cuz, arabicNumber(page.ayahs.first().juz)), style = typo.labelLarge)
         IconButton(onClick = { onAddBookmark(page) }) {
             Icon(imageVector = Icons.Filled.BookmarkAdd, contentDescription = null)
         }
@@ -200,11 +190,7 @@ private fun QuranHeader(
         IconButton(onClick = onShowQuickMenu) {
             Icon(imageVector = Icons.Filled.Bookmarks, contentDescription = null)
         }
-        TextButton(
-            onClick = { onPageSelected(page.pageSurahId) },
-        ) {
-            Text(textAlign = TextAlign.Center, text = stringResource(id = R.string.sure_list_page, arabicNumber(page.page)), style = typo.labelLarge)
-        }
+        Text(textAlign = TextAlign.Center, text = stringResource(id = R.string.sure_list_page, arabicNumber(page.page)), style = typo.labelLarge)
     }
 }
 
@@ -300,22 +286,22 @@ fun QuickMenu(
     maxPage: Int,
     currentJuz: Int,
     maxJuz: Int,
-    marks: List<Bookmark>,
+    marks: List<QuranBookmark>,
     onPageSelected: (Int) -> Unit,
     onJuzSelected: (Int) -> Unit,
-    onBookmark: (Bookmark) -> Unit,
+    onBookmark: (QuranBookmark) -> Unit,
     onDismiss: () -> Unit
 ) {
-    var rememberPage by remember { mutableIntStateOf(currentPage) }
-    var rememberJuz by remember { mutableIntStateOf(currentJuz) }
-    var rememberBookmark: Bookmark? by remember { mutableStateOf(null) }
+    var rememberPage by remember { mutableIntStateOf(currentPage - 1) }
+    var rememberJuz by remember { mutableIntStateOf(currentJuz - 1) }
+    var rememberBookmark: QuranBookmark? by remember { mutableStateOf(null) }
     var lastChanged by remember { mutableIntStateOf(4) }
     ModalBottomSheet(
         modifier = modifier,
         onDismissRequest = {
             when {
-                lastChanged < 2 && rememberPage != currentPage -> onPageSelected(rememberPage)
-                lastChanged < 3 && rememberJuz != currentJuz -> onJuzSelected(rememberJuz)
+                lastChanged < 2 && rememberPage != currentPage -> onPageSelected(rememberPage + 1)
+                lastChanged < 3 && rememberJuz != currentJuz -> onJuzSelected(rememberJuz + 1)
                 lastChanged < 4 -> rememberBookmark?.let(onBookmark)
             }
             onDismiss()
@@ -324,30 +310,42 @@ fun QuickMenu(
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                text = stringResource(id = R.string.sure_list_cuz, rememberJuz),
+                text = stringResource(id = R.string.sure_list_cuz, rememberJuz + 1),
                 style = MaterialTheme.typography.labelLarge
             )
             Slider(value = rememberJuz.toFloat() / maxJuz, onValueChange = {
                 rememberJuz = (it * maxJuz).toInt()
                 lastChanged = 2
-            }, steps = maxJuz)
+            }, steps = maxJuz - 1)
             Spacer(modifier = Modifier.size(16.dp))
             Text(
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                text = stringResource(id = R.string.sure_list_page, rememberPage),
+                text = stringResource(id = R.string.sure_list_page, rememberPage + 1),
                 style = MaterialTheme.typography.labelLarge
             )
             Slider(value = rememberPage.toFloat() / maxPage, onValueChange = {
                 rememberPage = (it * maxPage).toInt()
                 lastChanged = 1
-            }, steps = maxPage)
+            }, steps = maxPage - 1)
             Spacer(modifier = Modifier.size(16.dp))
-            LazyColumn {
-                items(items = marks, key = { it.id }) {
-                    if (it.type == BookmarkType.JuzType) {
-                        Text(modifier = Modifier.padding(4.dp), text = "To Juz ${it.nr}", style = MaterialTheme.typography.labelSmall)
-                    } else {
-                        Text(modifier = Modifier.padding(4.dp), text = "To Page ${it.nr}", style = MaterialTheme.typography.labelSmall)
+            Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Icon(modifier = Modifier.size(48.dp), imageVector = Icons.Rounded.Bookmark, contentDescription = null)
+                Spacer(modifier = Modifier.width(8.dp))
+                Column {
+                    Text(modifier = Modifier.padding(horizontal = 8.dp), text = stringResource(id = R.string.quran_jump_title), style = MaterialTheme.typography.titleSmall)
+                    LazyColumn {
+                        items(items = marks, key = { it.id }) {
+                            Row(modifier = Modifier.padding(4.dp)) {
+                                Icon(imageVector = Icons.Rounded.NavigateNext, contentDescription = null)
+                                Spacer(modifier = Modifier.padding(8.dp))
+                                Text(
+                                    modifier = Modifier.padding(4.dp),
+                                    text = stringResource(id = R.string.quran_jump_item, it.page, it.juz, it.surahName, it.ayah),
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            }
+
+                        }
                     }
                 }
             }
