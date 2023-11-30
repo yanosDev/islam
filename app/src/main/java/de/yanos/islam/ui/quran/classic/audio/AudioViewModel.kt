@@ -49,7 +49,6 @@ open class AudioViewModel(
     }
 
     init {
-
         viewModelScope.launch {
             while (controller == null)
                 delay(1000)
@@ -65,7 +64,7 @@ open class AudioViewModel(
                 is SurahSelection -> repository.loadFirstAyahBySurahId(selection.surahId)
                 is PageSelection -> repository.loadFirstAyahByPageId(selection.page)
                 is JuzSelection -> repository.loadFirstAyahByJuz(selection.juz)
-                is BookmarkSelection -> repository.loadFirstAyahByPageId(selection.mark.ayahId)
+                is BookmarkSelection -> repository.loadAyahById(selection.mark.ayahId)
                 else -> null
             }?.let { ayah ->
                 if (ayah != referenceAyah) {
