@@ -26,7 +26,8 @@ class QuranLearningViewModel @Inject constructor(
     @VideoPlayer val player: ExoPlayer
 ) : ViewModel() {
     internal val learnings = mutableStateListOf<VideoLearning>()
-    var index by mutableIntStateOf(appSettings.lastPlayedLearningIndex)
+    //var index by mutableIntStateOf(appSettings.lastPlayedLearningIndex)
+    var index by mutableIntStateOf(0)
 
     init {
         viewModelScope.launch {

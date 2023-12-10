@@ -20,7 +20,6 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -43,12 +42,11 @@ fun QuranMainListScreen(
         modifier = modifier
             .widthIn(320.dp, 600.dp)
             .padding(horizontal = 32.dp, vertical = 24.dp)
-            .fillMaxHeight(), horizontalAlignment = Alignment.CenterHorizontally
+            .fillMaxHeight(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Lottie(modifier = Modifier.height(180.dp), resId = R.raw.lottie_quran2, applyColor = false)
         Spacer(modifier = Modifier.height(12.dp))
-        val isEmpty = vm.lastSurah.collectAsState(initial = listOf()).value.isEmpty()
-
         Column {
             ElevatedButton(
                 modifier = Modifier

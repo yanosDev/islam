@@ -12,11 +12,9 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -69,7 +67,7 @@ class MainActivity : ComponentActivity() {
                 if (locationPermissionState.status.isGranted && notificationPermissionState.status.isGranted) {
                     navController = rememberNavController()
                     DynamicNavigationScreen(
-                        modifier = modifier.padding(top = 48.dp), // TODO: Check statusbar problem
+                        modifier = modifier,
                         config = config.copy(),
                         destinations = MainNavigation.all,
                         navController = navController!!

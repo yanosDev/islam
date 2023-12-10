@@ -68,7 +68,7 @@ open class AudioViewModel(
                 else -> null
             }?.let { ayah ->
                 if (ayah != referenceAyah) {
-                    referenceAyah = ayah
+                    onAyahChange(ayah)
                     controller?.seekTo(ayah.id - 1, 0)
                 }
             }
@@ -142,12 +142,17 @@ open class AudioViewModel(
     private suspend fun refreshData() {
         controller?.let {
             it.currentMediaItem?.mediaId?.toInt()?.let { id ->
-                if (id != referenceAyah?.id)
-                    referenceAyah = repository.loadAyahById(id)
+                if (id != referenceAyah?.id) {
+                    onAyahChange(repository.loadAyahById(id))
+                }
             }
             progress = max(((it.currentPosition.toFloat() / it.duration.toFloat()) * 100F), 5F)
             isPlaying = it.isPlaying
         }
+    }
+
+    open fun onAyahChange(ayah: Ayah?) {
+        referenceAyah = ayah
     }
 
     override fun onCleared() {

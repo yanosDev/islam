@@ -3,10 +3,12 @@ package de.yanos.islam.ui.quran.classic
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.data.model.QuranBookmark
+import de.yanos.islam.data.model.quran.Ayah
 import de.yanos.islam.data.model.quran.Page
 import de.yanos.islam.data.repositories.QuranRepository
 import de.yanos.islam.ui.quran.classic.audio.AudioViewModel
@@ -29,7 +31,9 @@ class QuranClassicViewModel @Inject constructor(
     val quranStyle get() = appSettings.quranStyle
     val quranSizeFactor get() = appSettings.quranSizeFactor
     val quickMarks = repository.loadBookmarks()
-    val initPage by mutableIntStateOf(appSettings.lastOpenPage)
+
+    //val initPage by mutableIntStateOf(appSettings.lastOpenPage)
+    var initPage by mutableIntStateOf(appSettings.lastOpenPage)
 
     init {
         viewModelScope.launch(dispatcher) {
@@ -54,6 +58,12 @@ class QuranClassicViewModel @Inject constructor(
 
     fun updateCurrentPage(page: Int) {
         appSettings.lastOpenPage = page
+    }
+
+    override fun onAyahChange(ayah: Ayah?) {
+        super.onAyahChange(ayah)
+        initPage = ayah?.page?.let { it - 1 } ?: 0
+        appSettings.lastOpenPage = initPage
     }
 }
 

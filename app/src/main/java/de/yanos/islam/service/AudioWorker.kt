@@ -56,7 +56,7 @@ class AudioWorker @AssistedInject constructor(
                     controller?.addMediaItems(subItems)
                     delay(100)
                 }
-                controller?.seekTo(appSettings.lastPlayedAyahIndex, 0)
+                //controller?.seekTo(appSettings.lastPlayedAyahIndex, 0)
                 controller?.prepare()
             }
             rescheduleFailedDownloads()

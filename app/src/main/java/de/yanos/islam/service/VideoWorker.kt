@@ -71,7 +71,7 @@ class VideoWorker @AssistedInject constructor(
                         controller?.addMediaItem(it)
                         delay(100)
                     }
-                    controller?.seekTo(appSettings.lastPlayedLearningIndex, 0)
+                    //controller?.seekTo(appSettings.lastPlayedLearningIndex, 0)
                     controller?.prepare()
                 }
                 Result.success()
