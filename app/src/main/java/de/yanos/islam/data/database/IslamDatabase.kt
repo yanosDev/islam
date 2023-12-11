@@ -69,7 +69,7 @@ interface IslamDatabase {
         BotReply::class,
         QuranBookmark::class
     ],
-    version = 5
+    version = 7
 )
 internal abstract class IslamDatabaseImpl : IslamDatabase, RoomDatabase() {
     abstract override fun topicDao(): TopicDao
