@@ -55,9 +55,7 @@ fun AIScreen(
     val scope = rememberCoroutineScope()
     DisposableEffect(replies.value.size) {
         scope.launch {
-            if (replies.value.isNotEmpty() && !vm.requestInProgress)
-                scrollState.animateScrollToItem(replies.value.first().replies.size)
-            else scrollState.animateScrollToItem(0)
+            scrollState.animateScrollToItem(0)
         }
 
         onDispose {
@@ -99,7 +97,7 @@ fun AIScreen(
                 }
             }
             replies.value.forEach { request ->
-                items(items = request.replies) {
+                items(items = request.replies, key = { it }) {
                     BotAnswer(modifier = Modifier.animateItemPlacement(), text = it)
                 }
                 item {
@@ -155,7 +153,7 @@ fun UserRequest(
             topStart = 16.dp, bottomEnd = 16.dp, bottomStart = 4.dp, topEnd = 4.dp
         )
     ) {
-        Text(modifier = Modifier.padding(8.dp), text = text)
+        Text(modifier = Modifier.padding(8.dp), text = text, style = MaterialTheme.typography.bodySmall)
     }
 }
 
@@ -174,6 +172,6 @@ fun BotAnswer(
             topStart = 4.dp, bottomEnd = 4.dp, bottomStart = 16.dp, topEnd = 16.dp
         )
     ) {
-        Text(modifier = Modifier.padding(8.dp), text = text)
+        Text(modifier = Modifier.padding(8.dp), text = text, style = MaterialTheme.typography.bodySmall)
     }
 }
