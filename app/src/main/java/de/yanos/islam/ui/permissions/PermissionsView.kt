@@ -137,7 +137,7 @@ fun DownloadingScreen(modifier: Modifier = Modifier, downloadingResources: Boole
             Text(modifier = Modifier.padding(16.dp), text = stringResource(id = R.string.init_download), style = titleSmall(), color = MaterialTheme.colorScheme.onBackground)
             Spacer(modifier = Modifier.height(32.dp))
             if (downloadingResources)
-                Lottie(modifier = Modifier.height(160.dp), resId = R.raw.lottie_download, applyColor = false)
-            else Lottie(modifier = Modifier.height(160.dp), resId = R.raw.lottie_done, applyColor = false)
+                Lottie(modifier = Modifier.height(128.dp), resId = R.raw.lottie_download, applyColor = false)
+            else Lottie(modifier = Modifier.height(128.dp), resId = R.raw.lottie_done, applyColor = false)
         }
 }

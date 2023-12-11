@@ -51,7 +51,7 @@ fun ChallengeScreen(
     }
 
     Column(modifier = modifier.padding(16.dp)) {
-        Lottie(modifier = Modifier.height(160.dp), resId = R.raw.lottie_configuring, applyColor = false)
+        Lottie(modifier = Modifier.height(128.dp), resId = R.raw.lottie_configuring, applyColor = false)
         Text(text = stringResource(id = R.string.challenge_creation_title), style = titleLarge())
         Spacer(modifier = Modifier.height(4.dp))
         ChallengeDifficulty(modifier = Modifier.padding(vertical = 8.dp), difficulty = vm.difficulty) { difficulty: ChallengeDifficulty -> vm.difficulty = difficulty }

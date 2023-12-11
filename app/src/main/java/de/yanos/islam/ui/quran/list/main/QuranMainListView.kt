@@ -48,7 +48,7 @@ fun QuranMainListScreen(
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Lottie(modifier = Modifier.height(180.dp), resId = R.raw.lottie_quran2, applyColor = false)
+        Lottie(modifier = Modifier.height(128.dp), resId = R.raw.lottie_quran2, applyColor = false)
         Spacer(modifier = Modifier.height(12.dp))
         Column {
             ElevatedButton(

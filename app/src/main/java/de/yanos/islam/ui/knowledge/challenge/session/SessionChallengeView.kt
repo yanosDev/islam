@@ -32,17 +32,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.core.ui.view.CustomDialog
 import de.yanos.islam.R
 import de.yanos.islam.data.model.Challenge
-import de.yanos.islam.util.IslamCheckBox
 import de.yanos.islam.util.IslamDivider
 import de.yanos.islam.util.Lottie
 import de.yanos.islam.util.NavigationAction
-import de.yanos.islam.util.NavigationPath
 import de.yanos.islam.util.bodyLarge
 import de.yanos.islam.util.bodySmall
 import de.yanos.islam.util.correctColor
@@ -78,7 +75,7 @@ fun ChallengeSessionScreen(
     }
     if (vm.challengeQuizList.size > 0)
         Column(modifier = modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Lottie(modifier = Modifier.height(160.dp), resId = R.raw.lottie_girl_thinking, applyColor = false)
+            Lottie(modifier = Modifier.height(128.dp), resId = R.raw.lottie_girl_thinking, applyColor = false)
             ChallengeList(modifier = Modifier.weight(1f), state = state, quizList = vm.challengeQuizList)
             ChallengeBoard(
                 modifier = Modifier

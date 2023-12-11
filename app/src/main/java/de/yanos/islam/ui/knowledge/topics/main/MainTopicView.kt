@@ -62,7 +62,7 @@ fun MainTopicsScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             item {
-                Lottie(modifier = modifier.height(200.dp), resId = R.raw.lottie_stars_moving)
+                Lottie(modifier = modifier.height(128.dp), resId = R.raw.lottie_stars_moving)
             }
             item {
                 Text(text = stringResource(id = R.string.main_topic_title), style = headlineLarge())

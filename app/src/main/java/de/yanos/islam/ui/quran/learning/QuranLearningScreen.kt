@@ -3,7 +3,6 @@
 
 package de.yanos.islam.ui.quran.learning
 
-import android.content.pm.ActivityInfo
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -42,7 +41,6 @@ import coil.compose.AsyncImage
 import de.yanos.islam.data.model.VideoLearning
 import de.yanos.islam.util.NavigationAction
 import de.yanos.islam.util.goldColor
-import de.yanos.islam.util.setScreenOrientation
 
 @Composable
 fun QuranLearningScreen(
@@ -55,15 +53,6 @@ fun QuranLearningScreen(
         resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
         player = vm.player
         artworkDisplayMode = PlayerView.ARTWORK_DISPLAY_MODE_FIT
-        setFullscreenButtonClickListener { isFullScreen ->
-            with(context) {
-                if (isFullScreen) {
-                    setScreenOrientation(orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
-                } else {
-                    setScreenOrientation(orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-                }
-            }
-        }
     }
     LazyColumn(modifier = modifier) {
         stickyHeader {
@@ -72,7 +61,8 @@ fun QuranLearningScreen(
                     .fillMaxWidth()
                     .aspectRatio(1290F / 720F)
                     .heightIn(min = 248.dp, max = 512.dp),
-                    factory = { playerView })
+                    factory = { playerView }
+                )
             ) {
                 onDispose {
                     playerView.player?.pause()
