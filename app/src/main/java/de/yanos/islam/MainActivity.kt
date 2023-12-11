@@ -12,6 +12,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -37,7 +38,6 @@ import de.yanos.islam.util.AppSettings
 import de.yanos.islam.util.KnowledgeNavigation
 import de.yanos.islam.util.MainNavigation
 import de.yanos.islam.util.NavigationAction
-import de.yanos.islam.util.PatternedBackgroung
 import de.yanos.islam.util.QuranNavigation
 import de.yanos.islam.util.ToRootAfterPermission
 import de.yanos.islam.util.allKnowledge
@@ -67,7 +67,7 @@ class MainActivity : ComponentActivity() {
                 if (locationPermissionState.status.isGranted && notificationPermissionState.status.isGranted) {
                     navController = rememberNavController()
                     DynamicNavigationScreen(
-                        modifier = modifier,
+                        modifier = modifier.statusBarsPadding(),
                         config = config.copy(),
                         destinations = MainNavigation.all,
                         navController = navController!!
@@ -111,34 +111,33 @@ private fun IslamNavHost(
         }
         Unit
     }
-    PatternedBackgroung(modifier = modifier) {
-        NavHost(
-            navController = navController,
-            startDestination = startRoute,
+    NavHost(
+        navController = navController,
+        startDestination = startRoute,
+        modifier = modifier,
+    ) {
+        navKnowledge(modifier = modifier, onNavigationChange = onNavigationChange)
+        navQuran(modifier = modifier, onNavigationChange = onNavigationChange)
+        composable(
+            route = MainNavigation.Praying.route,
+            deepLinks = listOf(navDeepLink { uriPattern = "yanos://de.islam/praying" })
         ) {
-            navKnowledge(onNavigationChange = onNavigationChange)
-            navQuran(onNavigationChange = onNavigationChange)
-            composable(
-                route = MainNavigation.Praying.route,
-                deepLinks = listOf(navDeepLink { uriPattern = "yanos://de.islam/praying" })
-            ) {
-                PrayerScreen(modifier = Modifier.fillMaxSize())
-            }
-            composable(
-                route = MainNavigation.AI.route,
-            ) {
-                AIScreen(modifier = Modifier.fillMaxSize())
-            }
-            composable(
-                route = MainNavigation.Settings.route,
-            ) {
-                SettingsScreen(modifier = Modifier.fillMaxSize())
-            }
+            PrayerScreen(modifier = modifier.fillMaxSize())
+        }
+        composable(
+            route = MainNavigation.AI.route,
+        ) {
+            AIScreen(modifier = modifier.fillMaxSize())
+        }
+        composable(
+            route = MainNavigation.Settings.route,
+        ) {
+            SettingsScreen(modifier = modifier.fillMaxSize())
         }
     }
 }
 
-fun NavGraphBuilder.navQuran(onNavigationChange: (NavigationAction) -> Unit) {
+fun NavGraphBuilder.navQuran(modifier: Modifier = Modifier, onNavigationChange: (NavigationAction) -> Unit) {
     navigation(
         startDestination = QuranNavigation.QuranMainList.route,
         route = MainNavigation.Quran.route,
@@ -149,7 +148,7 @@ fun NavGraphBuilder.navQuran(onNavigationChange: (NavigationAction) -> Unit) {
                     route = path.route, arguments = path.args,
                     exitTransition = { fadeOut() }
                 ) {
-                    path.View(onNavigationChange = onNavigationChange)
+                    path.View(modifier = modifier, onNavigationChange = onNavigationChange)
                 }
             else
                 composable(
@@ -159,13 +158,13 @@ fun NavGraphBuilder.navQuran(onNavigationChange: (NavigationAction) -> Unit) {
                     popEnterTransition = { slideInHorizontally(initialOffsetX = { -it }) },
                     popExitTransition = { slideOutHorizontally(targetOffsetX = { it }) },
                 ) {
-                    path.View(onNavigationChange = onNavigationChange)
+                    path.View(modifier = modifier, onNavigationChange = onNavigationChange)
                 }
         }
     }
 }
 
-fun NavGraphBuilder.navKnowledge(onNavigationChange: (NavigationAction) -> Unit) {
+fun NavGraphBuilder.navKnowledge(modifier: Modifier, onNavigationChange: (NavigationAction) -> Unit) {
     navigation(
         startDestination = KnowledgeNavigation.MainList.route,
         route = MainNavigation.Knowledge.route,
@@ -176,7 +175,7 @@ fun NavGraphBuilder.navKnowledge(onNavigationChange: (NavigationAction) -> Unit)
                     route = path.route, arguments = path.args,
                     exitTransition = { fadeOut() }
                 ) {
-                    path.View(onNavigationChange = onNavigationChange)
+                    path.View(modifier = modifier, onNavigationChange = onNavigationChange)
                 }
             else
                 composable(
@@ -186,7 +185,7 @@ fun NavGraphBuilder.navKnowledge(onNavigationChange: (NavigationAction) -> Unit)
                     popEnterTransition = { slideInHorizontally(initialOffsetX = { -it }) },
                     popExitTransition = { slideOutHorizontally(targetOffsetX = { it }) },
                 ) {
-                    path.View(onNavigationChange = onNavigationChange)
+                    path.View(modifier = modifier, onNavigationChange = onNavigationChange)
                 }
         }
     }

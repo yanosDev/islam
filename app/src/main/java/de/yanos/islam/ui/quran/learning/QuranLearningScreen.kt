@@ -71,7 +71,7 @@ fun QuranLearningScreen(
                 AndroidView(modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1290F / 720F)
-                    .heightIn(min = 248.dp),
+                    .heightIn(min = 248.dp, max = 512.dp),
                     factory = { playerView })
             ) {
                 onDispose {

@@ -34,6 +34,8 @@ class AIScreenViewModel @Inject constructor(
     fun sendRequest(text: String) {
         requestInProgress = true
         viewModelScope.launch(dispatcher) {
+            val request = BotReply(question = text, replies = listOf(), ts = System.currentTimeMillis())
+            botDao.insert(request)
             val completion = try {
                 ai.chatCompletion(
                     ChatCompletionRequest(
@@ -45,7 +47,15 @@ class AIScreenViewModel @Inject constructor(
                 Timber.e(e)
                 listOf("Malesef yardimci olamicam")
             }
-            botDao.insert(BotReply(question = text, replies = completion.flatMap { it.split("\n\n").reversed() }.map { it.trim() }, ts = System.currentTimeMillis()))
+
+            botDao.update(
+                BotReply(
+                    id = botDao.recentRequestId(),
+                    question = text,
+                    replies = completion.flatMap { it.split("\n\n").reversed() }.map { it.trim() },
+                    ts = System.currentTimeMillis()
+                )
+            )
             withContext(mainDispatcher) {
                 requestInProgress = false
             }

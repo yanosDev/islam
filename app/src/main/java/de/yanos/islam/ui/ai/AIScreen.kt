@@ -37,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -49,6 +50,7 @@ fun AIScreen(
     modifier: Modifier,
     vm: AIScreenViewModel = hiltViewModel()
 ) {
+    val focusManager = LocalFocusManager.current
     val replies = vm.conversation.collectAsState(initial = listOf())
     var currentInput by remember { mutableStateOf("") }
     val scrollState = rememberLazyListState()
@@ -62,6 +64,7 @@ fun AIScreen(
 
         }
     }
+    val flatList = replies.value.flatMap { it.replies.toMutableList().apply { add("::bot" + it.question) } }
     Column(modifier = modifier, verticalArrangement = Arrangement.Bottom) {
         LazyColumn(
             modifier = Modifier
@@ -96,26 +99,11 @@ fun AIScreen(
                     }
                 }
             }
-            replies.value.forEach { request ->
-                items(items = request.replies, key = { it }) {
+            items(items = flatList, key = { it }) {
+                if (it.startsWith("::bot"))
+                    UserRequest(modifier = Modifier.animateItemPlacement(), text = it.removePrefix("::bot"))
+                else {
                     BotAnswer(modifier = Modifier.animateItemPlacement(), text = it)
-                }
-                item {
-                    Spacer(
-                        modifier = Modifier
-                            .animateItemPlacement()
-                            .padding(4.dp)
-                    )
-                }
-                stickyHeader {
-                    UserRequest(modifier = Modifier.animateItemPlacement(), text = request.question)
-                }
-                item {
-                    Spacer(
-                        modifier = Modifier
-                            .animateItemPlacement()
-                            .padding(8.dp)
-                    )
                 }
             }
         }
@@ -132,7 +120,11 @@ fun AIScreen(
             shape = RoundedCornerShape(16.dp),
             onValueChange = { currentInput = it },
             trailingIcon = {
-                IconButton(enabled = !vm.requestInProgress, onClick = { vm.sendRequest(currentInput) }) {
+                IconButton(enabled = !vm.requestInProgress, onClick = {
+                    focusManager.clearFocus()
+                    vm.sendRequest(currentInput)
+                    currentInput = ""
+                }) {
                     Icon(imageVector = Icons.Rounded.Send, contentDescription = "", tint = goldColor().copy(alpha = if (vm.requestInProgress) 0.4f else 1f))
                 }
             })
@@ -144,16 +136,24 @@ fun UserRequest(
     modifier: Modifier = Modifier,
     text: String
 ) {
-    ElevatedCard(
-        modifier = modifier
-            .padding(start = 48.dp, end = 4.dp)
-            .fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = goldColor().copy(alpha = 0.65f)),
-        shape = RoundedCornerShape(
-            topStart = 16.dp, bottomEnd = 16.dp, bottomStart = 4.dp, topEnd = 4.dp
+    Column {
+        Spacer(
+            modifier = Modifier.padding(8.dp)
         )
-    ) {
-        Text(modifier = Modifier.padding(8.dp), text = text, style = MaterialTheme.typography.bodySmall)
+        ElevatedCard(
+            modifier = modifier
+                .padding(start = 48.dp, end = 4.dp)
+                .fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = goldColor().copy(alpha = 0.65f)),
+            shape = RoundedCornerShape(
+                topStart = 16.dp, bottomEnd = 16.dp, bottomStart = 4.dp, topEnd = 4.dp
+            )
+        ) {
+            Text(modifier = Modifier.padding(8.dp), text = text, style = MaterialTheme.typography.bodySmall)
+        }
+        Spacer(
+            modifier = Modifier.padding(4.dp)
+        )
     }
 }
 

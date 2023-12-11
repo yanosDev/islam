@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.AbsoluteCutCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.LibraryBooks
 import androidx.compose.material.icons.rounded.MenuBook
@@ -42,7 +44,8 @@ fun QuranMainListScreen(
         modifier = modifier
             .widthIn(320.dp, 600.dp)
             .padding(horizontal = 32.dp, vertical = 24.dp)
-            .fillMaxHeight(),
+            .fillMaxHeight()
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Lottie(modifier = Modifier.height(180.dp), resId = R.raw.lottie_quran2, applyColor = false)
