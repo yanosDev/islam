@@ -84,6 +84,13 @@ class QuranPartialViewModel @Inject constructor(
         surah = surah.copy(showPronunciation = showPronunciation)
         appSettings.showPronunciations = showPronunciation
     }
+
+    override fun onAyahChange(ayah: Ayah?) {
+        super.onAyahChange(ayah)
+        if(isPlaying && ayah?.id != surah.id){
+            loadSurah(nextSurahId!!)
+        }
+    }
 }
 
 data class SurahData(

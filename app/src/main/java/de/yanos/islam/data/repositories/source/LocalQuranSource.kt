@@ -79,7 +79,7 @@ class LocalQuranSourceImpl @Inject constructor(
     }
 
     override fun loadSurahAyahs(id: Int): Flow<List<Ayah>> {
-        return dao.subsribeSurahAyahs(id)
+        return dao.subscribeSurahAyahs(id)
     }
 
     override suspend fun sureList(): List<Surah> {

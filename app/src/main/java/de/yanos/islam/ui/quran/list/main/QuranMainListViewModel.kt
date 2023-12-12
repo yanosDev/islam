@@ -9,5 +9,5 @@ import javax.inject.Inject
 class QuranMainListViewModel @Inject constructor(
     private val dao: QuranDao,
 ) : ViewModel() {
-    val lastSurah = dao.subsribeSurahAyahs(114)
+    val lastSurah = dao.subscribeSurahAyahs(114)
 }

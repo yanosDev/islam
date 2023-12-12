@@ -17,8 +17,8 @@ interface QuranDao : BaseDao<Ayah> {
     @Query("SELECT * FROM Ayah WHERE (sureName LIKE '%' || :query || '%' OR translationTr LIKE '%' || :query || '%' OR transliterationEn LIKE '%' || :query || '%') ORDER BY sureId")
     fun findMatches(query: String): List<Ayah>
 
-    @Query("SELECT * FROM Ayah WHERE sureId = :sureId ORDER BY id")
-    fun subsribeSurahAyahs(sureId: Int): Flow<List<Ayah>>
+    @Query("SELECT * FROM Ayah WHERE sureId = :sureId ORDER BY id ASC")
+    fun subscribeSurahAyahs(sureId: Int): Flow<List<Ayah>>
 
     @Query("SELECT * FROM Ayah WHERE id = :ayahId")
     fun subscribeAyah(ayahId: Int): Flow<Ayah>

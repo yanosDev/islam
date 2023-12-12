@@ -36,7 +36,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -126,15 +125,6 @@ fun QuranPartialScreen(
                 }
             }
             val typo = quranTypoByConfig(vm.quranSizeFactor, vm.quranStyle)
-            DisposableEffect(vm.referenceAyah) {
-                scope.launch {
-                    if (vm.referenceAyah != null && vm.referenceAyah?.sureId != vm.surah.id) {
-                        vm.loadSurah(vm.nextSurahId!!)
-                        onScrollTo(1)
-                    }
-                }
-                onDispose { }
-            }
             AyetList(modifier = Modifier.weight(1f), state = state, sure = vm.surah, typo = typo, onAyahChanged = { vm.onSelectionChange(AyahSelection(it.id)) })
             if (vm.showAyahDetails)
                 AyahDetailBottomSheet(

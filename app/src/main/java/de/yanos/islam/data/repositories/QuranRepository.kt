@@ -58,9 +58,9 @@ class QuranRepositoryImpl @Inject constructor(
                 val ayahs = surahAudio.ayahs.mapIndexed { index, ayahAudio ->
                     Ayah(
                         id = ayahAudio.number,
-                        sureId = ayahAudio.numberInSurah,
+                        sureId = surahAudio.number,
                         sureName = surahAudio.englishName,
-                        number = ayahAudio.number,
+                        number = ayahAudio.numberInSurah,
                         audio = ayahAudio.audio,
                         audioAlt = ayahAudio.audioSecondary.firstOrNull(),
                         text = ayahAudio.text,

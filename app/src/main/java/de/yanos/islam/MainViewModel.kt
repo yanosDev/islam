@@ -52,7 +52,7 @@ class MainViewModel @Inject constructor(
                     locationDone = true
                 },
                 async {
-                    if (!quranRepository.isWholeQuranFetched())
+                    //if (!quranRepository.isWholeQuranFetched())
                         quranRepository.fetchQuran()
                     quranDone = true
                 }
