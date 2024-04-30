@@ -64,7 +64,7 @@ fun QuranSearchScreen(
             if (!isActive)
                 padding(horizontal = 12.dp)
         },
-    ) { values ->
+    ) { _ ->
         val onClick = { id: Int -> onNavigationChange(QuranNavigationAction.NavigateToSure(id)) }
         Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             SearchBar(

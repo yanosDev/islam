@@ -47,8 +47,7 @@ import de.yanos.islam.util.setScreenOrientation
 @Composable
 fun QuranLearningScreen(
     modifier: Modifier = Modifier,
-    vm: QuranLearningViewModel = hiltViewModel(),
-    onNavigationChange: (NavigationAction) -> Unit
+    vm: QuranLearningViewModel = hiltViewModel()
 ) {
     val playerView = PlayerView(LocalContext.current).apply {
         useController = true

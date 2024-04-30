@@ -69,8 +69,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun QuranPartialScreen(
     modifier: Modifier = Modifier,
-    vm: QuranPartialViewModel = hiltViewModel(),
-    onNavigationChange: (NavigationAction) -> Unit = {}
+    vm: QuranPartialViewModel = hiltViewModel()
 ) {
     val state = rememberLazyListState()
     var position by remember { mutableIntStateOf(0) }

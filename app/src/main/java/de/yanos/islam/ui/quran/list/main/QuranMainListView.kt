@@ -12,8 +12,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.AbsoluteCutCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.LibraryBooks
+import androidx.compose.material.icons.automirrored.rounded.MenuBook
 import androidx.compose.material.icons.rounded.LibraryBooks
-import androidx.compose.material.icons.rounded.MenuBook
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.VideoLibrary
 import androidx.compose.material3.ElevatedButton
@@ -36,7 +37,6 @@ import de.yanos.islam.util.labelMedium
 @Composable
 fun QuranMainListScreen(
     modifier: Modifier = Modifier,
-    vm: QuranMainListViewModel = hiltViewModel(),
     onNavigationChange: (NavigationAction) -> Unit
 ) {
     Column(
@@ -47,7 +47,6 @@ fun QuranMainListScreen(
     ) {
         Lottie(modifier = Modifier.height(180.dp), resId = R.raw.lottie_quran2, applyColor = false)
         Spacer(modifier = Modifier.height(12.dp))
-        val isEmpty = vm.lastSurah.collectAsState(initial = listOf()).value.isEmpty()
 
         Column {
             ElevatedButton(
@@ -59,7 +58,7 @@ fun QuranMainListScreen(
                 onClick = { onNavigationChange(QuranNavigationAction.NavigateToQuran) },
             ) {
                 Row {
-                    Icon(imageVector = Icons.Rounded.MenuBook, contentDescription = "", tint = goldColor())
+                    Icon(imageVector = Icons.AutoMirrored.Rounded.MenuBook, contentDescription = "", tint = goldColor())
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(modifier = Modifier.weight(1f), text = stringResource(id = R.string.quran_read_main), style = labelMedium(), color = goldColor())
                 }
@@ -73,7 +72,7 @@ fun QuranMainListScreen(
                 onClick = { onNavigationChange(QuranNavigationAction.NavigateToSureList) },
             ) {
                 Row {
-                    Icon(imageVector = Icons.Rounded.LibraryBooks, contentDescription = "", tint = goldColor())
+                    Icon(imageVector = Icons.AutoMirrored.Rounded.LibraryBooks, contentDescription = "", tint = goldColor())
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(modifier = Modifier.weight(1f), text = stringResource(id = R.string.quran_sure_list), style = labelMedium())
                 }
@@ -108,5 +107,4 @@ fun QuranMainListScreen(
             }
         }
     }
-
 }

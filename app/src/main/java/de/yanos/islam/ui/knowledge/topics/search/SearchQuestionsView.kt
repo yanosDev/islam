@@ -57,8 +57,7 @@ import de.yanos.islam.util.labelMedium
 @Composable
 fun SearchQuestionsScreen(
     modifier: Modifier = Modifier,
-    vm: SearchQuestionsViewModel = hiltViewModel(),
-    onNavigationChange: (path: NavigationAction) -> Unit = {}
+    vm: SearchQuestionsViewModel = hiltViewModel()
 ) {
     var isActive by remember { mutableStateOf(false) }
     val recentSearches = vm.recentSearches.collectAsState(initial = listOf()).value
@@ -67,7 +66,7 @@ fun SearchQuestionsScreen(
             if (!isActive)
                 padding(horizontal = 12.dp)
         },
-    ) { values ->
+    ) { _ ->
         Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             SearchBar(
                 query = vm.query,
@@ -129,7 +128,7 @@ fun SearchQuestionsScreen(
 
 @Composable
 fun SearchHistory(modifier: Modifier = Modifier, search: Search, onHistoryClicked: (String) -> Unit) {
-    Row(modifier = Modifier
+    Row(modifier = modifier
         .padding(horizontal = 18.dp, vertical = 6.dp)
         .clickable { onHistoryClicked(search.query) }) {
         Icon(imageVector = Icons.Rounded.History, contentDescription = "Search History")

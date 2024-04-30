@@ -18,6 +18,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.ArrowForward
 import androidx.compose.material3.Icon
@@ -249,7 +251,7 @@ private fun ChallengeNavigation(
             enabled = isPreviousButtonEnabled,
             onClick = { onScroll(currentIndex - 1) }
         ) {
-            Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "Former Question")
+            Icon(imageVector = Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Former Question")
             Text(modifier = Modifier.padding(horizontal = 4.dp), text = stringResource(id = R.string.challenge_session_previous), style = labelMedium())
         }
         TextButton(
@@ -257,7 +259,7 @@ private fun ChallengeNavigation(
             onClick = { onScroll(currentIndex + 1) }
         ) {
             Text(modifier = Modifier.padding(horizontal = 4.dp), text = stringResource(id = R.string.challenge_session_next), style = labelMedium())
-            Icon(imageVector = Icons.Rounded.ArrowForward, contentDescription = "Next Question")
+            Icon(imageVector = Icons.AutoMirrored.Rounded.ArrowForward, contentDescription = "Next Question")
         }
     }
 }

@@ -153,13 +153,11 @@ fun getAnnotatedString(query: String, name: String, highlightStyle: SpanStyle): 
 @Composable
 fun alternatingColors(
     primaryColor: Color = goldColor(),
-    secondaryColor: Color = MaterialTheme.colorScheme.primary.copy(alpha = 0.85f),
     text: String,
     delimiter: Regex = Regex(" ")
 ): AnnotatedString {
     //Find where searchQuery appears in courseName
     val primaryStyle = SpanStyle(color = primaryColor)
-    val secondaryStyle = SpanStyle(color = secondaryColor)
     val builder = AnnotatedString.Builder(text)
     var startIndex = 0
     text.split(delimiter).takeIf { it.isNotEmpty() }?.forEachIndexed { index, part ->
@@ -264,7 +262,7 @@ fun Long.humanReadableByteCountSI(): String {
 }
 
 fun Context.setScreenOrientation(orientation: Int) {
-    val activity = this.findActivity() ?: return
+    val activity = this.findActivity()
     activity.requestedOrientation = orientation
     if (orientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
         hideSystemUi()
@@ -274,7 +272,7 @@ fun Context.setScreenOrientation(orientation: Int) {
 }
 
 fun Context.hideSystemUi() {
-    val activity = this.findActivity() ?: return
+    val activity = this.findActivity()
     val window = activity.window ?: return
     WindowCompat.setDecorFitsSystemWindows(window, false)
     WindowInsetsControllerCompat(window, window.decorView).let { controller ->
@@ -284,7 +282,7 @@ fun Context.hideSystemUi() {
 }
 
 fun Context.showSystemUi() {
-    val activity = this.findActivity() ?: return
+    val activity = this.findActivity()
     val window = activity.window ?: return
     WindowCompat.setDecorFitsSystemWindows(window, true)
     WindowInsetsControllerCompat(

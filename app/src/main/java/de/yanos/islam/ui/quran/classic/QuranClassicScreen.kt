@@ -52,8 +52,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun QuranClassicScreen(
     modifier: Modifier = Modifier,
-    quranViewModel: QuranClassicViewModel = hiltViewModel(),
-    onNavigationChange: (NavigationAction) -> Unit
+    quranViewModel: QuranClassicViewModel = hiltViewModel()
 ) {
     val typo = quranTypoByConfig(quranViewModel.quranSizeFactor, quranViewModel.quranStyle)
     QuranContent(

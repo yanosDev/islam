@@ -7,8 +7,8 @@ plugins {
     alias(libs.plugins.android)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.crashlytics)
-    id(libs.plugins.kapt.get().pluginId)
     id(libs.plugins.hilt.get().pluginId)
+    id(libs.plugins.kapt.get().pluginId)
 }
 android {
 

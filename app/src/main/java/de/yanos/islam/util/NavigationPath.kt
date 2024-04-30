@@ -2,9 +2,9 @@ package de.yanos.islam.util
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Chat
+import androidx.compose.material.icons.automirrored.rounded.Chat
+import androidx.compose.material.icons.automirrored.rounded.MenuBook
 import androidx.compose.material.icons.rounded.LockClock
-import androidx.compose.material.icons.rounded.MenuBook
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Text
@@ -99,14 +99,14 @@ sealed class MainNavigation(override val route: String, override val args: List<
             ),
             NavigationDestination.TopDestination(
                 route = Quran.route,
-                selectedIcon = Icons.Rounded.MenuBook,
-                unselectedIcon = Icons.Rounded.MenuBook,
+                selectedIcon = Icons.AutoMirrored.Rounded.MenuBook,
+                unselectedIcon = Icons.AutoMirrored.Rounded.MenuBook,
                 iconTextId = R.string.tab_quran
             ),
             NavigationDestination.TopDestination(
                 route = AI.route,
-                selectedIcon = Icons.Rounded.Chat,
-                unselectedIcon = Icons.Rounded.Chat,
+                selectedIcon = Icons.AutoMirrored.Rounded.Chat,
+                unselectedIcon = Icons.AutoMirrored.Rounded.Chat,
                 iconTextId = R.string.tab_ai
             ),
             NavigationDestination.TopDestination(
@@ -138,14 +138,14 @@ sealed class QuranNavigation(override val route: String, override val args: List
     object QuranPartial : QuranNavigation("quran/sure/{id}", args = listOf(navArgument("id") { type = NavType.IntType })) {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
-            QuranPartialScreen(modifier = Modifier.fillMaxSize(), onNavigationChange = onNavigationChange)
+            QuranPartialScreen(modifier = Modifier.fillMaxSize())
         }
     }
 
     object QuranClassic : QuranNavigation("quran/book") {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
-            QuranClassicScreen(modifier = Modifier.fillMaxSize(), onNavigationChange = onNavigationChange)
+            QuranClassicScreen(modifier = Modifier.fillMaxSize())
         }
     }
 
@@ -159,7 +159,7 @@ sealed class QuranNavigation(override val route: String, override val args: List
     object QuranLearning : QuranNavigation("quran/learning/") {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
-            QuranLearningScreen(modifier = Modifier.fillMaxSize(), onNavigationChange = onNavigationChange)
+            QuranLearningScreen(modifier = Modifier.fillMaxSize())
         }
     }
 }
@@ -211,7 +211,7 @@ sealed class KnowledgeNavigation(override val route: String, override val args: 
     object SearchQuestions : KnowledgeNavigation("topics/search/") {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
-            SearchQuestionsScreen(modifier = Modifier.fillMaxSize(), onNavigationChange = onNavigationChange)
+            SearchQuestionsScreen(modifier = Modifier.fillMaxSize())
         }
     }
 

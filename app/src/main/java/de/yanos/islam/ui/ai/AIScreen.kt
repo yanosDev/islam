@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.Send
 import androidx.compose.material.icons.rounded.Send
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -135,7 +136,7 @@ fun AIScreen(
             onValueChange = { currentInput = it },
             trailingIcon = {
                 IconButton(enabled = !vm.requestInProgress, onClick = { vm.sendRequest(currentInput) }) {
-                    Icon(imageVector = Icons.Rounded.Send, contentDescription = "", tint = goldColor().copy(alpha = if (vm.requestInProgress) 0.4f else 1f))
+                    Icon(imageVector = Icons.AutoMirrored.Rounded.Send, contentDescription = "", tint = goldColor().copy(alpha = if (vm.requestInProgress) 0.4f else 1f))
                 }
             })
     }

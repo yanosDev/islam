@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
@@ -63,7 +64,7 @@ import de.yanos.islam.R
 @Composable
 @Preview
 fun IslamDivider(modifier: Modifier = Modifier, color: Color = goldColor()) {
-    Divider(modifier = modifier, color = color)
+    HorizontalDivider(modifier = modifier, color = color)
 }
 
 @Composable
@@ -139,7 +140,6 @@ fun Lottie(modifier: Modifier, @RawRes resId: Int, applyColor: Boolean = true) {
         )
     )
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(resId))
-    val progress by animateLottieCompositionAsState(composition, speed = 1.6f)
     if (applyColor)
         LottieAnimation(
             modifier = modifier,

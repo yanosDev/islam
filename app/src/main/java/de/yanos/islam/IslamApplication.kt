@@ -27,9 +27,10 @@ class IslamApplication : Application(), Configuration.Provider {
     @Inject lateinit var workManager: WorkManager
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
-            .setMinimumLoggingLevel(if (BuildConfig.DEBUG) Log.INFO else Log.ERROR)
+            .setMinimumLoggingLevel(if (resources.getBoolean(R.bool.isDebug)) Log.INFO else Log.ERROR)
             .setWorkerFactory(workerFactory)
             .build()
+
     override fun onCreate() {
         StrictMode.setThreadPolicy(
             ThreadPolicy.Builder()
