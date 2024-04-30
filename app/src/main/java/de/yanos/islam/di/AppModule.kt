@@ -48,7 +48,7 @@ import de.yanos.core.utils.IODispatcher
 import de.yanos.core.utils.MainDispatcher
 import de.yanos.islam.MainActivity
 import de.yanos.islam.R
-import de.yanos.islam.data.api.AwqatApi
+import de.yanos.islam.data.api.AladhanApi
 import de.yanos.islam.data.api.QuranApi
 import de.yanos.islam.data.database.IslamDatabase
 import de.yanos.islam.data.database.IslamDatabaseImpl
@@ -94,19 +94,6 @@ internal class AppModule {
             }.build()
     }
 
-    @Awqat
-    @Provides
-    fun provideAwqatRetrofit(okHttpClient: OkHttpClient): Retrofit {
-        val moshi = Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
-            .build()
-        return Retrofit.Builder()
-            .client(okHttpClient)
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .baseUrl("https://awqatsalah.diyanet.gov.tr/")
-            .build()
-    }
-
     @Quran
     @Provides
     fun provideQuranRetrofit(okHttpClient: OkHttpClient): Retrofit {
@@ -120,6 +107,19 @@ internal class AppModule {
             .build()
     }
 
+    @Aladhan
+    @Provides
+    fun provideAladhanRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        val moshi = Moshi.Builder()
+            .add(KotlinJsonAdapterFactory())
+            .build()
+        return Retrofit.Builder()
+            .client(okHttpClient)
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .baseUrl("https://api.Aladhan.com/")
+            .build()
+    }
+
     @AzanPlayer
     @Provides
     @Singleton
@@ -129,12 +129,10 @@ internal class AppModule {
     }
 
     @Provides
-    fun provideAwqatApi(@Awqat retrofit: Retrofit): AwqatApi {
-        return retrofit.create(AwqatApi::class.java)
-    }
+    fun provideQuranApi(@Quran retrofit: Retrofit) = retrofit.create(QuranApi::class.java)
 
     @Provides
-    fun provideQuranApi(@Quran retrofit: Retrofit) = retrofit.create(QuranApi::class.java)
+    fun provideAladhanApi(@Quran retrofit: Retrofit) = retrofit.create(AladhanApi::class.java)
 
     @Provides
     @Singleton
@@ -404,6 +402,10 @@ annotation class Awqat
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class Quran
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class Aladhan
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
