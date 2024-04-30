@@ -25,7 +25,11 @@ class IslamApplication : Application(), Configuration.Provider {
     @Inject lateinit var workerFactory: HiltWorkerFactory
     @Inject lateinit var notificationManager: NotificationManager
     @Inject lateinit var workManager: WorkManager
-
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder()
+            .setMinimumLoggingLevel(if (BuildConfig.DEBUG) Log.INFO else Log.ERROR)
+            .setWorkerFactory(workerFactory)
+            .build()
     override fun onCreate() {
         StrictMode.setThreadPolicy(
             ThreadPolicy.Builder()
@@ -68,13 +72,5 @@ class IslamApplication : Application(), Configuration.Provider {
             NotificationManager.IMPORTANCE_HIGH
         )
         notificationManager.createNotificationChannel(channel)
-    }
-
-    override fun getWorkManagerConfiguration(): Configuration {
-        return Configuration.Builder()
-            .setMinimumLoggingLevel(if (BuildConfig.DEBUG) Log.INFO else Log.ERROR)
-            .setWorkerFactory(workerFactory)
-            .build()
-
     }
 }

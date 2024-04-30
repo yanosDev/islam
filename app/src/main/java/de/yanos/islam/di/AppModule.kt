@@ -48,7 +48,6 @@ import de.yanos.core.utils.DebugInterceptor
 import de.yanos.core.utils.DefaultDispatcher
 import de.yanos.core.utils.IODispatcher
 import de.yanos.core.utils.MainDispatcher
-import de.yanos.islam.BuildConfig
 import de.yanos.islam.MainActivity
 import de.yanos.islam.R
 import de.yanos.islam.data.api.AwqatApi
@@ -91,10 +90,10 @@ internal class AppModule {
     }
 
     @Provides
-    fun provideOkHttpClient(@DebugInterceptor debugInterceptor: Interceptor): OkHttpClient {
+    fun provideOkHttpClient(@ApplicationContext context: Context, @DebugInterceptor debugInterceptor: Interceptor): OkHttpClient {
         return OkHttpClient.Builder()
             .apply {
-                if (BuildConfig.DEBUG)
+                if (context.resources.getBoolean(R.bool.isDebug))
                     addInterceptor(debugInterceptor)
             }.build()
     }
@@ -381,10 +380,6 @@ internal class AppModule {
     @Singleton
     fun provideVideoMediaController(@ApplicationContext context: Context, @VideoPlayer sessionToken: SessionToken): ListenableFuture<MediaController> =
         MediaController.Builder(context, sessionToken).buildAsync()
-
-    @Provides
-    @Singleton
-    fun provideOpenAI(): OpenAI = OpenAI(token = BuildConfig.OPEN_API_TOKEN, timeout = Timeout(socket = 2.minutes))
 
     @Provides
     @Singleton

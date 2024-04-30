@@ -21,14 +21,6 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        val token: String = gradleLocalProperties(rootDir).getProperty("open.api.token")
-
-        buildConfigField(
-            "String",
-            "OPEN_API_TOKEN",
-            "\"$token\""
-        )
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -43,11 +35,13 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
     }
-    packagingOptions {
+    packaging {
         // Multiple dependency bring these files in. Exclude them to enable
         // our test APK to build (has no effect on our AARs)
-        excludes += "/META-INF/AL2.0"
-        excludes += "/META-INF/LGPL2.1"
+        resources{
+            excludes +=  "/META-INF/AL2.0"
+            excludes +=  "/META-INF/LGPL2.1"
+        }
     }
 }
 

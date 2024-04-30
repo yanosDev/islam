@@ -15,12 +15,6 @@ buildscript {
     }
 }
 
-subprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.android).apply(false)

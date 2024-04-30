@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.aallam.openai.api.chat.ChatCompletionRequest
 import com.aallam.openai.api.chat.ChatMessage
 import com.aallam.openai.api.chat.ChatRole
+import com.aallam.openai.api.http.Timeout
 import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.OpenAI
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,14 +21,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
 
 @HiltViewModel
 class AIScreenViewModel @Inject constructor(
-    private val ai: OpenAI,
     private val botDao: BotDao,
     @IODispatcher private val dispatcher: CoroutineDispatcher,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
+    private val ai = OpenAI(token = "", timeout = Timeout(socket = 2.minutes))
     internal var conversation = botDao.loadPreviousQuestions()
     var requestInProgress by mutableStateOf(false)
 
