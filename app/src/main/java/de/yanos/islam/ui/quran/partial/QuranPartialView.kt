@@ -53,16 +53,15 @@ import de.yanos.islam.R
 import de.yanos.islam.data.model.quran.Ayah
 import de.yanos.islam.ui.quran.classic.AyahSelection
 import de.yanos.islam.ui.quran.classic.audio.AyahDetailBottomSheet
-import de.yanos.islam.util.IslamDivider
-import de.yanos.islam.util.IslamSwitch
-import de.yanos.islam.util.NavigationAction
-import de.yanos.islam.util.QuranText
-import de.yanos.islam.util.alternatingColors
-import de.yanos.islam.util.bodyMedium
-import de.yanos.islam.util.headlineSmall
-import de.yanos.islam.util.labelLarge
-import de.yanos.islam.util.labelSmall
-import de.yanos.islam.util.quranTypoByConfig
+import de.yanos.islam.util.helper.IslamDivider
+import de.yanos.islam.util.helper.IslamSwitch
+import de.yanos.islam.util.helper.QuranText
+import de.yanos.islam.util.helper.alternatingColors
+import de.yanos.islam.util.helper.bodyMedium
+import de.yanos.islam.util.helper.headlineSmall
+import de.yanos.islam.util.helper.labelLarge
+import de.yanos.islam.util.helper.labelSmall
+import de.yanos.islam.util.constants.quranTypoByConfig
 import kotlinx.coroutines.launch
 
 

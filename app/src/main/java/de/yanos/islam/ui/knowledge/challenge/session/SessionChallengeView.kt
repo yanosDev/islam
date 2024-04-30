@@ -20,8 +20,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
-import androidx.compose.material.icons.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.ArrowForward
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
@@ -34,22 +32,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.core.ui.view.CustomDialog
 import de.yanos.islam.R
 import de.yanos.islam.data.model.Challenge
-import de.yanos.islam.util.IslamCheckBox
-import de.yanos.islam.util.IslamDivider
-import de.yanos.islam.util.Lottie
-import de.yanos.islam.util.NavigationAction
-import de.yanos.islam.util.NavigationPath
-import de.yanos.islam.util.bodyLarge
-import de.yanos.islam.util.bodySmall
-import de.yanos.islam.util.correctColor
-import de.yanos.islam.util.errorColor
-import de.yanos.islam.util.labelMedium
+import de.yanos.islam.util.helper.IslamDivider
+import de.yanos.islam.util.helper.Lottie
+import de.yanos.islam.util.constants.NavigationAction
+import de.yanos.islam.util.helper.bodyLarge
+import de.yanos.islam.util.helper.bodySmall
+import de.yanos.islam.util.helper.correctColor
+import de.yanos.islam.util.helper.errorColor
+import de.yanos.islam.util.helper.labelMedium
 import kotlinx.coroutines.launch
 
 @Composable

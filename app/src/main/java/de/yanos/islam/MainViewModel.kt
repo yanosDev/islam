@@ -12,8 +12,8 @@ import de.yanos.core.utils.MainDispatcher
 import de.yanos.islam.data.database.IslamDatabase
 import de.yanos.islam.data.repositories.AwqatRepository
 import de.yanos.islam.data.repositories.QuranRepository
-import de.yanos.islam.util.AppSettings
-import de.yanos.islam.util.getCurrentLocation
+import de.yanos.islam.util.settings.AppSettings
+import de.yanos.islam.util.helper.getCurrentLocation
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll

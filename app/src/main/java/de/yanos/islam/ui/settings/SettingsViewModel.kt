@@ -14,7 +14,7 @@ import androidx.media3.exoplayer.offline.DownloadManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.data.repositories.QuranRepository
-import de.yanos.islam.util.AppSettings
+import de.yanos.islam.util.settings.AppSettings
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import timber.log.Timber

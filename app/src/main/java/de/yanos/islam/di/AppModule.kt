@@ -33,8 +33,6 @@ import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionToken
 import androidx.room.Room
 import androidx.work.WorkManager
-import com.aallam.openai.api.http.Timeout
-import com.aallam.openai.client.OpenAI
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.ListenableFuture
 import com.squareup.moshi.Moshi
@@ -60,12 +58,11 @@ import de.yanos.islam.service.ExoAudioPlaybackService
 import de.yanos.islam.service.ExoLearningCallback
 import de.yanos.islam.service.ExoVideoPlaybackService
 import de.yanos.islam.util.AppContainer
-import de.yanos.islam.util.Constants
+import de.yanos.islam.util.constants.Constants
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
 import okhttp3.Interceptor
-import okhttp3.Interceptor.*
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -75,7 +72,6 @@ import java.util.Locale
 import java.util.UUID
 import javax.inject.Qualifier
 import javax.inject.Singleton
-import kotlin.time.Duration.Companion.minutes
 
 
 @UnstableApi

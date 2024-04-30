@@ -12,7 +12,7 @@ import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.R
 import de.yanos.islam.data.database.dao.QuranDao
 import de.yanos.islam.data.model.quran.Surah
-import de.yanos.islam.util.AppSettings
+import de.yanos.islam.util.settings.AppSettings
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

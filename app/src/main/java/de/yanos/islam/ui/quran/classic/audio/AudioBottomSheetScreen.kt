@@ -43,11 +43,11 @@ import androidx.compose.ui.unit.dp
 import de.yanos.islam.R
 import de.yanos.islam.data.model.quran.Ayah
 import de.yanos.islam.ui.quran.classic.AudioEvents
-import de.yanos.islam.util.IslamDivider
-import de.yanos.islam.util.alternatingColors
-import de.yanos.islam.util.arabicNumber
-import de.yanos.islam.util.bodyMedium
-import de.yanos.islam.util.labelMedium
+import de.yanos.islam.util.helper.IslamDivider
+import de.yanos.islam.util.helper.alternatingColors
+import de.yanos.islam.util.helper.arabicNumber
+import de.yanos.islam.util.helper.bodyMedium
+import de.yanos.islam.util.helper.labelMedium
 
 
 @Composable

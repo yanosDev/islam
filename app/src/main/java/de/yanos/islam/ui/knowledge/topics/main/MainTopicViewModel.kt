@@ -3,7 +3,7 @@ package de.yanos.islam.ui.knowledge.topics.main
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.yanos.islam.data.database.dao.TopicDao
-import de.yanos.islam.util.AppSettings
+import de.yanos.islam.util.settings.AppSettings
 import javax.inject.Inject
 
 @HiltViewModel

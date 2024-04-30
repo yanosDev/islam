@@ -39,11 +39,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.R
-import de.yanos.islam.util.FontStyle
-import de.yanos.islam.util.IslamRadio
-import de.yanos.islam.util.Lottie
-import de.yanos.islam.util.QuranFontStyle
-import de.yanos.islam.util.titleSmall
+import de.yanos.islam.util.constants.FontStyle
+import de.yanos.islam.util.helper.IslamRadio
+import de.yanos.islam.util.helper.Lottie
+import de.yanos.islam.util.constants.QuranFontStyle
+import de.yanos.islam.util.helper.titleSmall
 import kotlinx.coroutines.launch
 
 @Composable

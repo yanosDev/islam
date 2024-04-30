@@ -11,11 +11,10 @@ import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import dagger.hilt.android.HiltAndroidApp
-import de.yanos.core.BuildConfig
 import de.yanos.islam.service.queueAudioWorker
 import de.yanos.islam.service.queuePeriodicDailyWorker
 import de.yanos.islam.service.queueVideoWorker
-import de.yanos.islam.util.Constants
+import de.yanos.islam.util.constants.Constants
 import timber.log.Timber
 import javax.inject.Inject
 

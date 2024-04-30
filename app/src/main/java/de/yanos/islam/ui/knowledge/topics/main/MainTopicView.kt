@@ -35,12 +35,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.R
 import de.yanos.islam.data.model.Topic
 import de.yanos.islam.data.model.TopicType
-import de.yanos.islam.util.KnowledgeNavigationAction
-import de.yanos.islam.util.Lottie
-import de.yanos.islam.util.NavigationAction
-import de.yanos.islam.util.goldColor
-import de.yanos.islam.util.headlineLarge
-import de.yanos.islam.util.labelMedium
+import de.yanos.islam.util.constants.KnowledgeNavigationAction
+import de.yanos.islam.util.helper.Lottie
+import de.yanos.islam.util.constants.NavigationAction
+import de.yanos.islam.util.helper.goldColor
+import de.yanos.islam.util.helper.headlineLarge
+import de.yanos.islam.util.helper.labelMedium
 
 @Composable
 fun MainTopicsScreen(

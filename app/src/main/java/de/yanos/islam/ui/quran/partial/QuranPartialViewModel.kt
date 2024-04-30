@@ -13,7 +13,7 @@ import de.yanos.islam.ui.quran.classic.audio.AudioViewModel
 import de.yanos.islam.ui.quran.list.sure.SureSorting
 import de.yanos.islam.ui.quran.list.sure.sortSure
 import de.yanos.islam.util.AppContainer
-import de.yanos.islam.util.AppSettings
+import de.yanos.islam.util.settings.AppSettings
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch

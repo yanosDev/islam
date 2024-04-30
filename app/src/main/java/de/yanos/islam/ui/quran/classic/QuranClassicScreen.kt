@@ -40,12 +40,11 @@ import de.yanos.islam.R
 import de.yanos.islam.data.model.quran.Ayah
 import de.yanos.islam.data.model.quran.Page
 import de.yanos.islam.ui.quran.classic.audio.AyahDetailBottomSheet
-import de.yanos.islam.util.NavigationAction
-import de.yanos.islam.util.QuranText
-import de.yanos.islam.util.arabicNumber
-import de.yanos.islam.util.ayahWithColoredNumber
-import de.yanos.islam.util.quranInnerColor
-import de.yanos.islam.util.quranTypoByConfig
+import de.yanos.islam.util.helper.QuranText
+import de.yanos.islam.util.helper.arabicNumber
+import de.yanos.islam.util.helper.ayahWithColoredNumber
+import de.yanos.islam.util.helper.quranInnerColor
+import de.yanos.islam.util.constants.quranTypoByConfig
 import kotlinx.coroutines.launch
 
 

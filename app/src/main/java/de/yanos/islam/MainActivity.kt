@@ -35,16 +35,16 @@ import de.yanos.islam.ui.ai.AIScreen
 import de.yanos.islam.ui.permissions.InitScreen
 import de.yanos.islam.ui.prayer.PrayerScreen
 import de.yanos.islam.ui.settings.SettingsScreen
-import de.yanos.islam.util.AppSettings
-import de.yanos.islam.util.KnowledgeNavigation
-import de.yanos.islam.util.MainNavigation
-import de.yanos.islam.util.NavigationAction
-import de.yanos.islam.util.PatternedBackgroung
-import de.yanos.islam.util.QuranNavigation
-import de.yanos.islam.util.ToRootAfterPermission
-import de.yanos.islam.util.allKnowledge
-import de.yanos.islam.util.allQuran
-import de.yanos.islam.util.typoByConfig
+import de.yanos.islam.util.settings.AppSettings
+import de.yanos.islam.util.constants.KnowledgeNavigation
+import de.yanos.islam.util.constants.MainNavigation
+import de.yanos.islam.util.constants.NavigationAction
+import de.yanos.islam.util.helper.PatternedBackgroung
+import de.yanos.islam.util.constants.QuranNavigation
+import de.yanos.islam.util.constants.ToRootAfterPermission
+import de.yanos.islam.util.constants.allKnowledge
+import de.yanos.islam.util.constants.allQuran
+import de.yanos.islam.util.constants.typoByConfig
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

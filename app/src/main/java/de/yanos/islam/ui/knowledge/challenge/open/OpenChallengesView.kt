@@ -29,15 +29,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.R
-import de.yanos.islam.util.IslamDivider
-import de.yanos.islam.util.KnowledgeNavigationAction
-import de.yanos.islam.util.NavigationAction
-import de.yanos.islam.util.bodySmall
-import de.yanos.islam.util.correctColor
-import de.yanos.islam.util.errorColor
-import de.yanos.islam.util.goldColor
-import de.yanos.islam.util.labelMedium
-import de.yanos.islam.util.titleLarge
+import de.yanos.islam.util.helper.IslamDivider
+import de.yanos.islam.util.constants.KnowledgeNavigationAction
+import de.yanos.islam.util.constants.NavigationAction
+import de.yanos.islam.util.helper.bodySmall
+import de.yanos.islam.util.helper.correctColor
+import de.yanos.islam.util.helper.errorColor
+import de.yanos.islam.util.helper.goldColor
+import de.yanos.islam.util.helper.labelMedium
+import de.yanos.islam.util.helper.titleLarge
 
 @Composable
 fun OpenChallengesScreen(

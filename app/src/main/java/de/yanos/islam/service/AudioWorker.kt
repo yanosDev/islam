@@ -18,7 +18,7 @@ import de.yanos.islam.R
 import de.yanos.islam.data.database.dao.QuranDao
 import de.yanos.islam.data.model.quran.Ayah
 import de.yanos.islam.util.AppContainer
-import de.yanos.islam.util.AppSettings
+import de.yanos.islam.util.settings.AppSettings
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext

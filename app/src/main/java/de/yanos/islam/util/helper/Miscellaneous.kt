@@ -1,4 +1,4 @@
-package de.yanos.islam.util
+package de.yanos.islam.util.helper
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -22,6 +22,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.google.android.gms.location.LocationServices
 import de.yanos.core.utils.findActivity
+import de.yanos.islam.util.states.LoadState
 import retrofit2.Response
 import timber.log.Timber
 import java.io.File

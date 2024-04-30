@@ -17,7 +17,7 @@ import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.data.database.dao.AwqatDao
 import de.yanos.islam.data.model.Schedule
 import de.yanos.islam.data.model.awqat.PrayerTime
-import de.yanos.islam.util.AppSettings
+import de.yanos.islam.util.settings.AppSettings
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import timber.log.Timber

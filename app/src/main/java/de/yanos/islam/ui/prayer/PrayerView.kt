@@ -55,16 +55,16 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.R
 import de.yanos.islam.data.model.Schedule
 import de.yanos.islam.data.model.awqat.AwqatDailyContent
-import de.yanos.islam.util.ContentAfterLoading
-import de.yanos.islam.util.IslamDivider
-import de.yanos.islam.util.IslamSwitch
-import de.yanos.islam.util.bodySmall
-import de.yanos.islam.util.correctColor
-import de.yanos.islam.util.goldColor
-import de.yanos.islam.util.labelLarge
-import de.yanos.islam.util.labelSmall
-import de.yanos.islam.util.titleLarge
-import de.yanos.islam.util.titleSmall
+import de.yanos.islam.util.helper.ContentAfterLoading
+import de.yanos.islam.util.helper.IslamDivider
+import de.yanos.islam.util.helper.IslamSwitch
+import de.yanos.islam.util.helper.bodySmall
+import de.yanos.islam.util.helper.correctColor
+import de.yanos.islam.util.helper.goldColor
+import de.yanos.islam.util.helper.labelLarge
+import de.yanos.islam.util.helper.labelSmall
+import de.yanos.islam.util.helper.titleLarge
+import de.yanos.islam.util.helper.titleSmall
 import kotlin.math.abs
 
 @Composable

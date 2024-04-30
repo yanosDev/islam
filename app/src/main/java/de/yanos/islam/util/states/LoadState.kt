@@ -1,4 +1,4 @@
-package de.yanos.islam.util
+package de.yanos.islam.util.states
 
 sealed interface LoadState<T> {
     data class Data<T>(val data: T) : LoadState<T>

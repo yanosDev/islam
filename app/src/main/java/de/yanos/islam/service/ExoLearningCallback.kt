@@ -9,7 +9,7 @@ import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import de.yanos.islam.data.repositories.QuranRepository
 import de.yanos.islam.util.AppContainer
-import de.yanos.islam.util.Constants
+import de.yanos.islam.util.constants.Constants
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job

@@ -7,6 +7,7 @@ import com.google.common.util.concurrent.ListenableFuture
 import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.di.AudioPlayer
 import de.yanos.islam.di.VideoPlayer
+import de.yanos.islam.util.settings.AppSettings
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.asExecutor
 import javax.inject.Inject

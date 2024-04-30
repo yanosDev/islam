@@ -13,7 +13,7 @@ import de.yanos.islam.data.model.VideoLearning
 import de.yanos.islam.data.repositories.QuranRepository
 import de.yanos.islam.di.VideoPlayer
 import de.yanos.islam.util.AppContainer
-import de.yanos.islam.util.AppSettings
+import de.yanos.islam.util.settings.AppSettings
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

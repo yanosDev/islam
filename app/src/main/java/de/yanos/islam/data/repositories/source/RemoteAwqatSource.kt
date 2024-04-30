@@ -8,9 +8,9 @@ import de.yanos.islam.data.model.awqat.AwqatEidResponse
 import de.yanos.islam.data.model.awqat.AwqatLocationResponse
 import de.yanos.islam.data.model.awqat.AwqatPrayerTimeResponse
 import de.yanos.islam.data.model.awqat.Login
-import de.yanos.islam.util.AppSettings
-import de.yanos.islam.util.LoadState
-import de.yanos.islam.util.localResponse
+import de.yanos.islam.util.settings.AppSettings
+import de.yanos.islam.util.states.LoadState
+import de.yanos.islam.util.helper.localResponse
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import retrofit2.awaitResponse

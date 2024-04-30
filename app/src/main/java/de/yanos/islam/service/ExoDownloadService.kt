@@ -10,8 +10,8 @@ import androidx.media3.exoplayer.scheduler.Requirements
 import androidx.media3.exoplayer.scheduler.Scheduler
 import dagger.hilt.android.AndroidEntryPoint
 import de.yanos.islam.R
-import de.yanos.islam.util.Constants
-import de.yanos.islam.util.humanReadableByteCountSI
+import de.yanos.islam.util.constants.Constants
+import de.yanos.islam.util.helper.humanReadableByteCountSI
 import javax.inject.Inject
 
 @UnstableApi

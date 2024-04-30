@@ -1,4 +1,4 @@
-package de.yanos.islam.util
+package de.yanos.islam.util.states
 
 interface ScreenState
 

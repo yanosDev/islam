@@ -32,14 +32,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.R
-import de.yanos.islam.util.IslamDivider
-import de.yanos.islam.util.IslamRadio
-import de.yanos.islam.util.NavigationAction
-import de.yanos.islam.util.QuranNavigationAction
-import de.yanos.islam.util.bodyMedium
-import de.yanos.islam.util.bodySmall
-import de.yanos.islam.util.headlineSmall
-import de.yanos.islam.util.labelLarge
+import de.yanos.islam.util.helper.IslamDivider
+import de.yanos.islam.util.helper.IslamRadio
+import de.yanos.islam.util.constants.NavigationAction
+import de.yanos.islam.util.constants.QuranNavigationAction
+import de.yanos.islam.util.helper.bodyMedium
+import de.yanos.islam.util.helper.bodySmall
+import de.yanos.islam.util.helper.headlineSmall
+import de.yanos.islam.util.helper.labelLarge
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

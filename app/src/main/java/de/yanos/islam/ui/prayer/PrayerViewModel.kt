@@ -18,8 +18,8 @@ import de.yanos.islam.data.model.CityData
 import de.yanos.islam.data.model.Schedule
 import de.yanos.islam.data.model.awqat.AwqatDailyContent
 import de.yanos.islam.service.DailyScheduleWorker
-import de.yanos.islam.util.IsLoading
-import de.yanos.islam.util.ScreenState
+import de.yanos.islam.util.states.IsLoading
+import de.yanos.islam.util.states.ScreenState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged

@@ -1,4 +1,4 @@
-package de.yanos.islam.util
+package de.yanos.islam.util.helper
 
 import android.annotation.SuppressLint
 import android.content.Context

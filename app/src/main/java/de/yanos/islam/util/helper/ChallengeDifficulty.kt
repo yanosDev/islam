@@ -1,4 +1,4 @@
-package de.yanos.islam.util
+package de.yanos.islam.util.helper
 
 sealed class ChallengeDifficulty(
     val quizCount: Int,

@@ -18,10 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.data.model.Quiz
-import de.yanos.islam.util.IslamDivider
-import de.yanos.islam.util.bodyMedium
-import de.yanos.islam.util.labelLarge
-import de.yanos.islam.util.titleLarge
+import de.yanos.islam.util.helper.IslamDivider
+import de.yanos.islam.util.helper.bodyMedium
+import de.yanos.islam.util.helper.labelLarge
+import de.yanos.islam.util.helper.titleLarge
 
 @Composable
 fun QuestionListScreen(

@@ -1,4 +1,4 @@
-package de.yanos.islam.util
+package de.yanos.islam.util.constants
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
@@ -28,6 +28,7 @@ import de.yanos.islam.ui.quran.list.main.QuranMainListScreen
 import de.yanos.islam.ui.quran.list.sure.SureListScreen
 import de.yanos.islam.ui.quran.partial.QuranPartialScreen
 import de.yanos.islam.ui.quran.search.QuranSearchScreen
+import de.yanos.islam.util.helper.headlineLarge
 
 interface NavigationPath {
     val route: String

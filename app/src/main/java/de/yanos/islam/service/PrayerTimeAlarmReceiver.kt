@@ -13,7 +13,7 @@ import androidx.core.net.toUri
 import dagger.hilt.android.AndroidEntryPoint
 import de.yanos.islam.R
 import de.yanos.islam.di.AzanPlayer
-import de.yanos.islam.util.Constants
+import de.yanos.islam.util.constants.Constants
 import javax.inject.Inject
 
 

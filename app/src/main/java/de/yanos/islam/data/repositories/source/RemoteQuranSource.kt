@@ -14,8 +14,8 @@ import de.yanos.islam.data.api.QuranApi
 import de.yanos.islam.data.model.alquran.QuranAudioResponse
 import de.yanos.islam.data.model.alquran.QuranTextResponse
 import de.yanos.islam.service.ExoDownloadService
-import de.yanos.islam.util.LoadState
-import de.yanos.islam.util.localResponse
+import de.yanos.islam.util.states.LoadState
+import de.yanos.islam.util.helper.localResponse
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import retrofit2.awaitResponse

@@ -10,7 +10,7 @@ import de.yanos.islam.data.model.quran.Page
 import de.yanos.islam.data.model.quran.Surah
 import de.yanos.islam.data.repositories.source.LocalQuranSource
 import de.yanos.islam.data.repositories.source.RemoteQuranSource
-import de.yanos.islam.util.LoadState
+import de.yanos.islam.util.states.LoadState
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

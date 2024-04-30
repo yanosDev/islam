@@ -1,4 +1,4 @@
-package de.yanos.islam.util
+package de.yanos.islam.util.constants
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.geometry.Offset
@@ -9,6 +9,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import de.yanos.islam.R
+import de.yanos.islam.util.settings.AppSettings
 
 fun typoByConfig(appSettings: AppSettings): Typography {
     return typoByConfig(appSettings.fontSizeFactor, appSettings.fontStyle)

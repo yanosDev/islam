@@ -33,13 +33,13 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import de.yanos.islam.R
-import de.yanos.islam.util.LocationPermission
-import de.yanos.islam.util.Lottie
-import de.yanos.islam.util.NotificationPermission
-import de.yanos.islam.util.bodyLarge
-import de.yanos.islam.util.goldColor
-import de.yanos.islam.util.titleLarge
-import de.yanos.islam.util.titleSmall
+import de.yanos.islam.util.helper.LocationPermission
+import de.yanos.islam.util.helper.Lottie
+import de.yanos.islam.util.helper.NotificationPermission
+import de.yanos.islam.util.helper.bodyLarge
+import de.yanos.islam.util.helper.goldColor
+import de.yanos.islam.util.helper.titleLarge
+import de.yanos.islam.util.helper.titleSmall
 
 
 @SuppressLint("UnrememberedMutableState")

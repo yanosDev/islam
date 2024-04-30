@@ -21,8 +21,8 @@ import de.yanos.core.utils.MainDispatcher
 import de.yanos.islam.data.database.dao.VideoDao
 import de.yanos.islam.data.model.VideoLearning
 import de.yanos.islam.util.AppContainer
-import de.yanos.islam.util.AppSettings
-import de.yanos.islam.util.safeLet
+import de.yanos.islam.util.settings.AppSettings
+import de.yanos.islam.util.helper.safeLet
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext

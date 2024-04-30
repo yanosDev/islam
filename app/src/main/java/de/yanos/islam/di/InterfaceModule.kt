@@ -18,8 +18,8 @@ import de.yanos.islam.data.repositories.source.RemoteAwqatSource
 import de.yanos.islam.data.repositories.source.RemoteAwqatSourceImpl
 import de.yanos.islam.data.usecase.LocationUseCase
 import de.yanos.islam.data.usecase.LocationUseCaseImpl
-import de.yanos.islam.util.AppSettings
-import de.yanos.islam.util.AppSettingsImpl
+import de.yanos.islam.util.settings.AppSettings
+import de.yanos.islam.util.settings.AppSettingsImpl
 
 @Module
 @InstallIn(SingletonComponent::class)

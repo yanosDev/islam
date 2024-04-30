@@ -14,25 +14,22 @@ import androidx.compose.foundation.shape.AbsoluteCutCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.LibraryBooks
 import androidx.compose.material.icons.automirrored.rounded.MenuBook
-import androidx.compose.material.icons.rounded.LibraryBooks
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.VideoLibrary
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.R
-import de.yanos.islam.util.Lottie
-import de.yanos.islam.util.NavigationAction
-import de.yanos.islam.util.QuranNavigationAction
-import de.yanos.islam.util.goldColor
-import de.yanos.islam.util.labelMedium
+import de.yanos.islam.util.helper.Lottie
+import de.yanos.islam.util.constants.NavigationAction
+import de.yanos.islam.util.constants.QuranNavigationAction
+import de.yanos.islam.util.helper.goldColor
+import de.yanos.islam.util.helper.labelMedium
 
 @Composable
 fun QuranMainListScreen(

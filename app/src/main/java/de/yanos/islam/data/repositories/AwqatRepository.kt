@@ -9,8 +9,8 @@ import de.yanos.islam.data.model.awqat.LocationType
 import de.yanos.islam.data.model.awqat.PrayerTime
 import de.yanos.islam.data.repositories.source.LocalAwqatSource
 import de.yanos.islam.data.repositories.source.RemoteAwqatSource
-import de.yanos.islam.util.AppSettings
-import de.yanos.islam.util.getData
+import de.yanos.islam.util.settings.AppSettings
+import de.yanos.islam.util.helper.getData
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll

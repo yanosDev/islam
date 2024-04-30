@@ -40,9 +40,8 @@ import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import coil.compose.AsyncImage
 import de.yanos.islam.data.model.VideoLearning
-import de.yanos.islam.util.NavigationAction
-import de.yanos.islam.util.goldColor
-import de.yanos.islam.util.setScreenOrientation
+import de.yanos.islam.util.helper.goldColor
+import de.yanos.islam.util.helper.setScreenOrientation
 
 @Composable
 fun QuranLearningScreen(

@@ -1,4 +1,4 @@
-package de.yanos.islam.util
+package de.yanos.islam.util.constants
 
 object Constants {
     const val CHANNEL_ID_DOWNLOAD = "cid_download"

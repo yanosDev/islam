@@ -12,10 +12,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.R
 import de.yanos.islam.ui.knowledge.topics.main.TopicButtons
-import de.yanos.islam.util.KnowledgeNavigationAction
-import de.yanos.islam.util.Lottie
-import de.yanos.islam.util.NavigationAction
-import de.yanos.islam.util.headlineMedium
+import de.yanos.islam.util.constants.KnowledgeNavigationAction
+import de.yanos.islam.util.helper.Lottie
+import de.yanos.islam.util.constants.NavigationAction
+import de.yanos.islam.util.helper.headlineMedium
 
 @Composable
 fun SubTopicsScreen(

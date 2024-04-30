@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -27,18 +26,17 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.core.ui.view.CustomDialog
 import de.yanos.islam.R
-import de.yanos.islam.util.ChallengeDifficulty
-import de.yanos.islam.util.IslamCheckBox
-import de.yanos.islam.util.IslamDivider
-import de.yanos.islam.util.IslamRadio
-import de.yanos.islam.util.KnowledgeNavigationAction
-import de.yanos.islam.util.Lottie
-import de.yanos.islam.util.NavigationAction
-import de.yanos.islam.util.NavigationPath
-import de.yanos.islam.util.bodyLarge
-import de.yanos.islam.util.bodyMedium
-import de.yanos.islam.util.labelMedium
-import de.yanos.islam.util.titleLarge
+import de.yanos.islam.util.helper.ChallengeDifficulty
+import de.yanos.islam.util.helper.IslamCheckBox
+import de.yanos.islam.util.helper.IslamDivider
+import de.yanos.islam.util.helper.IslamRadio
+import de.yanos.islam.util.constants.KnowledgeNavigationAction
+import de.yanos.islam.util.helper.Lottie
+import de.yanos.islam.util.constants.NavigationAction
+import de.yanos.islam.util.helper.bodyLarge
+import de.yanos.islam.util.helper.bodyMedium
+import de.yanos.islam.util.helper.labelMedium
+import de.yanos.islam.util.helper.titleLarge
 
 @Composable
 fun ChallengeScreen(

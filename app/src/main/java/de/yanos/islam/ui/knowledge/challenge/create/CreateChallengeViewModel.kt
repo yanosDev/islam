@@ -12,7 +12,7 @@ import de.yanos.islam.data.database.dao.ChallengeDao
 import de.yanos.islam.data.database.dao.TopicDao
 import de.yanos.islam.data.model.Challenge
 import de.yanos.islam.data.model.TopicType
-import de.yanos.islam.util.ChallengeDifficulty
+import de.yanos.islam.util.helper.ChallengeDifficulty
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

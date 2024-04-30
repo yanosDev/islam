@@ -39,14 +39,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.R
 import de.yanos.islam.ui.knowledge.topics.search.SearchHistory
-import de.yanos.islam.util.IslamDivider
-import de.yanos.islam.util.NavigationAction
-import de.yanos.islam.util.QuranNavigationAction
-import de.yanos.islam.util.bodyMedium
-import de.yanos.islam.util.getAnnotatedString
-import de.yanos.islam.util.goldColor
-import de.yanos.islam.util.labelLarge
-import de.yanos.islam.util.labelMedium
+import de.yanos.islam.util.helper.IslamDivider
+import de.yanos.islam.util.constants.NavigationAction
+import de.yanos.islam.util.constants.QuranNavigationAction
+import de.yanos.islam.util.helper.bodyMedium
+import de.yanos.islam.util.helper.getAnnotatedString
+import de.yanos.islam.util.helper.goldColor
+import de.yanos.islam.util.helper.labelLarge
+import de.yanos.islam.util.helper.labelMedium
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
