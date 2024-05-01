@@ -187,10 +187,6 @@ internal class AppModule {
 
     @Provides
     @Singleton
-    fun provideAwqatDao(db: IslamDatabase) = db.awqatDao()
-
-    @Provides
-    @Singleton
     fun provideSensorManager(@ApplicationContext context: Context): SensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
     @Magnetometer
@@ -394,10 +390,6 @@ internal class AppModule {
     @Singleton
     fun provideFilesDir(@ApplicationContext context: Context) = context.filesDir
 }
-
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class Awqat
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)

@@ -7,12 +7,8 @@ import androidx.room.Query
 import de.yanos.islam.data.model.CityData
 import de.yanos.islam.data.model.Degree
 import de.yanos.islam.data.model.Schedule
-import de.yanos.islam.data.model.awqat.AwqatDailyContent
-import de.yanos.islam.data.model.awqat.CityDetail
-import de.yanos.islam.data.model.awqat.CityEid
-import de.yanos.islam.data.model.awqat.Location
-import de.yanos.islam.data.model.awqat.PrayerTime
 import kotlinx.coroutines.flow.Flow
+/*
 
 @Dao
 interface AwqatDao : BaseDao<PrayerTime> {
@@ -77,4 +73,4 @@ interface AwqatDao : BaseDao<PrayerTime> {
 
     @Query("SELECT * FROM Schedule WHERE enabled = 1")
     suspend fun activeSchedules(): List<Schedule>
-}
+}*/

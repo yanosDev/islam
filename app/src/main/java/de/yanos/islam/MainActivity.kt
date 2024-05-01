@@ -33,7 +33,6 @@ import de.yanos.core.ui.theme.AppTheme
 import de.yanos.core.ui.view.DynamicNavigationScreen
 import de.yanos.islam.ui.ai.AIScreen
 import de.yanos.islam.ui.permissions.InitScreen
-import de.yanos.islam.ui.prayer.PrayerScreen
 import de.yanos.islam.ui.settings.SettingsScreen
 import de.yanos.islam.util.settings.AppSettings
 import de.yanos.islam.util.constants.KnowledgeNavigation
@@ -124,7 +123,7 @@ private fun IslamNavHost(
                 route = MainNavigation.Praying.route,
                 deepLinks = listOf(navDeepLink { uriPattern = "yanos://de.islam/praying" })
             ) {
-                PrayerScreen(modifier = Modifier.fillMaxSize())
+//                PrayerScreen(modifier = Modifier.fillMaxSize())
             }
             composable(
                 route = MainNavigation.AI.route,

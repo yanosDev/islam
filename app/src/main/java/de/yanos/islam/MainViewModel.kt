@@ -10,14 +10,11 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import de.yanos.core.utils.IODispatcher
 import de.yanos.core.utils.MainDispatcher
 import de.yanos.islam.data.database.IslamDatabase
-import de.yanos.islam.data.repositories.AwqatRepository
 import de.yanos.islam.data.repositories.QuranRepository
 import de.yanos.islam.util.settings.AppSettings
-import de.yanos.islam.util.helper.getCurrentLocation
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,7 +22,6 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     val appSettings: AppSettings,
-    private val awqatRepository: AwqatRepository,
     @ApplicationContext private val context: Context,
     private val db: IslamDatabase,
     @IODispatcher private val dispatcher: CoroutineDispatcher,
@@ -43,14 +39,14 @@ class MainViewModel @Inject constructor(
             var quranDone = false
             listOf(
                 async {
-                    if (appSettings.isDBInitialized) {
+                    /*if (appSettings.isDBInitialized) {
                         db.create(context)
                         appSettings.isDBInitialized = true
-                    }
+                    }*/
                     creationDone = true
                 },
                 async {
-                    awqatRepository.fetchAwqatLocationIndependentData()
+//                    awqatRepository.fetchAwqatLocationIndependentData()
                     locationDone = true
                 },
                 async {
@@ -65,21 +61,22 @@ class MainViewModel @Inject constructor(
 
     fun readLocationData() {
         viewModelScope.launch(dispatcher) {
-            while (!appSettings.isDBInitialized)
-                delay(500)
-            getCurrentLocation(context = context) { lat, lon ->
-                viewModelScope.launch(dispatcher) {
-                    @Suppress("DEPRECATION")
-                    geocoder.getFromLocation(lat, lon, 1)?.firstOrNull()?.let { address ->
-                        (address.subAdminArea ?: address.adminArea)?.let { name ->
-                            appSettings.lastLocation = name
-                            appSettings.lastLocation.takeIf { it.isNotBlank() }?.let {
-                                awqatRepository.fetchCityData(it)
-                            }
-                        }
-                    }
-                }
-            }
+            /* while (!appSettings.isDBInitialized)
+                 delay(500)
+             getCurrentLocation(context = context) { lat, lon ->
+                 viewModelScope.launch(dispatcher) {
+                     @Suppress("DEPRECATION")
+                     geocoder.getFromLocation(lat, lon, 1)?.firstOrNull()?.let { address ->
+                         (address.subAdminArea ?: address.adminArea)?.let { name ->
+                             appSettings.lastLocation = name
+                             appSettings.lastLocation.takeIf { it.isNotBlank() }?.let {
+                                 awqatRepository.fetchCityData(it)
+                             }
+                         }
+                     }
+                 }
+             }
+         }*/
         }
     }
 }

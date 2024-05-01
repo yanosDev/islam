@@ -1,6 +1,5 @@
 package de.yanos.islam.service
 
-import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
@@ -14,30 +13,18 @@ import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import de.yanos.core.utils.IODispatcher
-import de.yanos.islam.data.database.dao.AwqatDao
-import de.yanos.islam.data.model.Schedule
-import de.yanos.islam.data.model.awqat.PrayerTime
 import de.yanos.islam.util.settings.AppSettings
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.time.Duration
-import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
-import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
-
 
 @HiltWorker
 class DailyScheduleWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
-    private val dao: AwqatDao,
     private val appSettings: AppSettings,
     private val alarmManager: AlarmManager,
     @IODispatcher private val dispatcher: CoroutineDispatcher
@@ -45,7 +32,7 @@ class DailyScheduleWorker @AssistedInject constructor(
     override suspend fun doWork(): Result {
         return withContext(dispatcher) {
             cancelAllAlarms()
-            dao.loadCityCode(appSettings.lastLocation.uppercase())?.let { cityCode ->
+           /* dao.loadCityCode(appSettings.lastLocation.uppercase())?.let { cityCode ->
                 val prayingTime = dao.loadCityTimes(cityCode).first {
                     val date = LocalDate.parse(it.gregorianDateShort, DateTimeFormatter.ofPattern("dd.MM.yyyy"))
                     date.dayOfYear == LocalDate.now().dayOfYear && date.year == LocalDate.now().year
@@ -53,7 +40,7 @@ class DailyScheduleWorker @AssistedInject constructor(
                 dao.activeSchedules().forEach {
                     scheduleTime(it, prayingTime)
                 }
-            }
+            }*/
             Result.success()
         }
     }
@@ -71,7 +58,7 @@ class DailyScheduleWorker @AssistedInject constructor(
         }
     }
 
-    @SuppressLint("ScheduleExactAlarm")
+  /*  @SuppressLint("ScheduleExactAlarm")
     private fun scheduleTime(schedule: Schedule, prayingTime: PrayerTime) {
         val prayerTime = when (schedule.ordinal) {
             0 -> prayingTime.fajr
@@ -99,7 +86,7 @@ class DailyScheduleWorker @AssistedInject constructor(
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 )
             )
-    }
+    }*/
 }
 
 

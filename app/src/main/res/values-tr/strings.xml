@@ -1,24 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name" translatable="false">Islam</string>
-
-    <string name="method_shia" translatable="false">Shia Ithna-Ashari</string>
-    <string name="method_karachi" translatable="false">University of Islamic Sciences, Karachi</string>
-    <string name="method_north_america" translatable="false">Islamic Society of North America</string>
-    <string name="method_world_league" translatable="false">Muslim World League</string>
-    <string name="method_makkah" translatable="false">Umm Al-Qura University, Makkah</string>
-    <string name="method_egyptian" translatable="false">Egyptian General Authority of Survey</string>
-    <string name="method_tehran" translatable="false">Institute of Geophysics, University of Tehran</string>
-    <string name="method_gulf" translatable="false">Gulf Region</string>
-    <string name="method_kuwait" translatable="false">Kuwait</string>
-    <string name="method_qatar" translatable="false">Qatar</string>
-    <string name="method_singapore" translatable="false">Majlis Ugama Islam Singapura, Singapore</string>
-    <string name="method_france" translatable="false">Union Organization islamic de France</string>
-    <string name="method_diyanet" translatable="false">Diyanet İşleri Başkanlığı, Turkey</string>
-    <string name="method_russia" translatable="false">Spiritual Administration of Muslims of Russia</string>
-
-    <string name="school_hanafi">Hanafi</string>
-    <string name="school_safi">Shafi</string>
 
     <string name="tab_topic">Konular</string>
     <string name="tab_quran">Kuran</string>
