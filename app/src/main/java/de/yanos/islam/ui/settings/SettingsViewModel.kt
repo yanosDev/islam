@@ -33,8 +33,15 @@ class SettingsViewModel @Inject constructor(
     var downloadState: AudioDownloadState by mutableStateOf(AudioDownloadState.IsIdle)
     var progress by mutableIntStateOf(0)
     var max by mutableIntStateOf(0)
+    var fontSize by mutableIntStateOf(appSettings.fontSizeFactor)
+    var fontStyle by mutableIntStateOf(appSettings.fontStyle)
+    var quranFontSize by mutableIntStateOf(appSettings.quranSizeFactor)
+    var quranFontStyle by mutableIntStateOf(appSettings.quranStyle)
 
-    fun startTimer() {
+    init {
+        startTimer()
+    }
+    private fun startTimer() {
         if (timer == null) {
             timer = Timer()
             timer?.scheduleAtFixedRate(
@@ -72,11 +79,6 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun clearTimer() {
-        timer?.cancel()
-        timer = null
-    }
-
     fun queueDownloadAll() {
         viewModelScope.launch {
             downloadState = AudioDownloadState.IsDownloading
@@ -112,13 +114,9 @@ class SettingsViewModel @Inject constructor(
         appSettings.quranStyle = style
     }
 
-    var fontSize by mutableIntStateOf(appSettings.fontSizeFactor)
-    var fontStyle by mutableIntStateOf(appSettings.fontStyle)
-    var quranFontSize by mutableIntStateOf(appSettings.quranSizeFactor)
-    var quranFontStyle by mutableIntStateOf(appSettings.quranStyle)
-
     override fun onCleared() {
-        clearTimer()
+        timer?.cancel()
+        timer = null
         super.onCleared()
     }
 }

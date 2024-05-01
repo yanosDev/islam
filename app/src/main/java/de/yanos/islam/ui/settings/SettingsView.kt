@@ -51,15 +51,6 @@ fun SettingsScreen(
     modifier: Modifier = Modifier,
     vm: SettingsViewModel = hiltViewModel()
 ) {
-    val scope = rememberCoroutineScope()
-    DisposableEffect(scope) {
-        scope.launch {
-            vm.startTimer()
-        }
-        onDispose {
-            vm.clearTimer()
-        }
-    }
     var recreate by remember { mutableStateOf(false) }
     if (recreate) {
         (LocalContext.current as? Activity)?.recreate()
