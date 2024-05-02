@@ -14,12 +14,16 @@ import de.yanos.islam.data.usecase.LocationUseCase
 import de.yanos.islam.data.usecase.LocationUseCaseImpl
 import de.yanos.islam.util.settings.AppSettings
 import de.yanos.islam.util.settings.AppSettingsImpl
+import de.yanos.islam.util.settings.FeatureSettings
+import de.yanos.islam.util.settings.FeatureSettingsImpl
 
 @Module
 @InstallIn(SingletonComponent::class)
 internal abstract class InterfaceModule {
     @Binds
     abstract fun bindAppSettings(appSettings: AppSettingsImpl): AppSettings
+    @Binds
+    abstract fun bindFeatureSettings(appSettings: FeatureSettingsImpl): FeatureSettings
     @Binds
     abstract fun bindQuranLocalSource(source: LocalQuranSourceImpl): LocalQuranSource
     @Binds
