@@ -18,9 +18,17 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.FactCheck
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -29,6 +37,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -67,6 +78,12 @@ fun IslamDivider(modifier: Modifier = Modifier, color: Color = goldColor()) {
 }
 
 @Composable
+@Preview
+fun IslamLightDivider(modifier: Modifier = Modifier, color: Color = goldColor()) {
+    HorizontalDivider(modifier = modifier.alpha(0.25f), color = color)
+}
+
+@Composable
 fun IslamCheckBox(
     modifier: Modifier = Modifier,
     isEnabled: Boolean = true,
@@ -82,6 +99,51 @@ fun IslamCheckBox(
         )
         TextButton(onClick = { onCheckChange(!isChecked) }, enabled = isEnabled) {
             content()
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun IslamDropDown(
+    selectedValue: String,
+    options: List<String>,
+    label: String,
+    onValueChangedEvent: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+        modifier = modifier
+    ) {
+        OutlinedTextField(
+            readOnly = true,
+            value = selectedValue,
+            onValueChange = {},
+            label = { Text(text = label) },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
+            colors = OutlinedTextFieldDefaults.colors(),
+            modifier = Modifier
+                .menuAnchor()
+                .fillMaxWidth()
+        )
+
+        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            options.forEach { option: String ->
+                DropdownMenuItem(
+                    text = { Text(text = option) },
+                    trailingIcon = { if (selectedValue != option) Icons.AutoMirrored.Rounded.FactCheck },
+                    onClick = {
+                        expanded = false
+                        onValueChangedEvent(option)
+                    }
+                )
+            }
         }
     }
 }
@@ -155,38 +217,6 @@ fun Lottie(modifier: Modifier, @RawRes resId: Int, applyColor: Boolean = true) {
 
 }
 
-@Composable
-fun PatternedBackgroung(
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    Box(
-        modifier = modifier.fillMaxSize()
-    ) {
-//        BackGroundPattern(modifier = Modifier.matchParentSize())
-        content()
-    }
-}
-
-@Composable
-fun BackGroundPattern(modifier: Modifier = Modifier) {
-    val pattern = ImageBitmap.imageResource(R.drawable.pattern_2)
-
-    Canvas(
-        modifier = modifier.alpha(if (isSystemInDarkTheme()) 0.1F else 0.2F)
-    ) {
-        val paint = Paint().asFrameworkPaint().apply {
-            isAntiAlias = true
-            shader = ImageShader(pattern, TileMode.Repeated, TileMode.Repeated)
-        }
-
-        drawIntoCanvas {
-            it.nativeCanvas.drawPaint(paint)
-        }
-        paint.reset()
-    }
-}
-
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun NotificationPermission(
@@ -239,18 +269,6 @@ fun PermissionCompose(
         LaunchedEffect(key1 = true) {
             launcher.launch(permission)
         }
-    }
-}
-
-@Composable
-fun <T> ContentAfterLoading(
-    state: ScreenState,
-    clazz: Class<T>,
-    content: @Composable (T) -> Unit
-) where T : ScreenState {
-    @Suppress("UNCHECKED_CAST")
-    AnimatedVisibility(visible = state::class.java == clazz, enter = fadeIn()) {
-        content(state as T)
     }
 }
 

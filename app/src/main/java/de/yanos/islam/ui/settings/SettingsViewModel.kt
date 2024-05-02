@@ -14,6 +14,7 @@ import androidx.media3.exoplayer.offline.DownloadManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.data.repositories.QuranRepository
+import de.yanos.islam.util.constants.Method
 import de.yanos.islam.util.settings.AppSettings
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -25,10 +26,11 @@ import kotlin.concurrent.timerTask
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val appSettings: AppSettings,
-    @IODispatcher private val dispatcher: CoroutineDispatcher,
     private val downloadManager: DownloadManager,
     private val quranRepository: QuranRepository,
 ) : ViewModel() {
+    var method by mutableStateOf(Method.valueFromId(appSettings.method))
+
     private var timer: Timer? = null
     var downloadState: AudioDownloadState by mutableStateOf(AudioDownloadState.IsIdle)
     var progress by mutableIntStateOf(0)
@@ -47,7 +49,7 @@ class SettingsViewModel @Inject constructor(
             timer?.scheduleAtFixedRate(
                 timerTask()
                 {
-                    viewModelScope.launch(dispatcher) {
+                    viewModelScope.launch {
                         val queuedSize = downloadManager.downloadIndex.getDownloads(
                             Download.STATE_COMPLETED,
                             Download.STATE_QUEUED,
@@ -88,7 +90,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun pauseDownloadingAll() {
-        viewModelScope.launch(dispatcher) {
+        viewModelScope.launch {
             downloadState = AudioDownloadState.IsPaused
             downloadManager.pauseDownloads()
         }

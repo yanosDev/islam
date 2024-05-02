@@ -20,6 +20,25 @@
     <string name="school_hanafi">Hanafi</string>
     <string name="school_safi">Shafi</string>
 
+    <string name="settings_title">Settings</string>
+    <string name="settings_section_profile">Profile</string>
+    <string name="settings_section_profile_description">Authentication, Language, …</string>
+    <string name="settings_section_localization">Location</string>
+    <string name="settings_section_localization_description">Add Locals to pull exact praying times</string>
+    <string name="settings_section_prayer">Prayer Data and Timer</string>
+    <string name="settings_section_prayer_description">Data source, school and schedule reminders</string>
+    <string name="settings_section_font">Font</string>
+    <string name="settings_section_font_description">Change font style and size</string>
+    <string name="settings_section_cache">Cache</string>
+    <string name="settings_section_cache_description">Cache of audio and video data</string>
+    <string name="settings_section_subscription">Subscription</string>
+    <string name="settings_section_subscription_description">Ask AI, schedule reminders, create meetings</string>
+    <string name="settings_section_info">Help</string>
+    <string name="settings_section_info_description">Legal, contact, help section</string>
+
+    <string name="settings_method_label">Choose your desired school to retrieve data from</string>
+
+
     <string name="tab_topic">Konular</string>
     <string name="tab_quran">Kuran</string>
     <string name="tab_history">Sonuçlar</string>

@@ -23,6 +23,8 @@ plugins {
     alias(libs.plugins.hilt).apply(false)
     alias(libs.plugins.benManes).apply(true)
     alias(libs.plugins.versionCatalog).apply(true)
+    alias(libs.plugins.googleServices).apply(false)
+
 }
 
 apply("${project.rootDir}/buildscripts/toml-updater-config.gradle")

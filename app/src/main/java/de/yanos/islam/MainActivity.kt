@@ -38,11 +38,12 @@ import de.yanos.islam.util.settings.AppSettings
 import de.yanos.islam.util.constants.KnowledgeNavigation
 import de.yanos.islam.util.constants.MainNavigation
 import de.yanos.islam.util.constants.NavigationAction
-import de.yanos.islam.util.helper.PatternedBackgroung
 import de.yanos.islam.util.constants.QuranNavigation
+import de.yanos.islam.util.constants.SettingsNavigation
 import de.yanos.islam.util.constants.ToRootAfterPermission
 import de.yanos.islam.util.constants.allKnowledge
 import de.yanos.islam.util.constants.allQuran
+import de.yanos.islam.util.constants.allSettings
 import de.yanos.islam.util.constants.typoByConfig
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -75,7 +76,7 @@ class MainActivity : ComponentActivity() {
                     ) { contentModifier ->
                         IslamNavHost(
                             modifier = contentModifier,
-                            startRoute = MainNavigation.all[0].route,
+                            startRoute = MainNavigation.all[4].route,
                             navController = navController!!
                         )
                     }
@@ -112,30 +113,25 @@ private fun IslamNavHost(
         }
         Unit
     }
-    PatternedBackgroung(modifier = modifier) {
-        NavHost(
-            navController = navController,
-            startDestination = startRoute,
+    NavHost(
+        modifier = modifier,
+        navController = navController,
+        startDestination = startRoute,
+    ) {
+        navKnowledge(onNavigationChange = onNavigationChange)
+        navQuran(onNavigationChange = onNavigationChange)
+        composable(
+            route = MainNavigation.Praying.route,
+            deepLinks = listOf(navDeepLink { uriPattern = "yanos://de.islam/praying" })
         ) {
-            navKnowledge(onNavigationChange = onNavigationChange)
-            navQuran(onNavigationChange = onNavigationChange)
-            composable(
-                route = MainNavigation.Praying.route,
-                deepLinks = listOf(navDeepLink { uriPattern = "yanos://de.islam/praying" })
-            ) {
 //                PrayerScreen(modifier = Modifier.fillMaxSize())
-            }
-            composable(
-                route = MainNavigation.AI.route,
-            ) {
-                AIScreen(modifier = Modifier.fillMaxSize())
-            }
-            composable(
-                route = MainNavigation.Settings.route,
-            ) {
-                SettingsScreen(modifier = Modifier.fillMaxSize())
-            }
         }
+        composable(
+            route = MainNavigation.AI.route,
+        ) {
+            AIScreen(modifier = Modifier.fillMaxSize())
+        }
+        navSettings(onNavigationChange = onNavigationChange)
     }
 }
 
@@ -145,6 +141,33 @@ fun NavGraphBuilder.navQuran(onNavigationChange: (NavigationAction) -> Unit) {
         route = MainNavigation.Quran.route,
     ) {
         allQuran.forEachIndexed { index, path ->
+            if (index == 0)
+                composable(
+                    route = path.route, arguments = path.args,
+                    exitTransition = { fadeOut() }
+                ) {
+                    path.View(onNavigationChange = onNavigationChange)
+                }
+            else
+                composable(
+                    route = path.route, arguments = path.args,
+                    enterTransition = { slideInHorizontally(initialOffsetX = { it }) },
+                    exitTransition = { fadeOut() },
+                    popEnterTransition = { slideInHorizontally(initialOffsetX = { -it }) },
+                    popExitTransition = { slideOutHorizontally(targetOffsetX = { it }) },
+                ) {
+                    path.View(onNavigationChange = onNavigationChange)
+                }
+        }
+    }
+}
+
+fun NavGraphBuilder.navSettings(onNavigationChange: (NavigationAction) -> Unit) {
+    navigation(
+        startDestination = SettingsNavigation.MainSetting.route,
+        route = MainNavigation.Settings.route,
+    ) {
+        allSettings.forEachIndexed { index, path ->
             if (index == 0)
                 composable(
                     route = path.route, arguments = path.args,

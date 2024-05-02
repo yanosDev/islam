@@ -17,5 +17,11 @@ enum class Method(val id: Int, @StringRes val res: Int) {
     Singapore(id = 11, res = R.string.method_singapore),
     France(id = 12, res = R.string.method_france),
     Diyanet(id = 13, res = R.string.method_diyanet),
-    Russia(id = 14, res = R.string.method_russia)
+    Russia(id = 14, res = R.string.method_russia);
+
+    companion object {
+        fun valueFromId(methodId: Int): Method {
+            return Method.entries.find { it.id == methodId } ?: Diyanet
+        }
+    }
 }

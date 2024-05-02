@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.android)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.crashlytics)
+    id(libs.plugins.googleServices.get().pluginId)
     id(libs.plugins.hilt.get().pluginId)
     id(libs.plugins.kapt.get().pluginId)
 }
@@ -38,9 +39,9 @@ android {
     packaging {
         // Multiple dependency bring these files in. Exclude them to enable
         // our test APK to build (has no effect on our AARs)
-        resources{
-            excludes +=  "/META-INF/AL2.0"
-            excludes +=  "/META-INF/LGPL2.1"
+        resources {
+            excludes += "/META-INF/AL2.0"
+            excludes += "/META-INF/LGPL2.1"
         }
     }
 }
@@ -104,4 +105,9 @@ dependencies {
     implementation(aiBom)
     implementation(libs.open.ai)
     implementation(libs.ktor.client)
+
+    //Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.crashlytics)
 }

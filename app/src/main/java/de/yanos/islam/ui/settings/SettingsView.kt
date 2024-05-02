@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,6 +24,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -36,42 +38,43 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.R
 import de.yanos.islam.util.constants.FontStyle
+import de.yanos.islam.util.constants.Method
+import de.yanos.islam.util.constants.NavigationAction
 import de.yanos.islam.util.helper.IslamRadio
 import de.yanos.islam.util.helper.Lottie
 import de.yanos.islam.util.constants.QuranFontStyle
+import de.yanos.islam.util.helper.IslamDivider
+import de.yanos.islam.util.helper.IslamDropDown
+import de.yanos.islam.util.helper.headlineMedium
+import de.yanos.islam.util.helper.labelLarge
 import de.yanos.islam.util.helper.titleSmall
 import kotlinx.coroutines.launch
 
 @Composable
 fun SettingsScreen(
     modifier: Modifier = Modifier,
-    vm: SettingsViewModel = hiltViewModel()
+    vm: SettingsViewModel = hiltViewModel(),
+    onNavigationChange: (NavigationAction) -> Unit ={}
 ) {
-    var recreate by remember { mutableStateOf(false) }
+    /*var recreate by remember { mutableStateOf(false) }
     if (recreate) {
         (LocalContext.current as? Activity)?.recreate()
         recreate = false
     }
-    LazyColumn(modifier = modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-        item {
-            Lottie(modifier = Modifier.height(128.dp), resId = R.raw.lottie_config, applyColor = false)
-        }
-        item {
-            MediaCard(
-                modifier = Modifier,
-                state = vm.downloadState,
-                downloadProgress = vm.progress,
-                downloadMax = vm.max,
-                pauseDownload = { vm.pauseDownloadingAll() },
-                resumeDownload = { vm.queueDownloadAll() },
-                startDownload = { vm.queueDownloadAll() })
-        }
+    LazyColumn(modifier = modifier, contentPadding = PaddingValues(vertical = 16.dp), horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.SpaceBetween) {
+        item { SettingsHeader(modifier = Modifier.padding(horizontal = 16.dp)) }
+        item { PrayerHeader(modifier = Modifier.padding(horizontal = 24.dp)) }
+        item { PrayerMethod(modifier = Modifier.padding(horizontal = 16.dp), currentSelection = stringResource(id = vm.method.res)) }
+        item { NotificationTime(modifier = Modifier.padding(horizontal = 16.dp)) }
+        item { FontHeader(modifier = Modifier.padding(horizontal = 16.dp)) }
         item {
             FontSettings(
+                modifier = Modifier.padding(horizontal = 16.dp),
                 icon = Icons.Rounded.FormatSize,
                 currentSize = vm.fontSize,
                 fontStyleId = R.string.setting_font_style_title,
@@ -106,7 +109,50 @@ fun SettingsScreen(
                 fonts = QuranFontStyle.values().map { it.textId }
             )
         }
-    }
+    }*/
+
+
+}
+
+@Composable
+@Preview
+private fun NotificationTime(
+    modifier: Modifier = Modifier
+) {
+
+}
+
+@Composable
+@Preview
+private fun PrayerMethod(
+    currentSelection: String,
+    modifier: Modifier = Modifier
+) {
+    IslamDropDown(
+        modifier = modifier,
+        selectedValue = currentSelection,
+        options = Method.entries.map { stringResource(id = it.res) },
+        label = stringResource(id = R.string.settings_method_label),
+        onValueChangedEvent = {}
+    )
+}
+
+@Composable
+@Preview
+private fun FontHeader(modifier: Modifier = Modifier) {
+    Text(modifier = modifier, text = stringResource(id = R.string.settings_section_font), style = labelLarge())
+}
+
+@Composable
+@Preview
+private fun PrayerHeader(modifier: Modifier = Modifier) {
+    Text(modifier = modifier, text = stringResource(id = R.string.settings_section_prayer), style = labelLarge())
+}
+
+@Composable
+@Preview
+private fun SettingsHeader(modifier: Modifier = Modifier) {
+    Text(modifier = modifier, text = stringResource(id = R.string.settings_title), style = headlineMedium())
 }
 
 @Composable

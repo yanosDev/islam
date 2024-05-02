@@ -28,6 +28,13 @@ import de.yanos.islam.ui.quran.list.main.QuranMainListScreen
 import de.yanos.islam.ui.quran.list.sure.SureListScreen
 import de.yanos.islam.ui.quran.partial.QuranPartialScreen
 import de.yanos.islam.ui.quran.search.QuranSearchScreen
+import de.yanos.islam.ui.settings.font.FontSettingView
+import de.yanos.islam.ui.settings.info.InfoSettingView
+import de.yanos.islam.ui.settings.language.ProfileSettingView
+import de.yanos.islam.ui.settings.localization.LocalizationSettingView
+import de.yanos.islam.ui.settings.main.MainSettingsView
+import de.yanos.islam.ui.settings.prayer.PrayerSettingView
+import de.yanos.islam.ui.settings.subscription.SubscriptionSettingView
 import de.yanos.islam.util.helper.headlineLarge
 
 interface NavigationPath {
@@ -49,23 +56,32 @@ sealed interface NavigationAction {
     }
 }
 
-object ToRootAfterPermission : NavigationAction {
+data object ToRootAfterPermission : NavigationAction {
     override val route: String = KnowledgeNavigation.MainList.route
 }
 
 sealed class QuranNavigationAction(override val route: String) : NavigationAction {
-    object NavigateToQuran : QuranNavigationAction(QuranNavigation.QuranClassic.route)
-    object NavigateToQuranSearch : QuranNavigationAction(QuranNavigation.SearchThroughQuran.route)
-    object NavigateToVideoLearnings : QuranNavigationAction(QuranNavigation.QuranLearning.route)
-    object NavigateToSureList : QuranNavigationAction(QuranNavigation.SureList.route)
+    data object NavigateToQuran : QuranNavigationAction(QuranNavigation.QuranClassic.route)
+    data object NavigateToQuranSearch : QuranNavigationAction(QuranNavigation.SearchThroughQuran.route)
+    data object NavigateToVideoLearnings : QuranNavigationAction(QuranNavigation.QuranLearning.route)
+    data object NavigateToSureList : QuranNavigationAction(QuranNavigation.SureList.route)
     class NavigateToSure(val id: Int) : QuranNavigationAction(QuranNavigation.QuranPartial.route.replace("{id}", id.toString()))
 }
 
+sealed class SettingsNavigationAction(override val route: String) : NavigationAction {
+    data object NavigateToProfile : SettingsNavigationAction(SettingsNavigation.ProfileSetting.route)
+    data object NavigateToLocalization : SettingsNavigationAction(SettingsNavigation.LocalizationSetting.route)
+    data object NavigateToPrayer : SettingsNavigationAction(SettingsNavigation.PrayerSetting.route)
+    data object NavigateToSubscription : SettingsNavigationAction(SettingsNavigation.SubscriptionSetting.route)
+    data object NavigateToInfo : SettingsNavigationAction(SettingsNavigation.InfoSetting.route)
+    data object NavigateToCache : SettingsNavigationAction(SettingsNavigation.CacheSetting.route)
+}
+
 sealed class KnowledgeNavigationAction(override val route: String) : NavigationAction {
-    object NavigateToChallengeCreation : KnowledgeNavigationAction(KnowledgeNavigation.Challenge.route)
+    data object NavigateToChallengeCreation : KnowledgeNavigationAction(KnowledgeNavigation.Challenge.route)
     data class NavigateToChallenge(val id: Int) : KnowledgeNavigationAction(KnowledgeNavigation.ChallengeSession.route.replace("{id}", id.toString()))
-    object NavigateToOpenChallenges : KnowledgeNavigationAction(KnowledgeNavigation.ChallengeOpen.route)
-    object NavigateToSearchQuestions : KnowledgeNavigationAction(KnowledgeNavigation.SearchQuestions.route)
+    data object NavigateToOpenChallenges : KnowledgeNavigationAction(KnowledgeNavigation.ChallengeOpen.route)
+    data object NavigateToSearchQuestions : KnowledgeNavigationAction(KnowledgeNavigation.SearchQuestions.route)
     data class NavigateToSubTopic(val id: Int) : KnowledgeNavigationAction(KnowledgeNavigation.SubList.route.replace("{id}", id.toString()))
     data class NavigateToTopicQuestions(val id: Int, val parentId: Int?) :
         KnowledgeNavigationAction(KnowledgeNavigation.QuestionList.route.replace("{id}", id.toString()).replace("{parentId}", (parentId?.toString() ?: "-1")))
@@ -81,7 +97,7 @@ sealed class MainNavigation(override val route: String, override val args: List<
     object Quran : MainNavigation("quran")
     object Praying : MainNavigation("praying")
     object AI : MainNavigation("ai")
-    object Settings : MainNavigation("settings")
+    object Settings : MainNavigation("setting")
 
     companion object {
 
@@ -122,42 +138,42 @@ sealed class MainNavigation(override val route: String, override val args: List<
 
 sealed class QuranNavigation(override val route: String, override val args: List<NamedNavArgument> = emptyList()) : NavigationPath {
 
-    object QuranMainList : QuranNavigation("quran/main") {
+    data object QuranMainList : QuranNavigation("quran/main") {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
             QuranMainListScreen(modifier = Modifier.fillMaxSize(), onNavigationChange = onNavigationChange)
         }
     }
 
-    object SureList : QuranNavigation("quran/sure") {
+    data object SureList : QuranNavigation("quran/sure") {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
             SureListScreen(modifier = Modifier.fillMaxSize(), onNavigationChange = onNavigationChange)
         }
     }
 
-    object QuranPartial : QuranNavigation("quran/sure/{id}", args = listOf(navArgument("id") { type = NavType.IntType })) {
+    data object QuranPartial : QuranNavigation("quran/sure/{id}", args = listOf(navArgument("id") { type = NavType.IntType })) {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
             QuranPartialScreen(modifier = Modifier.fillMaxSize())
         }
     }
 
-    object QuranClassic : QuranNavigation("quran/book") {
+    data object QuranClassic : QuranNavigation("quran/book") {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
             QuranClassicScreen(modifier = Modifier.fillMaxSize())
         }
     }
 
-    object SearchThroughQuran : QuranNavigation("quran/search/") {
+    data object SearchThroughQuran : QuranNavigation("quran/search/") {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
             QuranSearchScreen(modifier = Modifier.fillMaxSize(), onNavigationChange = onNavigationChange)
         }
     }
 
-    object QuranLearning : QuranNavigation("quran/learning/") {
+    data object QuranLearning : QuranNavigation("quran/learning/") {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
             QuranLearningScreen(modifier = Modifier.fillMaxSize())
@@ -165,22 +181,82 @@ sealed class QuranNavigation(override val route: String, override val args: List
     }
 }
 
+sealed class SettingsNavigation(override val route: String, override val args: List<NamedNavArgument> = emptyList()) : NavigationPath {
+    data object MainSetting : SettingsNavigation("setting/main") {
+        @Composable
+        override fun View(onNavigationChange: (NavigationAction) -> Unit) {
+            MainSettingsView(onNavigationChange = onNavigationChange)
+        }
+    }
+
+    data object ProfileSetting : SettingsNavigation("setting/profile") {
+        @Composable
+        override fun View(onNavigationChange: (NavigationAction) -> Unit) {
+            ProfileSettingView()
+        }
+    }
+
+    data object FontSetting : SettingsNavigation("setting/font") {
+        @Composable
+        override fun View(onNavigationChange: (NavigationAction) -> Unit) {
+            FontSettingView()
+        }
+    }
+
+    data object InfoSetting : SettingsNavigation("setting/info") {
+        @Composable
+        override fun View(onNavigationChange: (NavigationAction) -> Unit) {
+            InfoSettingView()
+        }
+    }
+
+    data object CacheSetting : SettingsNavigation("setting/cache") {
+        @Composable
+        override fun View(onNavigationChange: (NavigationAction) -> Unit) {
+            InfoSettingView()
+        }
+    }
+
+    data object LocalizationSetting : SettingsNavigation("setting/localization") {
+        @Composable
+        override fun View(onNavigationChange: (NavigationAction) -> Unit) {
+            LocalizationSettingView()
+        }
+    }
+
+    data object PrayerSetting : SettingsNavigation("setting/prayer") {
+        @Composable
+        override fun View(onNavigationChange: (NavigationAction) -> Unit) {
+            PrayerSettingView()
+        }
+    }
+
+    data object SubscriptionSetting : SettingsNavigation("setting/subscribe") {
+        @Composable
+        override fun View(onNavigationChange: (NavigationAction) -> Unit) {
+            SubscriptionSettingView()
+        }
+    }
+
+
+}
+
 sealed class KnowledgeNavigation(override val route: String, override val args: List<NamedNavArgument> = emptyList()) : NavigationPath {
-    object MainList : KnowledgeNavigation("topics") {
+    data object MainList : KnowledgeNavigation("topics") {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
             MainTopicsScreen(modifier = Modifier.fillMaxSize(), onNavigationChange = onNavigationChange)
         }
     }
 
-    object SubList : KnowledgeNavigation("topics/{id}", args = listOf(navArgument("id") { type = NavType.IntType })) {
+    data object SubList : KnowledgeNavigation("topics/{id}", args = listOf(navArgument("id") { type = NavType.IntType })) {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
             SubTopicsScreen(modifier = Modifier.fillMaxSize(), onNavigationChange = onNavigationChange)
         }
     }
 
-    object QuestionList :
+    data object QuestionList :
         KnowledgeNavigation("topics/{parentId}/questions/{id}", args = listOf(navArgument("id") { type = NavType.IntType }, navArgument("parentId") { type = NavType.IntType })) {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
@@ -188,35 +264,35 @@ sealed class KnowledgeNavigation(override val route: String, override val args: 
         }
     }
 
-    object Challenge : KnowledgeNavigation("topics/challenge") {
+    data object Challenge : KnowledgeNavigation("topics/challenge") {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
             ChallengeScreen(modifier = Modifier.fillMaxSize(), onNavigationChange = onNavigationChange)
         }
     }
 
-    object ChallengeSession : KnowledgeNavigation("topics/challenge/{id}", args = listOf(navArgument("id") { type = NavType.IntType })) {
+    data object ChallengeSession : KnowledgeNavigation("topics/challenge/{id}", args = listOf(navArgument("id") { type = NavType.IntType })) {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
             ChallengeSessionScreen(modifier = Modifier.fillMaxSize(), onNavigationChange = onNavigationChange)
         }
     }
 
-    object ChallengeOpen : KnowledgeNavigation("topics/challenge/open/") {
+    data object ChallengeOpen : KnowledgeNavigation("topics/challenge/open/") {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
             OpenChallengesScreen(modifier = Modifier.fillMaxSize(), onNavigationChange = onNavigationChange)
         }
     }
 
-    object SearchQuestions : KnowledgeNavigation("topics/search/") {
+    data object SearchQuestions : KnowledgeNavigation("topics/search/") {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
             SearchQuestionsScreen(modifier = Modifier.fillMaxSize())
         }
     }
 
-    object ChallengeHistory : KnowledgeNavigation("topics/challenge/history/")
+    data object ChallengeHistory : KnowledgeNavigation("topics/challenge/history/")
 }
 
 val allKnowledge = listOf(
@@ -237,4 +313,15 @@ val allQuran = listOf(
     QuranNavigation.QuranClassic,
     QuranNavigation.SearchThroughQuran,
     QuranNavigation.QuranLearning,
+)
+
+val allSettings = listOf(
+    SettingsNavigation.MainSetting,
+    SettingsNavigation.ProfileSetting,
+    SettingsNavigation.FontSetting,
+    SettingsNavigation.InfoSetting,
+    SettingsNavigation.LocalizationSetting,
+    SettingsNavigation.PrayerSetting,
+    SettingsNavigation.CacheSetting,
+    SettingsNavigation.SubscriptionSetting,
 )

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "195044962562",
+    "project_id": "islam-ec1b9",
+    "storage_bucket": "islam-ec1b9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:195044962562:android:894e21e20ea81b48e4121b",
+        "android_client_info": {
+          "package_name": "de.yanos.islam"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCG4nCEGP_tGmK_nVc4RQgVL4MQBlun9KI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
