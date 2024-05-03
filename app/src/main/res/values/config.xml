@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <bool name="isDebug">true</bool>
+    <string name="gcp_id" translatable="false">195044962562-00bs7j47gio3pqvo2ckj2elu52skakot.apps.googleusercontent.com</string>
 </resources>

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -42,6 +43,7 @@ import de.yanos.islam.util.constants.NavigationAction
 import de.yanos.islam.util.constants.SettingsNavigationAction
 import de.yanos.islam.util.helper.IslamLightDivider
 import de.yanos.islam.util.helper.headlineMedium
+import de.yanos.islam.util.helper.labelLarge
 import de.yanos.islam.util.helper.labelMedium
 import de.yanos.islam.util.helper.labelSmall
 
@@ -127,13 +129,15 @@ private fun SettingItem(
     action: SettingsNavigationAction = SettingsNavigationAction.NavigateToProfile,
     onNavigationChange: (NavigationAction) -> Unit = {}
 ) {
-    Column(modifier = modifier.padding(horizontal = 12.dp)) {
+    Column(modifier = modifier
+        .padding(horizontal = 12.dp)
+        .fillMaxWidth()) {
         Spacer(modifier = Modifier.height(8.dp))
-        Row(modifier = Modifier.clickable { onNavigationChange(action) }, horizontalArrangement = Arrangement.Start) {
+        Row(modifier = Modifier.fillMaxWidth().clickable { onNavigationChange(action) }, horizontalArrangement = Arrangement.Start) {
             Icon(imageVector = icon, contentDescription = "Menu Icon")
             Spacer(modifier = Modifier.width(16.dp))
             Column(horizontalAlignment = Alignment.Start) {
-                Text(text = stringResource(id = title), style = labelMedium())
+                Text(text = stringResource(id = title), style = labelLarge())
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(modifier = Modifier.alpha(0.6f), text = stringResource(id = description), style = labelSmall())
             }

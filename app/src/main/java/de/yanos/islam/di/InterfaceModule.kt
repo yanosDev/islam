@@ -4,6 +4,8 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import de.yanos.islam.data.repositories.AuthRepository
+import de.yanos.islam.data.repositories.AuthRepositoryImpl
 import de.yanos.islam.data.repositories.QuranRepository
 import de.yanos.islam.data.repositories.QuranRepositoryImpl
 import de.yanos.islam.data.repositories.source.LocalQuranSource
@@ -30,6 +32,8 @@ internal abstract class InterfaceModule {
     abstract fun bindQuranRemoteSource(source: RemoteQuranSourceImpl): RemoteQuranSource
     @Binds
     abstract fun bindQuranRepository(repo: QuranRepositoryImpl): QuranRepository
+    @Binds
+    abstract fun bindAuthRepository(impl: AuthRepositoryImpl): AuthRepository
     @Binds
     abstract fun bindLocationUsecase(useCase: LocationUseCaseImpl): LocationUseCase
 }

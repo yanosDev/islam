@@ -35,6 +35,7 @@ import androidx.room.Room
 import androidx.work.WorkManager
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.ListenableFuture
+import com.google.firebase.auth.FirebaseAuth
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -370,6 +371,10 @@ internal class AppModule {
     @Singleton
     fun provideVideoMediaController(@ApplicationContext context: Context, @VideoPlayer sessionToken: SessionToken): ListenableFuture<MediaController> =
         MediaController.Builder(context, sessionToken).buildAsync()
+
+    @Provides
+    @Singleton
+    fun provideFirebaseAuth() = FirebaseAuth.getInstance()
 
     @Provides
     @Singleton

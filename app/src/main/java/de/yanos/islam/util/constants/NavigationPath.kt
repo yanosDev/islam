@@ -192,7 +192,7 @@ sealed class SettingsNavigation(override val route: String, override val args: L
     data object ProfileSetting : SettingsNavigation("setting/profile") {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
-            ProfileSettingView()
+            ProfileSettingView(onNavigationChange = onNavigationChange)
         }
     }
 

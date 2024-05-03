@@ -11,6 +11,7 @@ import javax.inject.Inject
 interface AppSettings {
     var school: Int
     var method: Int
+    var userName: String
     var fontSizeFactor: Int
     var fontStyle: Int
     var quranSizeFactor: Int
@@ -25,6 +26,7 @@ interface AppSettings {
 class AppSettingsImpl @Inject constructor(@ApplicationContext context: Context) : AppSettings {
     override var school: Int by PreferenceItem<Int>(context) { School.Hanafi.id }
     override var method: Int by PreferenceItem<Int>(context) { Method.Diyanet.id }
+    override var userName: String by PreferenceItem<String>(context) { "" }
     override var fontSizeFactor: Int by PreferenceItem<Int>(context) { 0 }
     override var fontStyle: Int by PreferenceItem<Int>(context) { 2 }
     override var quranSizeFactor: Int by PreferenceItem<Int>(context) { 0 }

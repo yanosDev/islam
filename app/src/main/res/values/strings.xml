@@ -38,6 +38,9 @@
 
     <string name="settings_method_label">Choose your desired school to retrieve data from</string>
 
+    <string name="settings_profile_name">Username to be used</string>
+    <string name="settings_profile_sign_out">Sign Out</string>
+    <string name="settings_profile_sign_in">Sign In for more features</string>
 
     <string name="tab_topic">Konular</string>
     <string name="tab_quran">Kuran</string>

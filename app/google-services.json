@@ -12,7 +12,20 @@
           "package_name": "de.yanos.islam"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "195044962562-5gari4il1irg5upi8im3hpbkf2t6hlbe.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "de.yanos.islam",
+            "certificate_hash": "d4b8e934f666ce4114210bb2421772da9a5342e6"
+          }
+        },
+        {
+          "client_id": "195044962562-00bs7j47gio3pqvo2ckj2elu52skakot.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCG4nCEGP_tGmK_nVc4RQgVL4MQBlun9KI"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "195044962562-00bs7j47gio3pqvo2ckj2elu52skakot.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
