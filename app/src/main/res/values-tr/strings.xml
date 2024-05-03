@@ -1,121 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="school_hanafi">Hanefi</string>
+    <string name="school_safi">Şafi</string>
 
+    <string name="settings_title">Ayarlar</string>
+    <string name="settings_section_profile">Kullanici</string>
+    <string name="settings_section_profile_description">Kimlik doğrulama, Dil, …</string>
+    <string name="settings_section_localization">Konum</string>
+    <string name="settings_section_localization_description">Namaz vakitleri icin konum gerekli</string>
+    <string name="settings_section_prayer">Namaz vakitleri ve uyarilar</string>
+    <string name="settings_section_prayer_description">Namaz vakitleri kaynağı, mesep ve uyarilar</string>
+    <string name="settings_section_font">Yazı tipi</string>
+    <string name="settings_section_font_description">Yazi tipi ve boyutu değiştir</string>
+    <string name="settings_section_cache">Önbellek</string>
+    <string name="settings_section_cache_description">Ayetler ve video dersleri indir</string>
+    <string name="settings_section_subscription">Abonelik</string>
+    <string name="settings_section_subscription_description">Ai sorgulama, uyarilar, toplantilar</string>
+    <string name="settings_section_info">Yardim</string>
+    <string name="settings_section_info_description">Hukuk, iletişim, yardım bölümü</string>
 
-    <string name="tab_topic">Konular</string>
-    <string name="tab_quran">Kuran</string>
-    <string name="tab_history">Sonuçlar</string>
-    <string name="tab_ai">AI</string>
-    <string name="tab_time">Namaz Vakitler</string>
-    <string name="tab_setting">Ayarlar</string>
+    <string name="settings_method_label">Veri almak istediğiniz okulu seçin</string>
 
-    <string name="search_placeholder">Ara…</string>
-    <string name="main_topic_title">Konular</string>
-    <string name="main_search_question">Sorulari aramak istermisin?</string>
-    <string name="main_to_new_challenge">Kendinizi Denemek istermisin?</string>
-    <string name="challenge_creation_title">Sinav Zorlugunu ve Konularinizi secin</string>
-    <string name="challenge_creation_difficulty_low">Kolay</string>
-    <string name="challenge_creation_difficulty_mid">Orta</string>
-    <string name="challenge_creation_difficulty_high">Zor</string>
-    <string name="challenge_creation_difficulty_max">Hepsi</string>
-    <string name="challenge_creation_total_count">Sorularin Sayisi: %s</string>
-    <string name="challenge_creation_level">Sorularin Zorlugu: %s</string>
-    <string name="challenge_creation_create">Sinava Gir</string>
-    <string name="challenge_creation_to_open">Önceki Sinvalarim</string>
-    <string name="challenge_creation_error_title">Sinav Olusturalamadi</string>
-    <string name="challenge_creation_error_content">Herhangi bir Konu secmediniz. Lütfen en azindan bir Konu seciniz</string>
-    <string name="challenge_creation_header">Henüz Sonuclanmamis Sinavlariniz var. Devam etmek istermisiniz?</string>
-    <string name="challenge_creation_corrects">Dogru: </string>
-    <string name="challenge_creation_count">Toplam: </string>
-    <string name="challenge_creation_failures">Yanlis: </string>
-    <string name="challenge_creation_delete">Sinavi Sil</string>
-    <string name="challenge_creation_delete_all">Hepsini Sil</string>
-    <string name="challenge_creation_new_form">Yeni Sinav Olustur</string>
-    <string name="challenge_session_previous">Önceki Soru</string>
-    <string name="challenge_session_next">Sonraki Soru</string>
-    <string name="challenge_session_show_answer">Sonucu göster</string>
-    <string name="challenge_session_total">Toplam Sorular:</string>
-    <string name="challenge_session_correct">Bilinen Sorular:</string>
-    <string name="challenge_session_error">Hatali Sorular:</string>
-    <string name="challenge_session_answer_correct">Bildim</string>
-    <string name="challenge_session_answer_failure">Bilemedim</string>
-    <string name="challenge_session_finished">Sinaviniz Bitmistir</string>
-    <string name="challenge_session_finished_result">Toplam %d sorudan tam %d tanesini dogru cevapladiniz ve %d tanesine yanlis cevap verdiniz</string>
-    <string name="praying_schedule_before">Namaz vaktine %d dakika kala</string>
-    <string name="praying_schedule_after">Namaz vaktinden %d dakika sonra</string>
-    <string name="praying_schedule_header">Alarmlar</string>
-    <string name="praying_schedule_fajr">Imsak Hatirlatmasi</string>
-    <string name="praying_schedule_sunrise">Günes Hatirlatmasi</string>
-    <string name="praying_schedule_dhuhr">Öglen Namazi Hatirlatmasi</string>
-    <string name="praying_schedule_asr">Ikindi Namazi Hatirlatmasi</string>
-    <string name="praying_schedule_maghrib">Aksam Namazi Hatirlatmasi</string>
-    <string name="praying_schedule_isha">Yatsi Namazi Hatirlatmasi</string>
-    <string name="praying_imsak_title">Imsak</string>
-    <string name="praying_morning_title">Sabah</string>
-    <string name="praying_sunrise_title">Günes</string>
-    <string name="praying_lunch_title">Ögle</string>
-    <string name="praying_afternoon_title">Ikindi</string>
-    <string name="praying_evening_title">Aksam</string>
-    <string name="praying_night_title">Yatsi</string>
-    <string name="praying_times_header">Namaz Vakitleri</string>
-    <string name="praying_daily_verse">Günün Ayeti:</string>
-    <string name="praying_daily_hadith">Günün Hadisi:</string>
-    <string name="praying_daily_prayer">Günün Duasi:</string>
-    <string name="setting_download_title">Internetsiz Kullanim</string>
-    <string name="setting_download_description">Internetsiz kullanim icin Ayetlerin Ses Kayitlarini ve Egitim videolari burdan indirebilirsiniz</string>
-    <string name="setting_download_start">Indir</string>
-    <string name="setting_font_title">Yazi ayarlari</string>
-    <string name="setting_font_size_title">Uygulama Genel Yazisi</string>
-    <string name="setting_font_style_title">Uygulama Genel Yazi Boyutu</string>
-    <string name="setting_quran_size_title">Quran Yazisi</string>
-    <string name="setting_quran_style_title">Quran Yazisinin Boyutu</string>
-    <string name="setting_apply_now">Simdi Degisiklikleri gerceklestir</string>
-    <string name="font_alogical">Alogical</string>
-    <string name="font_open_sans">Open Sans</string>
-    <string name="font_roboto">Roboto</string>
-    <string name="font_ubuntu">Ubuntu</string>
-    <string name="font_montserrat">Montserrat</string>
-    <string name="font_qalam">Al Qalam</string>
-    <string name="font_scheherazade">Scheherazade</string>
-    <string name="font_arabic">Arabic</string>
-    <string name="font_saleem">Saleem</string>
-    <string name="partial_show_translations">Ayetlerin Anlami</string>
-    <string name="partial_show_pronunciations">Ayetlerin Okunusu</string>
-    <string name="partial_settings">Ayarlar</string>
-
-    <string name="notification_alarm_title">Namaz Vakti</string>
-    <string name="notification_alarm_content">%s icin Namaz Vakti</string>
-    <string name="close_alarm">Ezani durdur</string>
-
-    <string name="quran_read_main">Kuran i oku</string>
-    <string name="quran_sure_list">Kuran daki Sureler</string>
-    <string name="quran_search">Herhangi bi Ayeti mi ariyorsunuz?</string>
-    <string name="quran_audio">Ayetlerin Ses kayitlerini indir</string>
-    <string name="quran_video">Kuran i okumayi ögrenin</string>
-    <string name="sure_ayet">%d. Ayet</string>
-    <string name="sure_list_cuz">Cüz: %s</string>
-    <string name="sure_list_page">Sayfa: %s</string>
-    <string name="sure_list_yer">Yer: %s</string>
-    <string name="sure_list_header">Sureler</string>
-    <string name="sure_sort_quran">Kurandaki Sira</string>
-    <string name="sure_sort_alphabetical">Alfabe Sira</string>
-    <string name="sure_sort_descending">Inis Sira</string>
-
-    <string name="init_download">Uygulamayi kullanmak icin gerekli bilgiler indirilmesi gerek. Lütfen birazcik bekleyin:</string>
-    <string name="init_title">Konum ve Bildirim Izini</string>
-    <string name="init_permission">1. Namaz vakitleri ve Kible yönünü belirlemek icin, suanki bulundugunuz ilin konumu gerekli.\n2. Namaz vakti Bildirimleri almak icin ayriyet den izin gerekli dir.</string>
-    <string name="init_permission_location">Konum Izin Ver</string>
-    <string name="init_permission_notification">Bildirim Izin Ver</string>
-
-
-    <string name="notification_channel_download_name">Ayet Audio</string>
-    <string name="notification_channel_download_description">Ayetlerin mp3 indiriliyor</string>
-
-    <string name="download_list_title">Offline Kullanim icin Ayetleri önceden indiriniz</string>
-    <string name="download_list_all">Quranin tamamini indir</string>
-    <string name="download_number">Geriye kalan Ayet ve Video sayisi %s %s</string>
-
-    <string name="ai_title">Bot </string>
-    <string name="ai_description">Burdaki alinan bilgilerin tümü Open Ai den geliyor. Tek kaynak olarak kullanmayiniz. Sorularinizla ilk firsat da bir Hoca ya danismaniz iyi olur!!!</string>
-    <string name="ai_placeholder">Sorunuz veyatta isteginizi buraya yazin</string>
+    <string name="settings_profile_name">Kullanılacak kullanıcı adı</string>
+    <string name="settings_profile_sign_out">Oturumu Kapat</string>
+    <string name="settings_profile_sign_in">Daha fazla özellik için Oturum Açın</string>
 </resources>

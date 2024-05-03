@@ -129,11 +129,16 @@ private fun SettingItem(
     action: SettingsNavigationAction = SettingsNavigationAction.NavigateToProfile,
     onNavigationChange: (NavigationAction) -> Unit = {}
 ) {
-    Column(modifier = modifier
-        .padding(horizontal = 12.dp)
-        .fillMaxWidth()) {
+    Column(
+        modifier = modifier
+            .padding(horizontal = 12.dp)
+            .fillMaxWidth()
+    ) {
         Spacer(modifier = Modifier.height(8.dp))
-        Row(modifier = Modifier.fillMaxWidth().clickable { onNavigationChange(action) }, horizontalArrangement = Arrangement.Start) {
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onNavigationChange(action) }, horizontalArrangement = Arrangement.Start
+        ) {
             Icon(imageVector = icon, contentDescription = "Menu Icon")
             Spacer(modifier = Modifier.width(16.dp))
             Column(horizontalAlignment = Alignment.Start) {
