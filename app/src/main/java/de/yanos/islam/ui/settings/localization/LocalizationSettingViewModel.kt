@@ -9,6 +9,5 @@ import javax.inject.Inject
 
 class LocalizationSettingViewModel @Inject constructor(
     private val appSettings: AppSettings,
-
     ) : ViewModel() {
 }

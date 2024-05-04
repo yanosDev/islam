@@ -3,7 +3,6 @@
 package de.yanos.islam.ui.settings.language
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -71,20 +70,10 @@ fun ProfileSettingView(
                     onSignOut = vm::signOut
                 )
             }
-            item {
-                LanguageSelection()
-            }
         }
     }
 }
 
-@Composable
-@Preview
-private fun LanguageSelection(
-    modifier: Modifier = Modifier
-) {
-
-}
 
 @Composable
 @Preview

@@ -8,4 +8,5 @@ import javax.inject.Inject
 internal class FeatureSettingsImpl @Inject constructor(@ApplicationContext context: Context) : FeatureSettings {
     override val enableOpenAI: Boolean by PreferenceItem<Boolean>(context) { false }
     override val enableVideoLearning: Boolean by PreferenceItem<Boolean>(context) { false }
+    override val enableMap: Boolean by PreferenceItem<Boolean>(context) { false }
 }

@@ -42,6 +42,10 @@
     <string name="settings_profile_sign_out">Sign Out</string>
     <string name="settings_profile_sign_in">Sign In for more features</string>
 
+    <string name="settings_localization_address">Address</string>
+    <string name="settings_localization_permission">Grant Location Permission to simplify</string>
+    <string name="settings_localization_explainer">Granting permissions to locate your device makes it easier to give you accurate times for praying</string>
+
     <string name="tab_topic">Konular</string>
     <string name="tab_quran">Kuran</string>
     <string name="tab_history">Sonuçlar</string>

@@ -2,4 +2,5 @@
 <resources>
     <bool name="isDebug">true</bool>
     <string name="gcp_id" translatable="false">195044962562-00bs7j47gio3pqvo2ckj2elu52skakot.apps.googleusercontent.com</string>
+    <string name="map_api_key" translatable="false">AIzaSyCWkWDdq74NIVXL59KMfScWdV44Dv0edbA</string>
 </resources>

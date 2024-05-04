@@ -32,9 +32,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.yanos.core.ui.theme.AppTheme
 import de.yanos.core.ui.view.DynamicNavigationScreen
 import de.yanos.islam.ui.ai.AIScreen
-import de.yanos.islam.ui.permissions.InitScreen
-import de.yanos.islam.ui.settings.SettingsScreen
-import de.yanos.islam.util.settings.AppSettings
 import de.yanos.islam.util.constants.KnowledgeNavigation
 import de.yanos.islam.util.constants.MainNavigation
 import de.yanos.islam.util.constants.NavigationAction
@@ -45,6 +42,7 @@ import de.yanos.islam.util.constants.allKnowledge
 import de.yanos.islam.util.constants.allQuran
 import de.yanos.islam.util.constants.allSettings
 import de.yanos.islam.util.constants.typoByConfig
+import de.yanos.islam.util.settings.AppSettings
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -66,7 +64,6 @@ class MainActivity : ComponentActivity() {
                 vm.readLocationData()
             }
             AppTheme(activity = this, typography = typoByConfig(appSettings)) { modifier, config ->
-                if (locationPermissionState.status.isGranted && notificationPermissionState.status.isGranted) {
                     navController = rememberNavController()
                     DynamicNavigationScreen(
                         modifier = modifier.padding(top = 48.dp), // TODO: Check statusbar problem
@@ -80,7 +77,6 @@ class MainActivity : ComponentActivity() {
                             navController = navController!!
                         )
                     }
-                } else InitScreen(modifier, locationPermissionState, notificationPermissionState)
             }
         }
     }
