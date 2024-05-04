@@ -220,7 +220,7 @@ sealed class SettingsNavigation(override val route: String, override val args: L
     data object LocalizationSetting : SettingsNavigation("setting/localization") {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
-            LocalizationSettingView()
+            LocalizationSettingView(onNavigationChange = onNavigationChange)
         }
     }
 

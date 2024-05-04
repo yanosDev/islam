@@ -121,15 +121,21 @@ fun LocalizationSettingView(
                     showCancel = true
                 )
 
-                !showExplainer && !showLocationPermission -> {
+                !showExplainer -> {
                     if (locationPermissionState.status.isGranted) {
-                        LocalizationMap(modifier = Modifier.weight(1f))
-                    } else if (!showLocationPermission) {
+                        LocalizationMap(
+                            modifier = Modifier.weight(1f),
+                            latitude = vm.latitude,
+                            longitude = vm.longitude,
+                            address = vm.address,
+                            onLocationChange = vm::onLocationChange
+                        )
+                    } else {
                         TextButton(onClick = { showLocationPermission = true }) {
                             Text(modifier = Modifier.padding(16.dp), text = stringResource(id = R.string.settings_localization_permission), style = labelLarge())
                         }
                     }
-                    AddressField(modifier = Modifier.padding())
+                    AddressField(modifier = Modifier.padding(), address = vm.address)
                 }
             }
         }
@@ -150,26 +156,35 @@ private fun settingsIntent(activity: Activity): Intent {
 @Composable
 @Preview
 private fun LocalizationMap(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    latitude: Double = 21.422510,
+    longitude: Double = 39.826168,
+    address: String = "Mekka",
+    onLocationChange: (latitude: Double, longitude: Double) -> Unit = { _, _ -> }
 ) {
     val properties by remember {
         mutableStateOf(MapProperties(isMyLocationEnabled = true, mapType = MapType.HYBRID))
     }
-    var deviceLatLng by remember { mutableStateOf(LatLng(21.422510, 39.826168)) }
+    val deviceLatLng = LatLng(latitude, longitude)
+
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(deviceLatLng, 10f)
+        position = CameraPosition.fromLatLngZoom(deviceLatLng, 18f)
     }
     GoogleMap(
         modifier = modifier,
         properties = properties,
         cameraPositionState = cameraPositionState,
-        onMapClick = { deviceLatLng = it },
-        onMyLocationClick = { deviceLatLng = LatLng(it.latitude, it.longitude) }
+        onMapClick = {
+            onLocationChange(it.latitude, it.longitude)
+        },
+        onMyLocationClick = {
+            onLocationChange(it.latitude, it.longitude)
+        }
     ) {
         Marker(
             state = MarkerState(position = deviceLatLng),
-            title = "Singapore",
-            snippet = "Marker in Singapore"
+            title = address,
+            snippet = "Marker in $address"
         )
     }
 }
@@ -178,8 +193,7 @@ private fun LocalizationMap(
 @Preview
 private fun AddressField(
     modifier: Modifier = Modifier,
-    address: String = "",
-    onAddressChange: (String) -> Unit = {}
+    address: String = ""
 ) {
     TextField(
         modifier = modifier.fillMaxWidth(),
@@ -187,7 +201,8 @@ private fun AddressField(
         maxLines = 1,
         keyboardOptions = KeyboardOptions.Default.copy(capitalization = KeyboardCapitalization.Words, keyboardType = KeyboardType.Text),
         value = address,
-        onValueChange = onAddressChange,
+        enabled = false,
+        onValueChange = {},
         label = { Text(text = stringResource(id = R.string.settings_localization_address), style = labelSmall()) }
     )
 }

@@ -2,7 +2,6 @@ package de.yanos.islam.util.helper
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.location.Geocoder
 import android.os.Looper
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -16,8 +15,6 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import timber.log.Timber
-import java.io.IOException
-import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 /**
@@ -139,27 +136,3 @@ data class LatandLong(
     val longitude: Double = 0.0
 )
 
-
-fun getReadableLocation(latitude: Double, longitude: Double, context: Context): String {
-    var addressText = ""
-    val geocoder = Geocoder(context, Locale.getDefault())
-
-    try {
-
-        val addresses = geocoder.getFromLocation(latitude, longitude, 1)
-
-        if (addresses?.isNotEmpty() == true) {
-            val address = addresses[0]
-            addressText = "${address.getAddressLine(0)}, ${address.locality}"
-            // Use the addressText in your app
-            Timber.d(addressText)
-        }
-
-    } catch (e: IOException) {
-        Timber.d("geolocation", e.message.toString())
-
-    }
-
-    return addressText
-
-}
