@@ -37,14 +37,12 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.R
 import de.yanos.islam.util.constants.NavigationAction
 import de.yanos.islam.util.constants.SettingsNavigationAction
 import de.yanos.islam.util.helper.IslamLightDivider
 import de.yanos.islam.util.helper.headlineMedium
 import de.yanos.islam.util.helper.labelLarge
-import de.yanos.islam.util.helper.labelMedium
 import de.yanos.islam.util.helper.labelSmall
 
 @Composable
@@ -133,11 +131,11 @@ private fun SettingItem(
         modifier = modifier
             .padding(horizontal = 12.dp)
             .fillMaxWidth()
+            .clickable { onNavigationChange(action) }
     ) {
-        Spacer(modifier = Modifier.height(8.dp))
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onNavigationChange(action) }, horizontalArrangement = Arrangement.Start
+        Spacer(modifier = Modifier.height(16.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start
         ) {
             Icon(imageVector = icon, contentDescription = "Menu Icon")
             Spacer(modifier = Modifier.width(16.dp))
@@ -149,6 +147,5 @@ private fun SettingItem(
         }
         Spacer(modifier = Modifier.height(8.dp))
         IslamLightDivider()
-        Spacer(modifier = Modifier.height(8.dp))
     }
 }

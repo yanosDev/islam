@@ -4,18 +4,16 @@ import android.content.Context
 import android.location.Geocoder
 import dagger.hilt.android.qualifiers.ApplicationContext
 import de.yanos.core.utils.PreferenceItem
-import de.yanos.islam.util.constants.Method
-import de.yanos.islam.util.constants.School
 import timber.log.Timber
 import java.util.Locale
 import javax.inject.Inject
 
 interface AppSettings {
-    var school: Int
-    var method: Int
     var userName: String
+
     var latitude: String
     var longitude: String
+
     var fontSizeFactor: Int
     var fontStyle: Int
     var quranSizeFactor: Int
@@ -30,8 +28,6 @@ interface AppSettings {
 }
 
 class AppSettingsImpl @Inject constructor(@ApplicationContext val context: Context) : AppSettings {
-    override var school: Int by PreferenceItem(context) { School.Hanafi.id }
-    override var method: Int by PreferenceItem(context) { Method.Diyanet.id }
     override var userName: String by PreferenceItem(context) { "" }
     override var latitude: String by PreferenceItem(context) { "21.422510" }
     override var longitude: String by PreferenceItem(context) { "39.826168" }

@@ -18,12 +18,22 @@ import de.yanos.islam.util.settings.AppSettings
 import de.yanos.islam.util.settings.AppSettingsImpl
 import de.yanos.islam.util.settings.FeatureSettings
 import de.yanos.islam.util.settings.FeatureSettingsImpl
+import de.yanos.islam.util.settings.PrayerSettings
+import de.yanos.islam.util.settings.PrayerSettingsImpl
+import de.yanos.islam.util.settings.QuranSettings
+import de.yanos.islam.util.settings.QuranSettingsImpl
 
 @Module
 @InstallIn(SingletonComponent::class)
 internal abstract class InterfaceModule {
     @Binds
     abstract fun bindAppSettings(appSettings: AppSettingsImpl): AppSettings
+
+    @Binds
+    abstract fun bindQuranSettings(appSettings: QuranSettingsImpl): QuranSettings
+
+    @Binds
+    abstract fun bindPrayerSettings(appSettings: PrayerSettingsImpl): PrayerSettings
     @Binds
     abstract fun bindFeatureSettings(appSettings: FeatureSettingsImpl): FeatureSettings
     @Binds

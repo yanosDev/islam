@@ -46,6 +46,18 @@
     <string name="settings_localization_permission">Grant Location Permission to simplify</string>
     <string name="settings_localization_explainer">Granting permissions to locate your device makes it easier to give you accurate times for praying</string>
 
+    <string name="settings_prayer_method_label">From where should we fetch the prayer time data?</string>
+    <string name="settings_prayer_school_label">Which school do you belong to?</string>
+    <string name="settings_prayer_imsak_reminder">Notify me on imsak</string>
+    <string name="settings_prayer_fajr_reminder">Notify me on fajr</string>
+    <string name="settings_prayer_dhuhr_reminder">Notify me on dhuhr</string>
+    <string name="settings_prayer_asr_reminder">Notify me on asr</string>
+    <string name="settings_prayer_maghrib_reminder">Notify me on maghrib</string>
+    <string name="settings_prayer_isha_reminder">Notify me on isha</string>
+    <string name="settings_prayer_source_label">Where should we retrieve your data from?</string>
+    <string name="settings_prayer_times_label">You want to be reminded on specific times?</string>
+    <string name="settings_prayer_delay_label">Delay notification by:</string>
+
     <string name="tab_topic">Konular</string>
     <string name="tab_quran">Kuran</string>
     <string name="tab_history">Sonuçlar</string>

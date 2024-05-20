@@ -12,11 +12,10 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import de.yanos.core.utils.IODispatcher
 import de.yanos.islam.data.repositories.QuranRepository
 import de.yanos.islam.util.constants.Method
 import de.yanos.islam.util.settings.AppSettings
-import kotlinx.coroutines.CoroutineDispatcher
+import de.yanos.islam.util.settings.PrayerSettings
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.Timer
@@ -26,10 +25,11 @@ import kotlin.concurrent.timerTask
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val appSettings: AppSettings,
+    private val prayerSettings: PrayerSettings,
     private val downloadManager: DownloadManager,
     private val quranRepository: QuranRepository,
 ) : ViewModel() {
-    var method by mutableStateOf(Method.valueFromId(appSettings.method))
+    var method by mutableStateOf(Method.valueFromId(prayerSettings.method))
 
     private var timer: Timer? = null
     var downloadState: AudioDownloadState by mutableStateOf(AudioDownloadState.IsIdle)
