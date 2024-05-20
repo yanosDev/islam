@@ -20,7 +20,6 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.Timer
 import javax.inject.Inject
-import kotlin.concurrent.timerTask
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
@@ -43,41 +42,40 @@ class SettingsViewModel @Inject constructor(
     init {
         startTimer()
     }
+
     private fun startTimer() {
-        if (timer == null) {
-            timer = Timer()
-            timer?.scheduleAtFixedRate(
-                timerTask()
-                {
-                    viewModelScope.launch {
-                        val queuedSize = downloadManager.downloadIndex.getDownloads(
-                            Download.STATE_COMPLETED,
-                            Download.STATE_QUEUED,
-                            Download.STATE_DOWNLOADING,
-                            Download.STATE_STOPPED,
-                            Download.STATE_FAILED,
-                            Download.STATE_REMOVING,
-                            Download.STATE_RESTARTING
-                        )
-                        val completedSize = downloadManager.downloadIndex.getDownloads(Download.STATE_COMPLETED)
-                        val stoppedSize = downloadManager.downloadIndex.getDownloads(Download.STATE_STOPPED)
-                        val download = downloadManager.downloadIndex.getDownloads(Download.STATE_DOWNLOADING)
-                        downloadState = when {
-                            completedSize.count == queuedSize.count && queuedSize.count > 0 -> AudioDownloadState.IsDownloaded
-                            download.count > 0 -> AudioDownloadState.IsDownloading
-                            completedSize.count != queuedSize.count && queuedSize.count > 0 && download.count == 0 -> AudioDownloadState.IsPaused
-                            else -> AudioDownloadState.IsIdle
-                        }
-                        progress = completedSize.count
-                        max = queuedSize.count
-                        Timber.e("Queued: ${queuedSize.count}, Completed: ${completedSize.count}, Downloading: ${download.count}")
-                        completedSize.close()
-                        queuedSize.close()
-                        stoppedSize.close()
-                        download.close()
-                    }
-                }, 0, 5000
+        viewModelScope.launch {
+            downloadManager.addListener(object : DownloadManager.Listener {
+                override fun onDownloadChanged(downloadManager: DownloadManager, download: Download, finalException: Exception?) {
+                    super.onDownloadChanged(downloadManager, download, finalException)
+                }
+            }
             )
+            val queuedSize = downloadManager.downloadIndex.getDownloads(
+                Download.STATE_COMPLETED,
+                Download.STATE_QUEUED,
+                Download.STATE_DOWNLOADING,
+                Download.STATE_STOPPED,
+                Download.STATE_FAILED,
+                Download.STATE_REMOVING,
+                Download.STATE_RESTARTING
+            )
+            val completedSize = downloadManager.downloadIndex.getDownloads(Download.STATE_COMPLETED)
+            val stoppedSize = downloadManager.downloadIndex.getDownloads(Download.STATE_STOPPED)
+            val download = downloadManager.downloadIndex.getDownloads(Download.STATE_DOWNLOADING)
+            downloadState = when {
+                completedSize.count == queuedSize.count && queuedSize.count > 0 -> AudioDownloadState.IsDownloaded
+                download.count > 0 -> AudioDownloadState.IsDownloading
+                completedSize.count != queuedSize.count && queuedSize.count > 0 && download.count == 0 -> AudioDownloadState.IsPaused
+                else -> AudioDownloadState.IsIdle
+            }
+            progress = completedSize.count
+            max = queuedSize.count
+            Timber.e("Queued: ${queuedSize.count}, Completed: ${completedSize.count}, Downloading: ${download.count}")
+            completedSize.close()
+            queuedSize.close()
+            stoppedSize.close()
+            download.close()
         }
     }
 

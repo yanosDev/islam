@@ -39,6 +39,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import de.yanos.islam.R
 import de.yanos.islam.util.constants.Method
 import de.yanos.islam.util.constants.NavigationAction
+import de.yanos.islam.util.constants.Reciter
 import de.yanos.islam.util.constants.School
 import de.yanos.islam.util.helper.IslamDropDown
 import de.yanos.islam.util.helper.IslamSwitch
@@ -77,12 +78,14 @@ fun PrayerSettingView(
                 SourceSection(
                     method = vm.method,
                     school = vm.school,
+                    reciter = vm.reciter,
                     onMethodChanged = vm::updateMethod,
                     onSchoolChanged = vm::updateSchool,
+                    onReciterChanged = vm::updateReciter
                 )
             }
             item {
-                Column {
+                Column(modifier = Modifier.padding(8.dp)) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         modifier = Modifier.padding(horizontal = 8.dp),
@@ -161,8 +164,10 @@ fun SourceSection(
     modifier: Modifier = Modifier,
     method: Method,
     school: School,
+    reciter: Reciter,
     onMethodChanged: (String) -> Unit,
-    onSchoolChanged: (String) -> Unit
+    onSchoolChanged: (String) -> Unit,
+    onReciterChanged: (String) -> Unit,
 ) {
     Column {
         Text(
@@ -178,8 +183,10 @@ fun SourceSection(
         ) {
             Column(modifier = Modifier.padding(8.dp)) {
                 School(school = school, onSchoolChanged = onSchoolChanged)
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
                 Method(method = method, onMethodChanged = onMethodChanged)
+                Spacer(modifier = Modifier.height(12.dp))
+                Reciter(reciter = reciter, onReciterChanged = onReciterChanged)
             }
 
         }
@@ -253,5 +260,21 @@ private fun School(
         options = School.entries.map { stringResource(id = it.res) },
         label = stringResource(id = R.string.settings_prayer_school_label),
         onValueChangedEvent = onSchoolChanged
+    )
+}
+
+@Composable
+@Preview
+private fun Reciter(
+    modifier: Modifier = Modifier,
+    reciter: Reciter = Reciter.Alafasi,
+    onReciterChanged: (String) -> Unit = {}
+) {
+    IslamDropDown(
+        modifier = modifier.padding(8.dp),
+        selectedValue = stringResource(id = reciter.res),
+        options = Reciter.entries.map { stringResource(id = it.res) },
+        label = stringResource(id = R.string.settings_prayer_reciter_label),
+        onValueChangedEvent = onReciterChanged
     )
 }

@@ -17,6 +17,13 @@
     <string name="method_diyanet" translatable="false">Diyanet İşleri Başkanlığı, Turkey</string>
     <string name="method_russia" translatable="false">Spiritual Administration of Muslims of Russia</string>
 
+    <string name="reciter_ajamy" translatable="false">Ahmed ibn Ali al-Ajamy</string>
+    <string name="reciter_alafasi" translatable="false">Mischari Raschid al-Afasi</string>
+    <string name="reciter_husary" translatable="false">Sheikh Mahmoud Khalil Husary</string>
+    <string name="reciter_alhusary" translatable="false">Al Husary (Mujawwad)</string>
+    <string name="reciter_mahermuaiqly" translatable="false">Sheikh Maher Al Muaiqly</string>
+    <string name="reciter_muhammadayyoub" translatable="false">Sheikh Muhammad Ayyub</string>
+
     <string name="school_hanafi">Hanafi</string>
     <string name="school_safi">Shafi</string>
 
@@ -48,6 +55,7 @@
 
     <string name="settings_prayer_method_label">From where should we fetch the prayer time data?</string>
     <string name="settings_prayer_school_label">Which school do you belong to?</string>
+    <string name="settings_prayer_reciter_label">Audio Source Reciter</string>
     <string name="settings_prayer_imsak_reminder">Notify me on imsak</string>
     <string name="settings_prayer_fajr_reminder">Notify me on fajr</string>
     <string name="settings_prayer_dhuhr_reminder">Notify me on dhuhr</string>
