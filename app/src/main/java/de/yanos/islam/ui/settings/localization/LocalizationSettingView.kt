@@ -68,6 +68,7 @@ fun LocalizationSettingView(
     vm: LocalizationSettingViewModel = hiltViewModel(),
     onNavigationChange: (NavigationAction) -> Unit = {}
 ) {
+    vm.refreshAddress()
     val activity = LocalContext.current as Activity
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val locationPermissionState = rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION)
@@ -175,9 +176,6 @@ private fun LocalizationMap(
         properties = properties,
         cameraPositionState = cameraPositionState,
         onMapClick = {
-            onLocationChange(it.latitude, it.longitude)
-        },
-        onMyLocationClick = {
             onLocationChange(it.latitude, it.longitude)
         }
     ) {

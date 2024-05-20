@@ -227,7 +227,7 @@ sealed class SettingsNavigation(override val route: String, override val args: L
     data object PrayerSetting : SettingsNavigation("setting/prayer") {
         @Composable
         override fun View(onNavigationChange: (NavigationAction) -> Unit) {
-            PrayerSettingView()
+            PrayerSettingView(onNavigationChange = onNavigationChange)
         }
     }
 

@@ -20,11 +20,7 @@ class LocalizationSettingViewModel @Inject constructor(
     var longitude by mutableDoubleStateOf(appSettings.longitude.toDouble())
     var address by mutableStateOf("")
 
-    init {
-        refreshAddress()
-    }
-
-    private fun refreshAddress() {
+    fun refreshAddress() {
         latitude = appSettings.latitude.toDouble()
         longitude = appSettings.longitude.toDouble()
         appSettings.address {
